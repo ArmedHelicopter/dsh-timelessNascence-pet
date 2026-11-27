@@ -1,11 +1,12 @@
-// dsh-nascence-pet — 硬件状态挂牌（像素风 HUD）
+// dsh-nascence-pet — 硬件状态挂牌（极简 HUD：navy / 白卡片 + 发丝线）
 //
 // CPU / 内存 / GPU 读数来自 GET /dsh-nascence/hardware。
 // 挂在桌宠上方或下方（设置里可选，默认下方），页面隐藏、屏保亮板或开关关闭时停采样。
 
 import { HARDWARE_PATH } from '../shared/protocol.js'
+import { palette as themePalette, detectScheme, watchScheme, FONT_MONO, CARD_RADIUS } from './theme.js'
 import {
-  buildSegments, normalizeScheme,
+  buildSegments,
   PLATE_MAX_ROW_WIDTH, PLATE_LINE_HEIGHT, PLATE_PADDING_Y, PLATE_PADDING_X,
   PLATE_GROUP_GAP, PLATE_SEGMENT_GAP, PLATE_DOT_SIZE, PLATE_FONT_SIZE,
 } from './plate-format.js'
@@ -13,39 +14,15 @@ import {
 var POLL_MS = 2000
 var FETCH_TIMEOUT_MS = 2500
 var GAP = 8
-var CHAMFER = 5
 
-var PALETTES = {
-  dark: {
-    surface: '#111842', border: '#2446e0', drop: '#0a0e24',
-    text: '#e8ecf8', cpu: '#5b7bff', gpu: '#8c6bff', mem: '#f5d76e',
-    ok: '#6ee7b7', warn: '#f5d76e', error: '#ff6b8b', idle: '#7d8ab8',
-  },
-  light: {
-    surface: '#f5f7fd', border: '#2446e0', drop: '#c6d1f7',
-    text: '#141a3a', cpu: '#2446e0', gpu: '#6b4ce6', mem: '#a67c00',
-    ok: '#1f7a5c', warn: '#b7791f', error: '#c0395b', idle: '#7c88b0',
-  },
-}
-
-function detectScheme() {
-  try {
-    var root = document.documentElement
-    var scheme = normalizeScheme(root.style && root.style.colorScheme)
-    if (scheme) return scheme
-    scheme = normalizeScheme(root.getAttribute('data-theme') || root.getAttribute('data-color-scheme'))
-    if (scheme) return scheme
-    try {
-      scheme = normalizeScheme(window.getComputedStyle(root).colorScheme)
-      if (scheme) return scheme
-    } catch (err) {}
-    if (root.classList) {
-      if (root.classList.contains('dark')) return 'dark'
-      if (root.classList.contains('light')) return 'light'
-    }
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark'
-  } catch (err) {}
-  return 'light'
+// 挂牌配色：读数统一用主文字色，状态只由左侧小圆点表达（钴蓝 = 正常）
+function plateColors(scheme) {
+  var t = themePalette(scheme)
+  return {
+    surface: t.card, border: t.line, shadow: t.shadow,
+    text: t.text, cpu: t.text, gpu: t.text, mem: t.text,
+    ok: t.accent, warn: t.warn, error: scheme === 'light' ? '#d0384f' : '#ff6b7f', idle: t.dim,
+  }
 }
 
 export function createPlate(deps) {
@@ -65,9 +42,8 @@ export function createPlate(deps) {
   var lastError = null
   var lastPos = null
   var theme = detectScheme()
-  var palette = PALETTES[theme]
-  var mediaQuery = null
-  var themeObserver = null
+  var palette = plateColors(theme)
+  var unwatch = null
 
   function createSeg() {
     var wrap = document.createElement('span')
@@ -77,6 +53,7 @@ export function createPlate(deps) {
       'display:inline-block',
       'width:' + PLATE_DOT_SIZE + 'px',
       'height:' + PLATE_DOT_SIZE + 'px',
+      'border-radius:50%',
       'flex:0 0 auto',
       'background:' + palette.idle,
     ].join(';')
@@ -100,25 +77,23 @@ export function createPlate(deps) {
       'pointer-events:none', 'user-select:none',
       'width:max-content',
       'max-width:' + PLATE_MAX_ROW_WIDTH + 'px',
-      'font-family:ui-monospace,"Cascadia Mono",Consolas,monospace',
+      'font-family:' + FONT_MONO,
       'font-size:' + PLATE_FONT_SIZE + 'px',
       'line-height:' + PLATE_LINE_HEIGHT + 'px',
       'font-variant-numeric:tabular-nums',
       'letter-spacing:0',
-      'image-rendering:pixelated',
     ].join(';')
     boxEl = document.createElement('div')
     boxEl.style.cssText = [
-      'padding:2px',
-      'border-radius:0',
-      'clip-path:polygon(' + CHAMFER + 'px 0,calc(100% - ' + CHAMFER + 'px) 0,100% ' + CHAMFER + 'px,100% calc(100% - ' + CHAMFER + 'px),calc(100% - ' + CHAMFER + 'px) 100%,' + CHAMFER + 'px 100%,0 calc(100% - ' + CHAMFER + 'px),0 ' + CHAMFER + 'px)',
+      'border:1px solid transparent',
+      'border-radius:' + CARD_RADIUS + 'px',
+      'overflow:hidden',
     ].join(';')
     rowEl = document.createElement('div')
     rowEl.style.cssText = [
       'display:flex', 'flex-wrap:wrap', 'align-items:center',
       'column-gap:' + PLATE_GROUP_GAP + 'px', 'row-gap:0px',
       'padding:' + PLATE_PADDING_Y + 'px ' + PLATE_PADDING_X + 'px',
-      'clip-path:polygon(3px 0,calc(100% - 3px) 0,100% 3px,100% calc(100% - 3px),calc(100% - 3px) 100%,3px 100%,0 calc(100% - 3px),0 3px)',
     ].join(';')
     boxEl.appendChild(rowEl)
     el.appendChild(boxEl)
@@ -130,17 +105,19 @@ export function createPlate(deps) {
   function applyPalette() {
     if (!el) return
     el.setAttribute('data-tn-pet-plate-scheme', theme)
-    el.style.filter = 'drop-shadow(4px 4px 0 ' + palette.drop + ')'
+    el.style.filter = 'drop-shadow(0 4px 10px ' + palette.shadow + ')'
     el.style.color = palette.text
-    if (boxEl) boxEl.style.background = palette.border
-    if (rowEl) rowEl.style.background = palette.surface
+    if (boxEl) {
+      boxEl.style.borderColor = palette.border
+      boxEl.style.background = palette.surface
+    }
   }
 
   function syncTheme() {
     var next = detectScheme()
     if (next === theme) return
     theme = next
-    palette = PALETTES[theme]
+    palette = plateColors(theme)
     applyPalette()
     render(lastSample)
   }
@@ -264,34 +241,12 @@ export function createPlate(deps) {
   }
 
   function watchTheme() {
-    if (!mediaQuery) {
-      try {
-        mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-        if (mediaQuery.addEventListener) mediaQuery.addEventListener('change', syncTheme)
-        else if (mediaQuery.addListener) mediaQuery.addListener(syncTheme)
-      } catch (err) { mediaQuery = null }
-    }
-    if (!themeObserver) {
-      try {
-        themeObserver = new MutationObserver(syncTheme)
-        themeObserver.observe(document.documentElement, {
-          attributes: true,
-          attributeFilter: ['style', 'class', 'data-theme', 'data-color-scheme', 'data-ds-theme-source'],
-        })
-      } catch (err) { themeObserver = null }
-    }
+    if (!unwatch) unwatch = watchScheme(syncTheme)
   }
 
   function unwatchTheme() {
-    try {
-      if (mediaQuery) {
-        if (mediaQuery.removeEventListener) mediaQuery.removeEventListener('change', syncTheme)
-        else if (mediaQuery.removeListener) mediaQuery.removeListener(syncTheme)
-      }
-    } catch (err) {}
-    mediaQuery = null
-    try { if (themeObserver) themeObserver.disconnect() } catch (err) {}
-    themeObserver = null
+    if (unwatch) unwatch()
+    unwatch = null
   }
 
   function start() {

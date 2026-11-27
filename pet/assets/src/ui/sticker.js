@@ -1,7 +1,10 @@
 // dsh-nascence-pet — 谷价贴画（工厂）
 //
-// 只在谷价时段、点击桌宠时弹一下：像素风深空蓝底 + 星金扫描线 + 像素字体。
+// 只在谷价时段、点击桌宠时弹一下：极简卡片（深色 navy / 浅色白 + 发丝线），
+// 等宽小标签 VALLEY + 钴蓝「-50%」。像素字体只在设置里打开「像素字体」时使用。
 // 依赖注入：getState() 读 /state、settings、size()、pet。
+
+import { palette, detectScheme, pixelFontEnabled, FONT_SANS, FONT_MONO, FONT_PIXEL, LABEL_TRACKING, CARD_RADIUS } from './theme.js'
 
 export function createSticker(deps) {
   var getState = deps.getState
@@ -9,88 +12,48 @@ export function createSticker(deps) {
   var size = deps.size
   var pet = deps.pet
 
-  // ————————————————————— 谷价贴画（−50% 扫描线）—————————————————————
-  // 只在谷价时段、点击桌宠时弹一下：像素风绿底 + 横向扫描线 + 像素字体。
-  // 画布按 6× 绘制（40×24 逻辑像素 → 240×144 设备像素），保证像素边缘锐利。
-  var STICKER_BASE_W = 40
-  var STICKER_H = 24           // 逻辑像素高
-  var STICKER_SCALE = 3        // 逻辑 → CSS（3×），设备像素再 ×DPR
+  // ————————————————————— 谷价贴画（−50%）—————————————————————
   var stickerEl = null
-  var stickerCanvas = null
-  var stickerReady = false
-  var stickerW = 120           // 动态计算后的 CSS 尺寸
-  var stickerH = 72
+  var stickerLabel = null
+  var stickerValue = null
+  var stickerW = 96            // 测量后的 CSS 尺寸（定位用）
+  var stickerH = 56
 
-  function drawSticker() {
-    var LOG_H = STICKER_H
-    var S = STICKER_SCALE * 2 // 设备像素 / 逻辑像素
-    var cv = stickerCanvas
-    var ctx = cv.getContext('2d')
-
-    // 先按 12px 量一次文字宽度，再决定逻辑宽度（左右各留 7px）
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.font = '12px ArkPixel12, monospace'
-    var tw = 0
-    try { tw = ctx.measureText('-99%').width } catch (err) { tw = 30 }
-    var LOG_W = Math.max(STICKER_BASE_W, Math.ceil(tw) + 14)
-
-    stickerW = LOG_W * STICKER_SCALE
-    stickerH = LOG_H * STICKER_SCALE
-    cv.width = LOG_W * S
-    cv.height = LOG_H * S
-    cv.style.width = stickerW + 'px'
-    cv.style.height = stickerH + 'px'
-    if (stickerEl) {
-      stickerEl.style.width = stickerW + 'px'
-      stickerEl.style.height = stickerH + 'px'
-    }
-
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.clearRect(0, 0, cv.width, cv.height)
-    ctx.scale(S, S)
-    ctx.imageSmoothingEnabled = false
-
-    // 底：深空蓝（deep）
-    ctx.fillStyle = '#111842'
-    ctx.fillRect(0, 0, LOG_W, LOG_H)
-    // 横向扫描线（每 2 个逻辑像素一条）
-    ctx.fillStyle = 'rgba(10,14,36,.35)'
-    for (var y = 0; y < LOG_H; y += 2) ctx.fillRect(0, y, LOG_W, 1)
-    // 顶部一道钴蓝高光
-    ctx.fillStyle = 'rgba(91,123,255,.22)'
-    ctx.fillRect(0, 0, LOG_W, 1)
-    // 双层描边（钴蓝 + 星金）
-    ctx.strokeStyle = '#2446e0'
-    ctx.lineWidth = 1
-    ctx.strokeRect(0.5, 0.5, LOG_W - 1, LOG_H - 1)
-    ctx.strokeStyle = 'rgba(245,215,110,.35)'
-    ctx.strokeRect(1.5, 1.5, LOG_W - 3, LOG_H - 3)
-
-    // 文字 −50%（星金）
-    ctx.fillStyle = '#f5d76e'
-    ctx.font = '12px ArkPixel12, monospace'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('-50%', LOG_W / 2, LOG_H / 2 + 0.5)
-
-    // 底部一条亮线（星金扫描线残留感）
-    ctx.fillStyle = 'rgba(245,215,110,.55)'
-    ctx.fillRect(6, LOG_H - 4, LOG_W - 12, 1)
+  function paintSticker() {
+    var t = palette(detectScheme())
+    var pixel = pixelFontEnabled()
+    stickerEl.style.background = t.card
+    stickerEl.style.borderColor = t.line
+    stickerEl.style.boxShadow = '0 6px 16px ' + t.shadow
+    stickerLabel.style.color = t.dim
+    stickerValue.style.color = t.accent
+    stickerValue.style.fontFamily = pixel ? FONT_PIXEL : FONT_SANS
+    stickerValue.style.fontSize = pixel ? '24px' : '22px'
+    stickerValue.style.fontWeight = pixel ? '400' : '600'
+    stickerW = stickerEl.offsetWidth || stickerW
+    stickerH = stickerEl.offsetHeight || stickerH
   }
 
   function ensureSticker() {
     if (stickerEl) return
-    stickerCanvas = document.createElement('canvas')
     stickerEl = document.createElement('div')
     stickerEl.id = 'dsh-nascence-pet-sticker'
     // z-index 与桌宠同级但后插入 → 盖在桌宠身上（"贴"上去）
     stickerEl.style.cssText = [
       'position:fixed', 'z-index:2147482000', 'pointer-events:none',
       'display:none', 'will-change:transform,opacity',
-      'image-rendering:pixelated',
+      'box-sizing:border-box', 'padding:8px 14px 9px',
+      'border:1px solid transparent', 'border-radius:' + CARD_RADIUS + 'px',
+      'text-align:center', 'white-space:nowrap',
     ].join(';')
-    stickerCanvas.style.cssText = 'display:block;image-rendering:pixelated'
-    stickerEl.appendChild(stickerCanvas)
+    stickerLabel = document.createElement('div')
+    stickerLabel.textContent = 'VALLEY'
+    stickerLabel.style.cssText = 'font:500 9.5px/1.2 ' + FONT_MONO + ';letter-spacing:' + LABEL_TRACKING + ';padding-left:' + LABEL_TRACKING
+    stickerValue = document.createElement('div')
+    stickerValue.textContent = '-50%'
+    stickerValue.style.cssText = 'line-height:1.15;letter-spacing:0.02em;margin-top:2px;font-variant-numeric:tabular-nums'
+    stickerEl.appendChild(stickerLabel)
+    stickerEl.appendChild(stickerValue)
     document.body.appendChild(stickerEl)
   }
 
@@ -99,15 +62,8 @@ export function createSticker(deps) {
     if (!s || s.period !== 'valley') return // 只在谷价弹
     if (!settings.bubble) return             // 跟气泡同一个"减少干扰"开关
     ensureSticker()
-    if (!stickerReady) {
-      try {
-        document.fonts.load('12px ArkPixel12').then(function () {
-          drawSticker(); stickerReady = true
-        }).catch(function () { drawSticker(); stickerReady = true })
-      } catch (err) { drawSticker(); stickerReady = true }
-      drawSticker()
-      stickerReady = true
-    }
+    stickerEl.style.display = 'block'
+    paintSticker()
 
     var petSize = size()
     var cx = pet.pos.x + petSize.w / 2
@@ -144,8 +100,8 @@ export function createSticker(deps) {
   function dispose() {
     if (stickerEl && stickerEl.parentNode) stickerEl.parentNode.removeChild(stickerEl)
     stickerEl = null
-    stickerCanvas = null
-    stickerReady = false
+    stickerLabel = null
+    stickerValue = null
   }
 
   return { show: showValleySticker, dispose: dispose }

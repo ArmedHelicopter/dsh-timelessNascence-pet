@@ -3,8 +3,33 @@
 // 依赖注入：settings / saveSettings / resolveFlip / layout / repositionForAnchor /
 // applyOpacity / hideBubble / audioEnsure / loadSounds / playSound / size / pet / resetPosition。
 // 面板 DOM 懒创建（第一次 open 时），关闭只是 display:none。
+// 样式：Timeless Nascence 极简卡片（深色 navy / 浅色白 + 发丝线），颜色走 --tnp-* 变量，
+// 每次打开按当前主题重设一次，控件内联样式只引用变量。
 
 import { SIZE_MIN, SIZE_MAX, BUBBLE_SCALE_MIN, BUBBLE_SCALE_MAX, SNAP_STRENGTH_MIN, SNAP_STRENGTH_MAX } from '../core/env.js'
+import {
+  palette, detectScheme, pixelFontEnabled, setPixelFontEnabled,
+  FONT_SANS, FONT_MONO, LABEL_TRACKING, CARD_RADIUS, CONTROL_RADIUS,
+} from './theme.js'
+
+// 控件样式（只引用 --tnp-* 变量）
+var SEG_BOX_CSS = 'display:inline-flex;border:1px solid var(--tnp-line);border-radius:' + CONTROL_RADIUS + 'px;overflow:hidden'
+var SEG_BTN_CSS = 'padding:3px 9px;border:0;background:transparent;color:var(--tnp-dim);font:inherit;cursor:pointer'
+var TOGGLE_CSS = 'padding:3px 10px;border-radius:' + CONTROL_RADIUS + 'px;border:1px solid var(--tnp-line);' +
+  'background:transparent;color:var(--tnp-dim);font:inherit;cursor:pointer;min-width:38px'
+var SLIDER_CSS = 'width:96px;accent-color:var(--tnp-accent);cursor:pointer'
+var VALUE_CSS = 'text-align:right;color:var(--tnp-text);font-family:' + FONT_MONO + ';font-size:11px'
+
+/** 开/关按钮与分段按钮的选中态：钴蓝底白字；未选：透明 + 次要文字色 */
+function paintToggle(btn, on) {
+  btn.style.background = on ? 'var(--tnp-accent)' : 'transparent'
+  btn.style.borderColor = on ? 'var(--tnp-accent)' : 'var(--tnp-line)'
+  btn.style.color = on ? '#ffffff' : 'var(--tnp-dim)'
+}
+function paintSegment(btn, on) {
+  btn.style.background = on ? 'var(--tnp-accent)' : 'transparent'
+  btn.style.color = on ? '#ffffff' : 'var(--tnp-dim)'
+}
 
 export function createPanel(deps) {
   var settings = deps.settings
@@ -32,19 +57,26 @@ export function createPanel(deps) {
     panel.id = 'dsh-nascence-pet-settings'
     panel.style.cssText = [
       'position:fixed', 'z-index:2147482003', 'display:none',
-      'pointer-events:auto', 'min-width:196px', 'padding:10px 12px',
-      'border-radius:10px', 'font:12px/1.6 ui-sans-serif,system-ui,"Microsoft YaHei",sans-serif',
-      'background:rgba(17,24,66,.96)', 'color:#e8ecf8',
-      'border:1px solid rgba(91,123,255,.35)',
-      'box-shadow:0 10px 30px rgba(10,14,36,.65)',
+      'pointer-events:auto', 'min-width:208px', 'padding:12px 14px',
+      'border-radius:' + CARD_RADIUS + 'px', 'font:12px/1.6 ' + FONT_SANS,
+      'background:var(--tnp-card)', 'color:var(--tnp-text)',
+      'border:1px solid var(--tnp-line)',
+      'box-shadow:0 10px 28px var(--tnp-shadow)',
     ].join(';')
+    applyTheme()
+
+    var head = document.createElement('div')
+    head.textContent = 'TIMELESS NASCENCE'
+    head.style.cssText = 'font:500 10px/1.4 ' + FONT_MONO + ';letter-spacing:' + LABEL_TRACKING +
+      ';color:var(--tnp-dim);padding-bottom:8px;margin-bottom:6px;border-bottom:1px solid var(--tnp-hairline)'
+    panel.appendChild(head)
 
     function row(label) {
       var el = document.createElement('div')
       el.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0'
       var name = document.createElement('span')
       name.textContent = label
-      name.style.cssText = 'color:#9da8cf'
+      name.style.cssText = 'color:var(--tnp-dim)'
       el.appendChild(name)
       panel.appendChild(el)
       return el
@@ -53,13 +85,13 @@ export function createPanel(deps) {
     // 镜像
     var mirrorRow = row('镜像')
     var segBox = document.createElement('span')
-    segBox.style.cssText = 'display:inline-flex;border:1px solid rgba(91,123,255,.28);border-radius:7px;overflow:hidden'
+    segBox.style.cssText = SEG_BOX_CSS
     var mirrorButtons = {}
     ;[['auto', '自动'], ['always', '始终'], ['never', '不镜像']].forEach(function (pair) {
       var btn = document.createElement('button')
       btn.textContent = pair[1]
       btn.dataset.value = pair[0]
-      btn.style.cssText = 'padding:3px 9px;border:0;background:transparent;color:#cfd6e6;font:inherit;cursor:pointer'
+      btn.style.cssText = SEG_BTN_CSS
       btn.addEventListener('click', function () {
         settings.mirror = pair[0]
         saveSettings()
@@ -73,8 +105,7 @@ export function createPanel(deps) {
     function syncMirrorButtons() {
       Object.keys(mirrorButtons).forEach(function (k) {
         var on = settings.mirror === k
-        mirrorButtons[k].style.background = on ? 'rgba(36,70,224,.92)' : 'transparent'
-        mirrorButtons[k].style.color = on ? '#fff' : '#cfd6e6'
+        paintSegment(mirrorButtons[k], on)
       })
     }
 
@@ -88,9 +119,9 @@ export function createPanel(deps) {
     slider.max = String(SIZE_MAX)
     slider.step = '0.05'
     slider.value = String(settings.size)
-    slider.style.cssText = 'width:96px;accent-color:#5b7bff;cursor:pointer'
+    slider.style.cssText = SLIDER_CSS
     var sizeText = document.createElement('span')
-    sizeText.style.cssText = 'width:34px;text-align:right;color:#cfd6e6'
+    sizeText.style.cssText = 'width:34px;' + VALUE_CSS
     sizeText.textContent = Math.round(settings.size * 100) + '%'
     var saveTimer = 0
     slider.addEventListener('input', function () {
@@ -115,9 +146,9 @@ export function createPanel(deps) {
     snapSlider.max = String(SNAP_STRENGTH_MAX)
     snapSlider.step = '5'
     snapSlider.value = String(settings.snapStrength)
-    snapSlider.style.cssText = 'width:96px;accent-color:#5b7bff;cursor:pointer'
+    snapSlider.style.cssText = SLIDER_CSS
     var snapText = document.createElement('span')
-    snapText.style.cssText = 'width:38px;text-align:right;color:#cfd6e6'
+    snapText.style.cssText = 'width:38px;' + VALUE_CSS
     snapText.textContent = Math.round(settings.snapStrength) + '%'
     snapSlider.addEventListener('input', function () {
       settings.snapStrength = Math.min(SNAP_STRENGTH_MAX, Math.max(SNAP_STRENGTH_MIN, Number(snapSlider.value) || 0))
@@ -138,9 +169,9 @@ export function createPanel(deps) {
     bubbleScaleSlider.max = String(BUBBLE_SCALE_MAX)
     bubbleScaleSlider.step = '5'
     bubbleScaleSlider.value = String(settings.bubbleScale)
-    bubbleScaleSlider.style.cssText = 'width:96px;accent-color:#5b7bff;cursor:pointer'
+    bubbleScaleSlider.style.cssText = SLIDER_CSS
     var bubbleScaleText = document.createElement('span')
-    bubbleScaleText.style.cssText = 'width:38px;text-align:right;color:#cfd6e6'
+    bubbleScaleText.style.cssText = 'width:38px;' + VALUE_CSS
     bubbleScaleText.textContent = Math.round(settings.bubbleScale) + '%'
     bubbleScaleSlider.addEventListener('input', function () {
       settings.bubbleScale = Math.min(BUBBLE_SCALE_MAX, Math.max(BUBBLE_SCALE_MIN, Number(bubbleScaleSlider.value) || 100))
@@ -155,12 +186,10 @@ export function createPanel(deps) {
     // 分级排版开关：金额大、辅助信息小的多字号效果
     var tiersRow = row('更多层次的字体视觉效果')
     var tiersBtn = document.createElement('button')
-    tiersBtn.style.cssText = 'padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);' +
-      'background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer'
+    tiersBtn.style.cssText = TOGGLE_CSS
     function syncTiersBtn() {
       tiersBtn.textContent = settings.bubbleTiers ? '开' : '关'
-      tiersBtn.style.background = settings.bubbleTiers ? 'rgba(36,70,224,.92)' : 'rgba(91,123,255,.1)'
-      tiersBtn.style.color = settings.bubbleTiers ? '#fff' : '#dfe4f0'
+      paintToggle(tiersBtn, !!settings.bubbleTiers)
     }
     tiersBtn.addEventListener('click', function () {
       settings.bubbleTiers = !settings.bubbleTiers
@@ -171,15 +200,30 @@ export function createPanel(deps) {
     syncTiersBtn()
     tiersRow.appendChild(tiersBtn)
 
+    // 像素字体：可选项，默认关闭（偏好存本机，只影响气泡）
+    var pixelRow = row('像素字体')
+    var pixelBtn = document.createElement('button')
+    pixelBtn.style.cssText = TOGGLE_CSS
+    function syncPixelBtn() {
+      var on = pixelFontEnabled()
+      pixelBtn.textContent = on ? '开' : '关'
+      paintToggle(pixelBtn, on)
+    }
+    pixelBtn.addEventListener('click', function () {
+      setPixelFontEnabled(!pixelFontEnabled())
+      syncPixelBtn()
+      if (refreshBubble) refreshBubble()
+    })
+    syncPixelBtn()
+    pixelRow.appendChild(pixelBtn)
+
     // 气泡开关
     var bubbleRow = row('气泡')
     var bubbleBtn = document.createElement('button')
-    bubbleBtn.style.cssText = 'padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);' +
-      'background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer'
+    bubbleBtn.style.cssText = TOGGLE_CSS
     function syncBubbleBtn() {
       bubbleBtn.textContent = settings.bubble ? '开' : '关'
-      bubbleBtn.style.background = settings.bubble ? 'rgba(36,70,224,.92)' : 'rgba(91,123,255,.1)'
-      bubbleBtn.style.color = settings.bubble ? '#fff' : '#dfe4f0'
+      paintToggle(bubbleBtn, !!settings.bubble)
     }
     bubbleBtn.addEventListener('click', function () {
       settings.bubble = !settings.bubble
@@ -200,9 +244,9 @@ export function createPanel(deps) {
     opaSlider.max = '1'
     opaSlider.step = '0.05'
     opaSlider.value = String(settings.opacity)
-    opaSlider.style.cssText = 'width:96px;accent-color:#5b7bff;cursor:pointer'
+    opaSlider.style.cssText = SLIDER_CSS
     var opaText = document.createElement('span')
-    opaText.style.cssText = 'width:38px;text-align:right;color:#cfd6e6'
+    opaText.style.cssText = 'width:38px;' + VALUE_CSS
     opaText.textContent = Math.round(settings.opacity * 100) + '%'
     opaSlider.addEventListener('input', function () {
       settings.opacity = Math.min(1, Math.max(0.3, Number(opaSlider.value) || 1))
@@ -219,12 +263,10 @@ export function createPanel(deps) {
     var soundWrap = document.createElement('span')
     soundWrap.style.cssText = 'display:inline-flex;align-items:center;gap:8px'
     var soundBtn = document.createElement('button')
-    soundBtn.style.cssText = 'padding:3px 9px;border-radius:7px;border:1px solid rgba(91,123,255,.28);' +
-      'background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer'
+    soundBtn.style.cssText = TOGGLE_CSS
     function syncSoundBtn() {
       soundBtn.textContent = settings.sound ? '开' : '关'
-      soundBtn.style.background = settings.sound ? 'rgba(36,70,224,.92)' : 'rgba(91,123,255,.1)'
-      soundBtn.style.color = settings.sound ? '#fff' : '#dfe4f0'
+      paintToggle(soundBtn, !!settings.sound)
     }
     soundBtn.addEventListener('click', function () {
       settings.sound = !settings.sound
@@ -239,9 +281,9 @@ export function createPanel(deps) {
     volSlider.max = '1'
     volSlider.step = '0.05'
     volSlider.value = String(settings.volume)
-    volSlider.style.cssText = 'width:74px;accent-color:#5b7bff;cursor:pointer'
+    volSlider.style.cssText = SLIDER_CSS.replace('96px', '74px')
     var volText = document.createElement('span')
-    volText.style.cssText = 'width:34px;text-align:right;color:#cfd6e6'
+    volText.style.cssText = 'width:34px;' + VALUE_CSS
     volText.textContent = Math.round(settings.volume * 100) + '%'
     volSlider.addEventListener('input', function () {
       settings.volume = Math.min(1, Math.max(0, Number(volSlider.value) || 0))
@@ -257,12 +299,10 @@ export function createPanel(deps) {
     // 语音：独立开关与语言（不影响音效）
     var voiceRow = row('语音')
     var voiceBtn = document.createElement('button')
-    voiceBtn.style.cssText = 'padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);' +
-      'background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer'
+    voiceBtn.style.cssText = TOGGLE_CSS
     function syncVoiceBtn() {
       voiceBtn.textContent = settings.voice ? '开' : '关'
-      voiceBtn.style.background = settings.voice ? 'rgba(36,70,224,.92)' : 'rgba(91,123,255,.1)'
-      voiceBtn.style.color = settings.voice ? '#fff' : '#dfe4f0'
+      paintToggle(voiceBtn, !!settings.voice)
     }
     voiceBtn.addEventListener('click', function () {
       settings.voice = !settings.voice
@@ -274,13 +314,13 @@ export function createPanel(deps) {
 
     var voiceLangRow = row('语音语言')
     var voiceLangBox = document.createElement('span')
-    voiceLangBox.style.cssText = 'display:inline-flex;border:1px solid rgba(91,123,255,.28);border-radius:7px;overflow:hidden'
+    voiceLangBox.style.cssText = SEG_BOX_CSS
     var voiceLangButtons = {}
     ;[['zh', '中文'], ['ja', '日语']].forEach(function (pair) {
       var btn = document.createElement('button')
       btn.textContent = pair[1]
       btn.dataset.value = pair[0]
-      btn.style.cssText = 'padding:3px 9px;border:0;background:transparent;color:#cfd6e6;font:inherit;cursor:pointer'
+      btn.style.cssText = SEG_BTN_CSS
       btn.addEventListener('click', function () {
         settings.voiceLang = pair[0]
         saveSettings(true)
@@ -292,8 +332,7 @@ export function createPanel(deps) {
     function syncVoiceLang() {
       Object.keys(voiceLangButtons).forEach(function (k) {
         var on = settings.voiceLang === k
-        voiceLangButtons[k].style.background = on ? 'rgba(36,70,224,.92)' : 'transparent'
-        voiceLangButtons[k].style.color = on ? '#fff' : '#cfd6e6'
+        paintSegment(voiceLangButtons[k], on)
       })
     }
     syncVoiceLang()
@@ -309,9 +348,9 @@ export function createPanel(deps) {
     voiceVolSlider.max = '1'
     voiceVolSlider.step = '0.05'
     voiceVolSlider.value = String(settings.voiceVolume === undefined ? 0.7 : settings.voiceVolume)
-    voiceVolSlider.style.cssText = 'width:74px;accent-color:#5b7bff;cursor:pointer'
+    voiceVolSlider.style.cssText = SLIDER_CSS.replace('96px', '74px')
     var voiceVolText = document.createElement('span')
-    voiceVolText.style.cssText = 'width:34px;text-align:right;color:#cfd6e6'
+    voiceVolText.style.cssText = 'width:34px;' + VALUE_CSS
     function syncVoiceVolume() {
       var v = settings.voiceVolume === undefined ? 0.7 : settings.voiceVolume
       voiceVolSlider.value = String(v)
@@ -331,12 +370,10 @@ export function createPanel(deps) {
     // 硬件挂牌：开关 + 在桌宠上方/下方
     var plateRow = row('硬件挂牌')
     var plateBtn = document.createElement('button')
-    plateBtn.style.cssText = 'padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);' +
-      'background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer'
+    plateBtn.style.cssText = TOGGLE_CSS
     function syncPlateBtn() {
       plateBtn.textContent = settings.plate ? '开' : '关'
-      plateBtn.style.background = settings.plate ? 'rgba(36,70,224,.92)' : 'rgba(91,123,255,.1)'
-      plateBtn.style.color = settings.plate ? '#fff' : '#dfe4f0'
+      paintToggle(plateBtn, !!settings.plate)
     }
     plateBtn.addEventListener('click', function () {
       settings.plate = !settings.plate
@@ -349,12 +386,12 @@ export function createPanel(deps) {
 
     var platePosRow = row('挂牌位置')
     var platePosBox = document.createElement('span')
-    platePosBox.style.cssText = 'display:inline-flex;border:1px solid rgba(91,123,255,.28);border-radius:7px;overflow:hidden'
+    platePosBox.style.cssText = SEG_BOX_CSS
     var platePosButtons = {}
     ;[['bottom', '下方'], ['top', '上方']].forEach(function (pair) {
       var btn = document.createElement('button')
       btn.textContent = pair[1]
-      btn.style.cssText = 'padding:3px 9px;border:0;background:transparent;color:#cfd6e6;font:inherit;cursor:pointer'
+      btn.style.cssText = SEG_BTN_CSS
       btn.addEventListener('click', function () {
         settings.platePosition = pair[0]
         syncPlatePosition()
@@ -367,8 +404,7 @@ export function createPanel(deps) {
     function syncPlatePosition() {
       Object.keys(platePosButtons).forEach(function (key) {
         var on = settings.platePosition === key
-        platePosButtons[key].style.background = on ? 'rgba(36,70,224,.92)' : 'transparent'
-        platePosButtons[key].style.color = on ? '#fff' : '#cfd6e6'
+        paintSegment(platePosButtons[key], on)
       })
     }
     syncPlatePosition()
@@ -376,17 +412,21 @@ export function createPanel(deps) {
 
     // 操作
     var actions = document.createElement('div')
-    actions.style.cssText = 'display:flex;gap:8px;margin-top:9px'
-    function action(label, fn) {
+    actions.style.cssText = 'display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--tnp-hairline)'
+    function action(label, fn, primary) {
       var b = document.createElement('button')
       b.textContent = label
-      b.style.cssText = 'flex:1;padding:5px 8px;border-radius:7px;border:1px solid rgba(91,123,255,.28);' +
-        'background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer'
+      b.style.cssText = 'flex:1;padding:5px 8px;border-radius:' + CONTROL_RADIUS + 'px;font:inherit;cursor:pointer;' +
+        (primary
+          ? 'border:1px solid var(--tnp-btn-bg);background:var(--tnp-btn-bg);color:var(--tnp-btn-ink)'
+          : 'border:1px solid var(--tnp-line);background:transparent;color:var(--tnp-text)')
+      b.addEventListener('mouseenter', function () { if (primary) b.style.boxShadow = '0 0 0 3px var(--tnp-glow)' })
+      b.addEventListener('mouseleave', function () { b.style.boxShadow = 'none' })
       b.addEventListener('click', fn)
       actions.appendChild(b)
     }
     action('重置位置', function () { resetPosition() })
-    action('完成', function () { closePanel() })
+    action('完成', function () { closePanel() }, true)
     panel.appendChild(actions)
 
     document.body.appendChild(panel)
@@ -395,6 +435,7 @@ export function createPanel(deps) {
     return {
       syncMirrorButtons: syncMirrorButtons,
       syncTiersBtn: syncTiersBtn,
+      syncPixelBtn: syncPixelBtn,
       syncVoiceBtn: syncVoiceBtn,
       syncVoiceLang: syncVoiceLang,
       syncVoiceVolume: syncVoiceVolume,
@@ -409,10 +450,25 @@ export function createPanel(deps) {
     }
   }
 
+  /** 按当前主题写入 --tnp-* 变量（深色 navy / 浅色白） */
+  function applyTheme() {
+    if (!panel) return
+    var t = palette(detectScheme())
+    var vars = {
+      card: t.card, raised: t.raised, line: t.line, hairline: t.hairline,
+      text: t.text, dim: t.dim, accent: t.accent, glow: t.accentGlow,
+      'btn-bg': t.btnBg, 'btn-ink': t.btnInk, shadow: t.shadow,
+    }
+    if (typeof panel.style.setProperty !== 'function') return
+    Object.keys(vars).forEach(function (k) { panel.style.setProperty('--tnp-' + k, vars[k]) })
+  }
+
   var panelApi = null
   function openPanel() {
     if (!panel) panelApi = buildPanel()
+    applyTheme()
     if (panelApi) {
+      panelApi.syncPixelBtn()
       panelApi.slider.value = String(settings.size)
       panelApi.sizeText.textContent = Math.round(settings.size * 100) + '%'
       panelApi.snapSlider.value = String(settings.snapStrength)

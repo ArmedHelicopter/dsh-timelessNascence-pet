@@ -530,7 +530,216 @@
     };
   }
 
+  // assets/src/ui/plate-format.js
+  var PLATE_MAX_ROW_WIDTH = 430;
+  var PLATE_LINE_HEIGHT = 18;
+  var PLATE_PADDING_Y = 4;
+  var PLATE_PADDING_X = 8;
+  var PLATE_GROUP_GAP = 12;
+  var PLATE_SEGMENT_GAP = 5;
+  var PLATE_DOT_SIZE = 5;
+  var PLATE_FONT_SIZE = 10.5;
+  var LEVEL_WARN = 75;
+  var LEVEL_ERROR = 90;
+  function normalizeScheme(raw) {
+    const text = String(raw === null || raw === void 0 ? "" : raw).trim().toLowerCase();
+    if (!text || text === "normal" || text === "no-preference") return null;
+    if (text === "dark") return "dark";
+    if (text === "light") return "light";
+    if (text.includes("dark") && !text.includes("light")) return "dark";
+    if (text.includes("light") && !text.includes("dark")) return "light";
+    return null;
+  }
+  function levelOf(percent) {
+    if (percent === null || percent === void 0) return "idle";
+    const value = Number(percent);
+    if (!Number.isFinite(value)) return "idle";
+    if (value >= LEVEL_ERROR) return "error";
+    if (value >= LEVEL_WARN) return "warn";
+    return "ok";
+  }
+  function formatPercent(percent) {
+    if (percent === null || percent === void 0) return "--";
+    const value = Number(percent);
+    if (!Number.isFinite(value)) return "--";
+    return Math.round(value) + "%";
+  }
+  function formatGigabytes(bytes) {
+    if (bytes === null || bytes === void 0) return "--";
+    const value = Number(bytes);
+    if (!Number.isFinite(value) || value < 0) return "--";
+    return (value / (1024 * 1024 * 1024)).toFixed(1) + "G";
+  }
+  function formatGpuLine(gpu) {
+    const g = gpu || {};
+    const index = Number.isFinite(Number(g.index)) ? Number(g.index) : 0;
+    const parts = ["GPU" + index, formatPercent(g.usage)];
+    const used = formatGigabytes(g.memUsed);
+    const total = formatGigabytes(g.memTotal);
+    if (used !== "--" && total !== "--") parts.push(used.replace(/G$/, "") + "/" + total);
+    if (Number.isFinite(Number(g.temp)) && g.temp !== null && g.temp !== void 0) {
+      parts.push(Math.round(Number(g.temp)) + "\xB0C");
+    }
+    return parts.join(" ");
+  }
+  function buildSegments(sample) {
+    const s = sample || {};
+    const segments = [{
+      key: "cpu",
+      tone: "cpu",
+      text: "CPU " + formatPercent(s.cpu),
+      level: levelOf(s.cpu)
+    }];
+    const gpus = Array.isArray(s.gpus) ? s.gpus : [];
+    for (let i = 0; i < gpus.length; i++) {
+      const gpu = gpus[i] || {};
+      const index = Number.isFinite(Number(gpu.index)) ? Number(gpu.index) : i;
+      segments.push({
+        key: "gpu" + index,
+        tone: "gpu",
+        text: formatGpuLine(gpu),
+        level: levelOf(gpu.usage)
+      });
+    }
+    const mem = s.mem && s.mem.percent !== void 0 ? s.mem.percent : null;
+    segments.push({
+      key: "mem",
+      tone: "mem",
+      text: "\u5185\u5B58 " + formatPercent(mem),
+      level: levelOf(mem)
+    });
+    return segments;
+  }
+
+  // assets/src/ui/theme.js
+  var FONT_SANS = '"Inter","HarmonyOS Sans SC","PingFang SC","Microsoft YaHei UI",system-ui,sans-serif';
+  var FONT_MONO = '"JetBrains Mono","Cascadia Mono",Consolas,monospace';
+  var FONT_PIXEL = '"ArkPixel12", ui-monospace, monospace';
+  var LABEL_TRACKING = "0.12em";
+  var CARD_RADIUS = 8;
+  var CONTROL_RADIUS = 6;
+  var PALETTES = {
+    dark: {
+      card: "#0b1430",
+      raised: "#111c40",
+      void: "#05070f",
+      line: "rgba(232,238,255,0.18)",
+      hairline: "rgba(232,238,255,0.08)",
+      text: "#eef2ff",
+      dim: "#8f9abb",
+      silver: "#c9d1e6",
+      accent: "#3d6bff",
+      accentGlow: "rgba(61,107,255,0.35)",
+      warn: "#e9c46a",
+      btnBg: "#ffffff",
+      btnInk: "#0b1430",
+      shadow: "rgba(0,0,0,0.32)"
+    },
+    light: {
+      card: "#ffffff",
+      raised: "#eef1f8",
+      void: "#f6f7fb",
+      line: "rgba(11,20,48,0.16)",
+      hairline: "rgba(11,20,48,0.08)",
+      text: "#0b1430",
+      dim: "#5b6480",
+      silver: "#3a4466",
+      accent: "#2148e8",
+      accentGlow: "rgba(33,72,232,0.25)",
+      warn: "#a87a12",
+      btnBg: "#0b1430",
+      btnInk: "#ffffff",
+      shadow: "rgba(11,20,48,0.12)"
+    }
+  };
+  function palette(scheme) {
+    return PALETTES[scheme === "light" ? "light" : "dark"];
+  }
+  function detectScheme() {
+    try {
+      if (document.body && document.body.hasAttribute("data-ds-dark-theme")) return "dark";
+      var root = document.documentElement;
+      var scheme = normalizeScheme(root.style && root.style.colorScheme);
+      if (scheme) return scheme;
+      scheme = normalizeScheme(root.getAttribute("data-theme") || root.getAttribute("data-color-scheme"));
+      if (scheme) return scheme;
+      try {
+        scheme = normalizeScheme(window.getComputedStyle(root).colorScheme);
+        if (scheme) return scheme;
+      } catch (err) {
+      }
+      if (root.classList) {
+        if (root.classList.contains("dark")) return "dark";
+        if (root.classList.contains("light")) return "light";
+      }
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+    } catch (err) {
+    }
+    return "light";
+  }
+  var PIXEL_FONT_KEY = "dshtn-pet-pixel-font";
+  function pixelFontEnabled() {
+    try {
+      return window.localStorage.getItem(PIXEL_FONT_KEY) === "1";
+    } catch (err) {
+      return false;
+    }
+  }
+  function setPixelFontEnabled(on) {
+    try {
+      if (on) window.localStorage.setItem(PIXEL_FONT_KEY, "1");
+      else window.localStorage.removeItem(PIXEL_FONT_KEY);
+    } catch (err) {
+    }
+  }
+  function watchScheme(onChange) {
+    var mq = null;
+    var observer = null;
+    try {
+      mq = window.matchMedia("(prefers-color-scheme: dark)");
+      if (mq.addEventListener) mq.addEventListener("change", onChange);
+      else if (mq.addListener) mq.addListener(onChange);
+    } catch (err) {
+      mq = null;
+    }
+    try {
+      observer = new MutationObserver(onChange);
+      var filter = ["style", "class", "data-theme", "data-color-scheme", "data-ds-theme-source", "data-ds-dark-theme"];
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: filter });
+      if (document.body) observer.observe(document.body, { attributes: true, attributeFilter: filter });
+    } catch (err) {
+      observer = null;
+    }
+    return function() {
+      try {
+        if (mq) {
+          if (mq.removeEventListener) mq.removeEventListener("change", onChange);
+          else if (mq.removeListener) mq.removeListener(onChange);
+        }
+      } catch (err) {
+      }
+      try {
+        if (observer) observer.disconnect();
+      } catch (err) {
+      }
+    };
+  }
+
   // assets/src/ui/panel.js
+  var SEG_BOX_CSS = "display:inline-flex;border:1px solid var(--tnp-line);border-radius:" + CONTROL_RADIUS + "px;overflow:hidden";
+  var SEG_BTN_CSS = "padding:3px 9px;border:0;background:transparent;color:var(--tnp-dim);font:inherit;cursor:pointer";
+  var TOGGLE_CSS = "padding:3px 10px;border-radius:" + CONTROL_RADIUS + "px;border:1px solid var(--tnp-line);background:transparent;color:var(--tnp-dim);font:inherit;cursor:pointer;min-width:38px";
+  var SLIDER_CSS = "width:96px;accent-color:var(--tnp-accent);cursor:pointer";
+  var VALUE_CSS = "text-align:right;color:var(--tnp-text);font-family:" + FONT_MONO + ";font-size:11px";
+  function paintToggle(btn, on) {
+    btn.style.background = on ? "var(--tnp-accent)" : "transparent";
+    btn.style.borderColor = on ? "var(--tnp-accent)" : "var(--tnp-line)";
+    btn.style.color = on ? "#ffffff" : "var(--tnp-dim)";
+  }
+  function paintSegment(btn, on) {
+    btn.style.background = on ? "var(--tnp-accent)" : "transparent";
+    btn.style.color = on ? "#ffffff" : "var(--tnp-dim)";
+  }
   function createPanel(deps) {
     var settings2 = deps.settings;
     var saveSettings2 = deps.saveSettings;
@@ -559,34 +768,39 @@
         "z-index:2147482003",
         "display:none",
         "pointer-events:auto",
-        "min-width:196px",
-        "padding:10px 12px",
-        "border-radius:10px",
-        'font:12px/1.6 ui-sans-serif,system-ui,"Microsoft YaHei",sans-serif',
-        "background:rgba(17,24,66,.96)",
-        "color:#e8ecf8",
-        "border:1px solid rgba(91,123,255,.35)",
-        "box-shadow:0 10px 30px rgba(10,14,36,.65)"
+        "min-width:208px",
+        "padding:12px 14px",
+        "border-radius:" + CARD_RADIUS + "px",
+        "font:12px/1.6 " + FONT_SANS,
+        "background:var(--tnp-card)",
+        "color:var(--tnp-text)",
+        "border:1px solid var(--tnp-line)",
+        "box-shadow:0 10px 28px var(--tnp-shadow)"
       ].join(";");
+      applyTheme();
+      var head = document.createElement("div");
+      head.textContent = "TIMELESS NASCENCE";
+      head.style.cssText = "font:500 10px/1.4 " + FONT_MONO + ";letter-spacing:" + LABEL_TRACKING + ";color:var(--tnp-dim);padding-bottom:8px;margin-bottom:6px;border-bottom:1px solid var(--tnp-hairline)";
+      panel.appendChild(head);
       function row(label) {
         var el = document.createElement("div");
         el.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0";
         var name = document.createElement("span");
         name.textContent = label;
-        name.style.cssText = "color:#9da8cf";
+        name.style.cssText = "color:var(--tnp-dim)";
         el.appendChild(name);
         panel.appendChild(el);
         return el;
       }
       var mirrorRow = row("\u955C\u50CF");
       var segBox = document.createElement("span");
-      segBox.style.cssText = "display:inline-flex;border:1px solid rgba(91,123,255,.28);border-radius:7px;overflow:hidden";
+      segBox.style.cssText = SEG_BOX_CSS;
       var mirrorButtons = {};
       [["auto", "\u81EA\u52A8"], ["always", "\u59CB\u7EC8"], ["never", "\u4E0D\u955C\u50CF"]].forEach(function(pair) {
         var btn = document.createElement("button");
         btn.textContent = pair[1];
         btn.dataset.value = pair[0];
-        btn.style.cssText = "padding:3px 9px;border:0;background:transparent;color:#cfd6e6;font:inherit;cursor:pointer";
+        btn.style.cssText = SEG_BTN_CSS;
         btn.addEventListener("click", function() {
           settings2.mirror = pair[0];
           saveSettings2();
@@ -600,8 +814,7 @@
       function syncMirrorButtons() {
         Object.keys(mirrorButtons).forEach(function(k) {
           var on = settings2.mirror === k;
-          mirrorButtons[k].style.background = on ? "rgba(36,70,224,.92)" : "transparent";
-          mirrorButtons[k].style.color = on ? "#fff" : "#cfd6e6";
+          paintSegment(mirrorButtons[k], on);
         });
       }
       var sizeRow = row("\u5927\u5C0F");
@@ -613,9 +826,9 @@
       slider.max = String(SIZE_MAX);
       slider.step = "0.05";
       slider.value = String(settings2.size);
-      slider.style.cssText = "width:96px;accent-color:#5b7bff;cursor:pointer";
+      slider.style.cssText = SLIDER_CSS;
       var sizeText = document.createElement("span");
-      sizeText.style.cssText = "width:34px;text-align:right;color:#cfd6e6";
+      sizeText.style.cssText = "width:34px;" + VALUE_CSS;
       sizeText.textContent = Math.round(settings2.size * 100) + "%";
       var saveTimer2 = 0;
       slider.addEventListener("input", function() {
@@ -638,9 +851,9 @@
       snapSlider.max = String(SNAP_STRENGTH_MAX);
       snapSlider.step = "5";
       snapSlider.value = String(settings2.snapStrength);
-      snapSlider.style.cssText = "width:96px;accent-color:#5b7bff;cursor:pointer";
+      snapSlider.style.cssText = SLIDER_CSS;
       var snapText = document.createElement("span");
-      snapText.style.cssText = "width:38px;text-align:right;color:#cfd6e6";
+      snapText.style.cssText = "width:38px;" + VALUE_CSS;
       snapText.textContent = Math.round(settings2.snapStrength) + "%";
       snapSlider.addEventListener("input", function() {
         settings2.snapStrength = Math.min(SNAP_STRENGTH_MAX, Math.max(SNAP_STRENGTH_MIN, Number(snapSlider.value) || 0));
@@ -659,9 +872,9 @@
       bubbleScaleSlider.max = String(BUBBLE_SCALE_MAX);
       bubbleScaleSlider.step = "5";
       bubbleScaleSlider.value = String(settings2.bubbleScale);
-      bubbleScaleSlider.style.cssText = "width:96px;accent-color:#5b7bff;cursor:pointer";
+      bubbleScaleSlider.style.cssText = SLIDER_CSS;
       var bubbleScaleText = document.createElement("span");
-      bubbleScaleText.style.cssText = "width:38px;text-align:right;color:#cfd6e6";
+      bubbleScaleText.style.cssText = "width:38px;" + VALUE_CSS;
       bubbleScaleText.textContent = Math.round(settings2.bubbleScale) + "%";
       bubbleScaleSlider.addEventListener("input", function() {
         settings2.bubbleScale = Math.min(BUBBLE_SCALE_MAX, Math.max(BUBBLE_SCALE_MIN, Number(bubbleScaleSlider.value) || 100));
@@ -674,11 +887,10 @@
       bubbleScaleRow.appendChild(bubbleScaleWrap);
       var tiersRow = row("\u66F4\u591A\u5C42\u6B21\u7684\u5B57\u4F53\u89C6\u89C9\u6548\u679C");
       var tiersBtn = document.createElement("button");
-      tiersBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
+      tiersBtn.style.cssText = TOGGLE_CSS;
       function syncTiersBtn() {
         tiersBtn.textContent = settings2.bubbleTiers ? "\u5F00" : "\u5173";
-        tiersBtn.style.background = settings2.bubbleTiers ? "rgba(36,70,224,.92)" : "rgba(91,123,255,.1)";
-        tiersBtn.style.color = settings2.bubbleTiers ? "#fff" : "#dfe4f0";
+        paintToggle(tiersBtn, !!settings2.bubbleTiers);
       }
       tiersBtn.addEventListener("click", function() {
         settings2.bubbleTiers = !settings2.bubbleTiers;
@@ -688,13 +900,27 @@
       });
       syncTiersBtn();
       tiersRow.appendChild(tiersBtn);
+      var pixelRow = row("\u50CF\u7D20\u5B57\u4F53");
+      var pixelBtn = document.createElement("button");
+      pixelBtn.style.cssText = TOGGLE_CSS;
+      function syncPixelBtn() {
+        var on = pixelFontEnabled();
+        pixelBtn.textContent = on ? "\u5F00" : "\u5173";
+        paintToggle(pixelBtn, on);
+      }
+      pixelBtn.addEventListener("click", function() {
+        setPixelFontEnabled(!pixelFontEnabled());
+        syncPixelBtn();
+        if (refreshBubble) refreshBubble();
+      });
+      syncPixelBtn();
+      pixelRow.appendChild(pixelBtn);
       var bubbleRow = row("\u6C14\u6CE1");
       var bubbleBtn = document.createElement("button");
-      bubbleBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
+      bubbleBtn.style.cssText = TOGGLE_CSS;
       function syncBubbleBtn() {
         bubbleBtn.textContent = settings2.bubble ? "\u5F00" : "\u5173";
-        bubbleBtn.style.background = settings2.bubble ? "rgba(36,70,224,.92)" : "rgba(91,123,255,.1)";
-        bubbleBtn.style.color = settings2.bubble ? "#fff" : "#dfe4f0";
+        paintToggle(bubbleBtn, !!settings2.bubble);
       }
       bubbleBtn.addEventListener("click", function() {
         settings2.bubble = !settings2.bubble;
@@ -713,9 +939,9 @@
       opaSlider.max = "1";
       opaSlider.step = "0.05";
       opaSlider.value = String(settings2.opacity);
-      opaSlider.style.cssText = "width:96px;accent-color:#5b7bff;cursor:pointer";
+      opaSlider.style.cssText = SLIDER_CSS;
       var opaText = document.createElement("span");
-      opaText.style.cssText = "width:38px;text-align:right;color:#cfd6e6";
+      opaText.style.cssText = "width:38px;" + VALUE_CSS;
       opaText.textContent = Math.round(settings2.opacity * 100) + "%";
       opaSlider.addEventListener("input", function() {
         settings2.opacity = Math.min(1, Math.max(0.3, Number(opaSlider.value) || 1));
@@ -730,11 +956,10 @@
       var soundWrap = document.createElement("span");
       soundWrap.style.cssText = "display:inline-flex;align-items:center;gap:8px";
       var soundBtn = document.createElement("button");
-      soundBtn.style.cssText = "padding:3px 9px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
+      soundBtn.style.cssText = TOGGLE_CSS;
       function syncSoundBtn() {
         soundBtn.textContent = settings2.sound ? "\u5F00" : "\u5173";
-        soundBtn.style.background = settings2.sound ? "rgba(36,70,224,.92)" : "rgba(91,123,255,.1)";
-        soundBtn.style.color = settings2.sound ? "#fff" : "#dfe4f0";
+        paintToggle(soundBtn, !!settings2.sound);
       }
       soundBtn.addEventListener("click", function() {
         settings2.sound = !settings2.sound;
@@ -753,9 +978,9 @@
       volSlider.max = "1";
       volSlider.step = "0.05";
       volSlider.value = String(settings2.volume);
-      volSlider.style.cssText = "width:74px;accent-color:#5b7bff;cursor:pointer";
+      volSlider.style.cssText = SLIDER_CSS.replace("96px", "74px");
       var volText = document.createElement("span");
-      volText.style.cssText = "width:34px;text-align:right;color:#cfd6e6";
+      volText.style.cssText = "width:34px;" + VALUE_CSS;
       volText.textContent = Math.round(settings2.volume * 100) + "%";
       volSlider.addEventListener("input", function() {
         settings2.volume = Math.min(1, Math.max(0, Number(volSlider.value) || 0));
@@ -774,11 +999,10 @@
       soundRow.appendChild(soundWrap);
       var voiceRow = row("\u8BED\u97F3");
       var voiceBtn = document.createElement("button");
-      voiceBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
+      voiceBtn.style.cssText = TOGGLE_CSS;
       function syncVoiceBtn() {
         voiceBtn.textContent = settings2.voice ? "\u5F00" : "\u5173";
-        voiceBtn.style.background = settings2.voice ? "rgba(36,70,224,.92)" : "rgba(91,123,255,.1)";
-        voiceBtn.style.color = settings2.voice ? "#fff" : "#dfe4f0";
+        paintToggle(voiceBtn, !!settings2.voice);
       }
       voiceBtn.addEventListener("click", function() {
         settings2.voice = !settings2.voice;
@@ -789,13 +1013,13 @@
       voiceRow.appendChild(voiceBtn);
       var voiceLangRow = row("\u8BED\u97F3\u8BED\u8A00");
       var voiceLangBox = document.createElement("span");
-      voiceLangBox.style.cssText = "display:inline-flex;border:1px solid rgba(91,123,255,.28);border-radius:7px;overflow:hidden";
+      voiceLangBox.style.cssText = SEG_BOX_CSS;
       var voiceLangButtons = {};
       [["zh", "\u4E2D\u6587"], ["ja", "\u65E5\u8BED"]].forEach(function(pair) {
         var btn = document.createElement("button");
         btn.textContent = pair[1];
         btn.dataset.value = pair[0];
-        btn.style.cssText = "padding:3px 9px;border:0;background:transparent;color:#cfd6e6;font:inherit;cursor:pointer";
+        btn.style.cssText = SEG_BTN_CSS;
         btn.addEventListener("click", function() {
           settings2.voiceLang = pair[0];
           saveSettings2(true);
@@ -807,8 +1031,7 @@
       function syncVoiceLang() {
         Object.keys(voiceLangButtons).forEach(function(k) {
           var on = settings2.voiceLang === k;
-          voiceLangButtons[k].style.background = on ? "rgba(36,70,224,.92)" : "transparent";
-          voiceLangButtons[k].style.color = on ? "#fff" : "#cfd6e6";
+          paintSegment(voiceLangButtons[k], on);
         });
       }
       syncVoiceLang();
@@ -822,9 +1045,9 @@
       voiceVolSlider.max = "1";
       voiceVolSlider.step = "0.05";
       voiceVolSlider.value = String(settings2.voiceVolume === void 0 ? 0.7 : settings2.voiceVolume);
-      voiceVolSlider.style.cssText = "width:74px;accent-color:#5b7bff;cursor:pointer";
+      voiceVolSlider.style.cssText = SLIDER_CSS.replace("96px", "74px");
       var voiceVolText = document.createElement("span");
-      voiceVolText.style.cssText = "width:34px;text-align:right;color:#cfd6e6";
+      voiceVolText.style.cssText = "width:34px;" + VALUE_CSS;
       function syncVoiceVolume() {
         var v = settings2.voiceVolume === void 0 ? 0.7 : settings2.voiceVolume;
         voiceVolSlider.value = String(v);
@@ -844,11 +1067,10 @@
       voiceVolRow.appendChild(voiceVolWrap);
       var plateRow = row("\u786C\u4EF6\u6302\u724C");
       var plateBtn = document.createElement("button");
-      plateBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
+      plateBtn.style.cssText = TOGGLE_CSS;
       function syncPlateBtn() {
         plateBtn.textContent = settings2.plate ? "\u5F00" : "\u5173";
-        plateBtn.style.background = settings2.plate ? "rgba(36,70,224,.92)" : "rgba(91,123,255,.1)";
-        plateBtn.style.color = settings2.plate ? "#fff" : "#dfe4f0";
+        paintToggle(plateBtn, !!settings2.plate);
       }
       plateBtn.addEventListener("click", function() {
         settings2.plate = !settings2.plate;
@@ -860,12 +1082,12 @@
       plateRow.appendChild(plateBtn);
       var platePosRow = row("\u6302\u724C\u4F4D\u7F6E");
       var platePosBox = document.createElement("span");
-      platePosBox.style.cssText = "display:inline-flex;border:1px solid rgba(91,123,255,.28);border-radius:7px;overflow:hidden";
+      platePosBox.style.cssText = SEG_BOX_CSS;
       var platePosButtons = {};
       [["bottom", "\u4E0B\u65B9"], ["top", "\u4E0A\u65B9"]].forEach(function(pair) {
         var btn = document.createElement("button");
         btn.textContent = pair[1];
-        btn.style.cssText = "padding:3px 9px;border:0;background:transparent;color:#cfd6e6;font:inherit;cursor:pointer";
+        btn.style.cssText = SEG_BTN_CSS;
         btn.addEventListener("click", function() {
           settings2.platePosition = pair[0];
           syncPlatePosition();
@@ -878,18 +1100,23 @@
       function syncPlatePosition() {
         Object.keys(platePosButtons).forEach(function(key) {
           var on = settings2.platePosition === key;
-          platePosButtons[key].style.background = on ? "rgba(36,70,224,.92)" : "transparent";
-          platePosButtons[key].style.color = on ? "#fff" : "#cfd6e6";
+          paintSegment(platePosButtons[key], on);
         });
       }
       syncPlatePosition();
       platePosRow.appendChild(platePosBox);
       var actions = document.createElement("div");
-      actions.style.cssText = "display:flex;gap:8px;margin-top:9px";
-      function action(label, fn) {
+      actions.style.cssText = "display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--tnp-hairline)";
+      function action(label, fn, primary) {
         var b = document.createElement("button");
         b.textContent = label;
-        b.style.cssText = "flex:1;padding:5px 8px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
+        b.style.cssText = "flex:1;padding:5px 8px;border-radius:" + CONTROL_RADIUS + "px;font:inherit;cursor:pointer;" + (primary ? "border:1px solid var(--tnp-btn-bg);background:var(--tnp-btn-bg);color:var(--tnp-btn-ink)" : "border:1px solid var(--tnp-line);background:transparent;color:var(--tnp-text)");
+        b.addEventListener("mouseenter", function() {
+          if (primary) b.style.boxShadow = "0 0 0 3px var(--tnp-glow)";
+        });
+        b.addEventListener("mouseleave", function() {
+          b.style.boxShadow = "none";
+        });
         b.addEventListener("click", fn);
         actions.appendChild(b);
       }
@@ -898,7 +1125,7 @@
       });
       action("\u5B8C\u6210", function() {
         closePanel();
-      });
+      }, true);
       panel.appendChild(actions);
       document.body.appendChild(panel);
       syncMirrorButtons();
@@ -906,6 +1133,7 @@
       return {
         syncMirrorButtons,
         syncTiersBtn,
+        syncPixelBtn,
         syncVoiceBtn,
         syncVoiceLang,
         syncVoiceVolume,
@@ -919,10 +1147,33 @@
         bubbleScaleText
       };
     }
+    function applyTheme() {
+      if (!panel) return;
+      var t = palette(detectScheme());
+      var vars = {
+        card: t.card,
+        raised: t.raised,
+        line: t.line,
+        hairline: t.hairline,
+        text: t.text,
+        dim: t.dim,
+        accent: t.accent,
+        glow: t.accentGlow,
+        "btn-bg": t.btnBg,
+        "btn-ink": t.btnInk,
+        shadow: t.shadow
+      };
+      if (typeof panel.style.setProperty !== "function") return;
+      Object.keys(vars).forEach(function(k) {
+        panel.style.setProperty("--tnp-" + k, vars[k]);
+      });
+    }
     var panelApi = null;
     function openPanel() {
       if (!panel) panelApi = buildPanel();
+      applyTheme();
       if (panelApi) {
+        panelApi.syncPixelBtn();
         panelApi.slider.value = String(settings2.size);
         panelApi.sizeText.textContent = Math.round(settings2.size * 100) + "%";
         panelApi.snapSlider.value = String(settings2.snapStrength);
@@ -968,16 +1219,40 @@
     var size = deps.size;
     var settings2 = deps.settings;
     var container = deps.container;
-    var BUBBLE_FONT = '"ArkPixel12", ui-monospace, monospace';
-    var BUBBLE_SIZE = 24;
-    var BUBBLE_SIZE_MID = 36;
-    var BUBBLE_SIZE_BIG = 48;
-    var BUBBLE_LINE = 30;
+    var BUBBLE_FONT = FONT_SANS;
+    var BUBBLE_SIZE = 15;
+    var BUBBLE_SIZE_MID = 22;
+    var BUBBLE_SIZE_BIG = 28;
+    var BUBBLE_LINE = 22;
+    var LINE_MID = 30;
+    var LINE_BIG = 36;
     var BUBBLE_PAD = 12;
     var BUBBLE_HIDE_MS = 5200;
     var BUBBLE_MIN_MS = 4200;
     var BUBBLE_CHAR_MS = 90;
-    var BUBBLE_CORNER = 6;
+    var BUBBLE_CORNER = CARD_RADIUS;
+    var pixelMode = false;
+    function syncMetrics() {
+      pixelMode = pixelFontEnabled();
+      if (pixelMode) {
+        BUBBLE_FONT = FONT_PIXEL;
+        BUBBLE_SIZE = 24;
+        BUBBLE_SIZE_MID = 36;
+        BUBBLE_SIZE_BIG = 48;
+        BUBBLE_LINE = 30;
+        LINE_MID = 44;
+        LINE_BIG = 56;
+      } else {
+        BUBBLE_FONT = FONT_SANS;
+        BUBBLE_SIZE = 15;
+        BUBBLE_SIZE_MID = 22;
+        BUBBLE_SIZE_BIG = 28;
+        BUBBLE_LINE = 22;
+        LINE_MID = 30;
+        LINE_BIG = 36;
+      }
+    }
+    syncMetrics();
     var TAIL_W = 14;
     var TAIL_H = 10;
     function bubbleFactor() {
@@ -989,7 +1264,7 @@
       return Math.max(1, Math.round(base * bubbleFactor()));
     }
     function bubbleLineH(size2) {
-      var base = size2 >= BUBBLE_SIZE_BIG ? 56 : size2 >= BUBBLE_SIZE_MID ? 44 : BUBBLE_LINE;
+      var base = size2 >= BUBBLE_SIZE_BIG ? LINE_BIG : size2 >= BUBBLE_SIZE_MID ? LINE_MID : BUBBLE_LINE;
       return Math.max(1, Math.round(base * bubbleFactor()));
     }
     var bubbleEl = null;
@@ -1029,6 +1304,8 @@
     var bubbleDialogUntil = 0;
     var bubbleMode = "info";
     function ensureFont() {
+      syncMetrics();
+      if (!pixelMode) return;
       if (document.getElementById("dsh-nascence-pet-font")) return;
       var st = document.createElement("style");
       st.id = "dsh-nascence-pet-font";
@@ -1053,35 +1330,26 @@
         "z-index:2147482002",
         "pointer-events:none",
         "opacity:0",
-        "transform-origin:center bottom",
-        "filter:none"
+        "transform-origin:center bottom"
       ].join(";");
       bubbleSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      bubbleSvg.setAttribute("shape-rendering", "crispEdges");
       bubbleSvg.style.cssText = "position:absolute;left:0;top:0;overflow:visible";
       bubbleEl.appendChild(bubbleSvg);
       bubbleTextEl = document.createElement("div");
       bubbleTextEl.style.cssText = [
         "position:absolute",
         "white-space:pre",
-        "font-family:" + BUBBLE_FONT,
-        "font-size:" + bubblePx(BUBBLE_SIZE) + "px",
-        "line-height:" + bubbleLineH(BUBBLE_SIZE) + "px",
-        "color:#e8ecf8",
-        "letter-spacing:0",
-        "-webkit-font-smoothing:none",
-        "font-smooth:never",
-        "text-rendering:geometricPrecision"
+        "letter-spacing:0"
       ].join(";");
       bubbleEl.appendChild(bubbleTextEl);
       (container || document.body).appendChild(bubbleEl);
     }
     var BUBBLE_MAX_W = 420;
-    function measureText(text, size2) {
+    function measureText(text, size2, bold) {
       var px = bubblePx(size2 || BUBBLE_SIZE);
       var cv = measureText._cv || (measureText._cv = document.createElement("canvas"));
       var ctx = cv.getContext("2d");
-      ctx.font = px + "px " + BUBBLE_FONT;
+      ctx.font = (bold ? pixelMode ? "700 " : "600 " : "") + px + "px " + BUBBLE_FONT;
       return ctx.measureText(text).width;
     }
     function wrapText(text, maxWidth, size2) {
@@ -1109,81 +1377,101 @@
       return out;
     }
     function bubblePath(w, h, tailX, tailUp) {
-      var c = bubblePx(BUBBLE_CORNER);
+      var r = Math.min(bubblePx(BUBBLE_CORNER), Math.floor(w / 2), Math.floor(h / 3));
       var t = bubblePx(TAIL_H);
       var tw = bubblePx(TAIL_W);
+      var o = 0.5;
+      var x0 = o;
+      var x1 = w - o;
+      var tm = tailX + tw / 2;
       if (!tailUp) {
-        var bodyH = h - t;
+        var y0 = o;
+        var y1 = h - t - o;
         return [
           "M",
-          c,
-          0,
+          x0 + r,
+          y0,
           "H",
-          w - c,
+          x1 - r,
+          "Q",
+          x1,
+          y0,
+          x1,
+          y0 + r,
           "V",
-          c,
-          "H",
-          w,
-          "V",
-          bodyH - c,
-          "H",
-          w - c,
-          "V",
-          bodyH,
+          y1 - r,
+          "Q",
+          x1,
+          y1,
+          x1 - r,
+          y1,
           "H",
           tailX + tw,
-          "V",
-          h,
-          "H",
+          "L",
+          tm,
+          h - o,
+          "L",
           tailX,
-          "V",
-          bodyH,
+          y1,
           "H",
-          c,
+          x0 + r,
+          "Q",
+          x0,
+          y1,
+          x0,
+          y1 - r,
           "V",
-          bodyH - c,
-          "H",
-          0,
-          "V",
-          c,
+          y0 + r,
+          "Q",
+          x0,
+          y0,
+          x0 + r,
+          y0,
           "Z"
         ].join(" ");
       }
-      var top = t;
+      var top = t + o;
+      var bottom = h - o;
       return [
         "M",
-        c,
+        x0 + r,
         top,
         "H",
         tailX,
-        "V",
-        0,
-        "H",
+        "L",
+        tm,
+        o,
+        "L",
         tailX + tw,
-        "V",
         top,
         "H",
-        w - c,
+        x1 - r,
+        "Q",
+        x1,
+        top,
+        x1,
+        top + r,
         "V",
-        top + c,
+        bottom - r,
+        "Q",
+        x1,
+        bottom,
+        x1 - r,
+        bottom,
         "H",
-        w,
+        x0 + r,
+        "Q",
+        x0,
+        bottom,
+        x0,
+        bottom - r,
         "V",
-        h - c,
-        "H",
-        w - c,
-        "V",
-        h,
-        "H",
-        c,
-        "V",
-        h - c,
-        "H",
-        0,
-        "V",
-        top + c,
-        "H",
-        c,
+        top + r,
+        "Q",
+        x0,
+        top,
+        x0 + r,
+        top,
         "Z"
       ].join(" ");
     }
@@ -1199,7 +1487,10 @@
       bubbleSvg.setAttribute("height", String(h + 6));
       bubbleSvg.setAttribute("viewBox", `0 0 ${w + 6} ${h + 6}`);
       var d = bubblePath(w, h, tailX, bubbleTailUp);
-      bubbleSvg.innerHTML = '<path d="' + d + '" fill="#0a0e24" fill-opacity=".68" transform="translate(3,3)"/><path d="' + d + '" fill="#111842" stroke="#5b7bff" stroke-width="2"/>';
+      var t = palette(detectScheme());
+      bubbleSvg.innerHTML = '<path d="' + d + '" fill="' + t.card + '" stroke="' + t.line + '" stroke-width="1"/>';
+      bubbleEl.style.filter = "drop-shadow(0 6px 16px " + t.shadow + ")";
+      bubbleTextEl.style.color = t.text;
     }
     function normalizeRows(rows) {
       var out = [];
@@ -1240,7 +1531,7 @@
       var widest = 0;
       var totalH = 0;
       for (var i = 0; i < rows.length; i++) {
-        widest = Math.max(widest, measureText(rows[i].text, rows[i].size));
+        widest = Math.max(widest, measureText(rows[i].text, rows[i].size, rows[i].bold));
         totalH += bubbleLineH(rows[i].size);
       }
       var pad = bubblePx(BUBBLE_PAD);
@@ -1256,6 +1547,8 @@
       bubbleTailCenter = tailCenterX || w / 2;
       bubbleTailUp = !!tailUp;
       drawBubbleFrame();
+      bubbleTextEl.style.fontFamily = BUBBLE_FONT;
+      bubbleTextEl.style.webkitFontSmoothing = pixelMode ? "none" : "";
       bubbleTextEl.style.left = pad + 2 + "px";
       bubbleTextEl.style.top = (tailUp ? tailH : 0) + pad + 1 + "px";
       var html = "";
@@ -1263,7 +1556,7 @@
         var rr = rows[ri];
         var style = "display:block;font-size:" + bubblePx(rr.size) + "px;line-height:" + bubbleLineH(rr.size) + "px";
         if (rr.color) style += ";color:" + rr.color;
-        if (rr.bold) style += ";font-weight:700";
+        if (rr.bold) style += ";font-weight:" + (pixelMode ? "700" : "600");
         html += '<span style="' + style + '">' + escapeHtml(rr.text) + "</span>";
       }
       bubbleTextEl.innerHTML = html;
@@ -1329,16 +1622,17 @@
       return parts.join(" \xB7 ");
     }
     function bubbleLines() {
+      var tone = palette(detectScheme());
       if ((bubbleEventRows || bubbleEventText) && Date.now() < bubbleEventUntil) {
         if (bubbleEventRows) {
           return bubbleEventRows.map(function(r) {
             var tier = r.tier;
             var size2 = r.size;
-            if (!size2) size2 = tier === "title" ? BUBBLE_SIZE + 6 : tier === "number" ? BUBBLE_SIZE_BIG : tier === "tag" ? BUBBLE_SIZE - 4 : BUBBLE_SIZE;
+            if (!size2) size2 = tier === "title" ? BUBBLE_SIZE + (pixelMode ? 6 : 3) : tier === "number" ? BUBBLE_SIZE_BIG : tier === "tag" ? BUBBLE_SIZE - (pixelMode ? 4 : 2) : BUBBLE_SIZE;
             return {
               text: r.text,
               size: size2,
-              color: r.color || (tier === "tag" ? "#9aa7d6" : tier === "title" ? "#f5d76e" : tier === "number" ? "#5b7bff" : ""),
+              color: r.color || (tier === "tag" ? tone.dim : tier === "title" ? tone.accent : ""),
               bold: r.bold === void 0 ? tier === "title" || tier === "number" : !!r.bold
             };
           });
@@ -1355,6 +1649,7 @@
       return infoLines();
     }
     function infoLines() {
+      var tone = palette(detectScheme());
       var rows = [];
       var s = getState();
       var b = s && s.balance;
@@ -1365,7 +1660,7 @@
         var hint = "";
         if (b.low) hint = "\u661F\u5C18\u5FEB\u8017\u5C3D\u4E86\uFF01";
         if (b.stale) hint = (hint ? hint + " " : "") + "\u672A\u5237\u65B0";
-        if (hint) rows.push({ text: hint, size: BUBBLE_SIZE, color: "#f5d76e" });
+        if (hint) rows.push({ text: hint, size: BUBBLE_SIZE, color: tone.warn });
       } else if (b && b.signedOut) {
         rows.push({ text: "\u7BA1\u7406\u5458\u8FD8\u6CA1\u6709\u767B\u5F55\u89C6\u754C\u54E6", size: BUBBLE_SIZE });
       } else {
@@ -1378,14 +1673,14 @@
           if (Number(sp.turnAmount) > 0) parts.push("\u672C\u8F6E " + fmtMoney(sp.turnAmount, "CNY"));
           rows.push({ text: parts.join(" \xB7 "), size: BUBBLE_SIZE });
           var foot = sourceFootnote(sp);
-          if (foot) rows.push({ text: foot, size: BUBBLE_SIZE, color: "#9aa7d6" });
+          if (foot) rows.push({ text: foot, size: BUBBLE_SIZE, color: tone.dim });
         }
         var peak = s.period === "peak";
         var left = s.periodNextChangeAt ? Math.max(0, s.periodNextChangeAt - Date.now()) : null;
         rows.push({
           text: (peak ? "\u6F6E\u6C50\u9AD8\u5CF0" : "\u5F15\u529B\u4F4E\u6F6E") + (left !== null ? " \u8DDD" + (peak ? "\u4F4E\u6F6E" : "\u9AD8\u5CF0") + " " + hhmmss(left) : ""),
           size: BUBBLE_SIZE,
-          color: peak ? "#8c6bff" : "#f5d76e"
+          color: peak ? tone.accent : tone.dim
         });
       }
       return rows;
@@ -1637,64 +1932,27 @@
     var settings2 = deps.settings;
     var size = deps.size;
     var pet = deps.pet;
-    var STICKER_BASE_W = 40;
-    var STICKER_H = 24;
-    var STICKER_SCALE = 3;
     var stickerEl = null;
-    var stickerCanvas = null;
-    var stickerReady = false;
-    var stickerW = 120;
-    var stickerH = 72;
-    function drawSticker() {
-      var LOG_H = STICKER_H;
-      var S = STICKER_SCALE * 2;
-      var cv = stickerCanvas;
-      var ctx = cv.getContext("2d");
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.font = "12px ArkPixel12, monospace";
-      var tw = 0;
-      try {
-        tw = ctx.measureText("-99%").width;
-      } catch (err) {
-        tw = 30;
-      }
-      var LOG_W = Math.max(STICKER_BASE_W, Math.ceil(tw) + 14);
-      stickerW = LOG_W * STICKER_SCALE;
-      stickerH = LOG_H * STICKER_SCALE;
-      cv.width = LOG_W * S;
-      cv.height = LOG_H * S;
-      cv.style.width = stickerW + "px";
-      cv.style.height = stickerH + "px";
-      if (stickerEl) {
-        stickerEl.style.width = stickerW + "px";
-        stickerEl.style.height = stickerH + "px";
-      }
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, cv.width, cv.height);
-      ctx.scale(S, S);
-      ctx.imageSmoothingEnabled = false;
-      ctx.fillStyle = "#111842";
-      ctx.fillRect(0, 0, LOG_W, LOG_H);
-      ctx.fillStyle = "rgba(10,14,36,.35)";
-      for (var y = 0; y < LOG_H; y += 2) ctx.fillRect(0, y, LOG_W, 1);
-      ctx.fillStyle = "rgba(91,123,255,.22)";
-      ctx.fillRect(0, 0, LOG_W, 1);
-      ctx.strokeStyle = "#2446e0";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(0.5, 0.5, LOG_W - 1, LOG_H - 1);
-      ctx.strokeStyle = "rgba(245,215,110,.35)";
-      ctx.strokeRect(1.5, 1.5, LOG_W - 3, LOG_H - 3);
-      ctx.fillStyle = "#f5d76e";
-      ctx.font = "12px ArkPixel12, monospace";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("-50%", LOG_W / 2, LOG_H / 2 + 0.5);
-      ctx.fillStyle = "rgba(245,215,110,.55)";
-      ctx.fillRect(6, LOG_H - 4, LOG_W - 12, 1);
+    var stickerLabel = null;
+    var stickerValue = null;
+    var stickerW = 96;
+    var stickerH = 56;
+    function paintSticker() {
+      var t = palette(detectScheme());
+      var pixel = pixelFontEnabled();
+      stickerEl.style.background = t.card;
+      stickerEl.style.borderColor = t.line;
+      stickerEl.style.boxShadow = "0 6px 16px " + t.shadow;
+      stickerLabel.style.color = t.dim;
+      stickerValue.style.color = t.accent;
+      stickerValue.style.fontFamily = pixel ? FONT_PIXEL : FONT_SANS;
+      stickerValue.style.fontSize = pixel ? "24px" : "22px";
+      stickerValue.style.fontWeight = pixel ? "400" : "600";
+      stickerW = stickerEl.offsetWidth || stickerW;
+      stickerH = stickerEl.offsetHeight || stickerH;
     }
     function ensureSticker() {
       if (stickerEl) return;
-      stickerCanvas = document.createElement("canvas");
       stickerEl = document.createElement("div");
       stickerEl.id = "dsh-nascence-pet-sticker";
       stickerEl.style.cssText = [
@@ -1703,10 +1961,21 @@
         "pointer-events:none",
         "display:none",
         "will-change:transform,opacity",
-        "image-rendering:pixelated"
+        "box-sizing:border-box",
+        "padding:8px 14px 9px",
+        "border:1px solid transparent",
+        "border-radius:" + CARD_RADIUS + "px",
+        "text-align:center",
+        "white-space:nowrap"
       ].join(";");
-      stickerCanvas.style.cssText = "display:block;image-rendering:pixelated";
-      stickerEl.appendChild(stickerCanvas);
+      stickerLabel = document.createElement("div");
+      stickerLabel.textContent = "VALLEY";
+      stickerLabel.style.cssText = "font:500 9.5px/1.2 " + FONT_MONO + ";letter-spacing:" + LABEL_TRACKING + ";padding-left:" + LABEL_TRACKING;
+      stickerValue = document.createElement("div");
+      stickerValue.textContent = "-50%";
+      stickerValue.style.cssText = "line-height:1.15;letter-spacing:0.02em;margin-top:2px;font-variant-numeric:tabular-nums";
+      stickerEl.appendChild(stickerLabel);
+      stickerEl.appendChild(stickerValue);
       document.body.appendChild(stickerEl);
     }
     function showValleySticker() {
@@ -1714,22 +1983,8 @@
       if (!s || s.period !== "valley") return;
       if (!settings2.bubble) return;
       ensureSticker();
-      if (!stickerReady) {
-        try {
-          document.fonts.load("12px ArkPixel12").then(function() {
-            drawSticker();
-            stickerReady = true;
-          }).catch(function() {
-            drawSticker();
-            stickerReady = true;
-          });
-        } catch (err) {
-          drawSticker();
-          stickerReady = true;
-        }
-        drawSticker();
-        stickerReady = true;
-      }
+      stickerEl.style.display = "block";
+      paintSticker();
       var petSize = size();
       var cx = pet.pos.x + petSize.w / 2;
       var leftOfPet = cx > window.innerWidth / 2;
@@ -1762,146 +2017,31 @@
     function dispose() {
       if (stickerEl && stickerEl.parentNode) stickerEl.parentNode.removeChild(stickerEl);
       stickerEl = null;
-      stickerCanvas = null;
-      stickerReady = false;
+      stickerLabel = null;
+      stickerValue = null;
     }
     return { show: showValleySticker, dispose };
-  }
-
-  // assets/src/ui/plate-format.js
-  var PLATE_MAX_ROW_WIDTH = 430;
-  var PLATE_LINE_HEIGHT = 18;
-  var PLATE_PADDING_Y = 4;
-  var PLATE_PADDING_X = 8;
-  var PLATE_GROUP_GAP = 12;
-  var PLATE_SEGMENT_GAP = 5;
-  var PLATE_DOT_SIZE = 5;
-  var PLATE_FONT_SIZE = 10.5;
-  var LEVEL_WARN = 75;
-  var LEVEL_ERROR = 90;
-  function normalizeScheme(raw) {
-    const text = String(raw === null || raw === void 0 ? "" : raw).trim().toLowerCase();
-    if (!text || text === "normal" || text === "no-preference") return null;
-    if (text === "dark") return "dark";
-    if (text === "light") return "light";
-    if (text.includes("dark") && !text.includes("light")) return "dark";
-    if (text.includes("light") && !text.includes("dark")) return "light";
-    return null;
-  }
-  function levelOf(percent) {
-    if (percent === null || percent === void 0) return "idle";
-    const value = Number(percent);
-    if (!Number.isFinite(value)) return "idle";
-    if (value >= LEVEL_ERROR) return "error";
-    if (value >= LEVEL_WARN) return "warn";
-    return "ok";
-  }
-  function formatPercent(percent) {
-    if (percent === null || percent === void 0) return "--";
-    const value = Number(percent);
-    if (!Number.isFinite(value)) return "--";
-    return Math.round(value) + "%";
-  }
-  function formatGigabytes(bytes) {
-    if (bytes === null || bytes === void 0) return "--";
-    const value = Number(bytes);
-    if (!Number.isFinite(value) || value < 0) return "--";
-    return (value / (1024 * 1024 * 1024)).toFixed(1) + "G";
-  }
-  function formatGpuLine(gpu) {
-    const g = gpu || {};
-    const index = Number.isFinite(Number(g.index)) ? Number(g.index) : 0;
-    const parts = ["GPU" + index, formatPercent(g.usage)];
-    const used = formatGigabytes(g.memUsed);
-    const total = formatGigabytes(g.memTotal);
-    if (used !== "--" && total !== "--") parts.push(used.replace(/G$/, "") + "/" + total);
-    if (Number.isFinite(Number(g.temp)) && g.temp !== null && g.temp !== void 0) {
-      parts.push(Math.round(Number(g.temp)) + "\xB0C");
-    }
-    return parts.join(" ");
-  }
-  function buildSegments(sample) {
-    const s = sample || {};
-    const segments = [{
-      key: "cpu",
-      tone: "cpu",
-      text: "CPU " + formatPercent(s.cpu),
-      level: levelOf(s.cpu)
-    }];
-    const gpus = Array.isArray(s.gpus) ? s.gpus : [];
-    for (let i = 0; i < gpus.length; i++) {
-      const gpu = gpus[i] || {};
-      const index = Number.isFinite(Number(gpu.index)) ? Number(gpu.index) : i;
-      segments.push({
-        key: "gpu" + index,
-        tone: "gpu",
-        text: formatGpuLine(gpu),
-        level: levelOf(gpu.usage)
-      });
-    }
-    const mem = s.mem && s.mem.percent !== void 0 ? s.mem.percent : null;
-    segments.push({
-      key: "mem",
-      tone: "mem",
-      text: "\u5185\u5B58 " + formatPercent(mem),
-      level: levelOf(mem)
-    });
-    return segments;
   }
 
   // assets/src/ui/plate.js
   var POLL_MS = 2e3;
   var FETCH_TIMEOUT_MS = 2500;
   var GAP = 8;
-  var CHAMFER = 5;
-  var PALETTES = {
-    dark: {
-      surface: "#111842",
-      border: "#2446e0",
-      drop: "#0a0e24",
-      text: "#e8ecf8",
-      cpu: "#5b7bff",
-      gpu: "#8c6bff",
-      mem: "#f5d76e",
-      ok: "#6ee7b7",
-      warn: "#f5d76e",
-      error: "#ff6b8b",
-      idle: "#7d8ab8"
-    },
-    light: {
-      surface: "#f5f7fd",
-      border: "#2446e0",
-      drop: "#c6d1f7",
-      text: "#141a3a",
-      cpu: "#2446e0",
-      gpu: "#6b4ce6",
-      mem: "#a67c00",
-      ok: "#1f7a5c",
-      warn: "#b7791f",
-      error: "#c0395b",
-      idle: "#7c88b0"
-    }
-  };
-  function detectScheme() {
-    try {
-      var root = document.documentElement;
-      var scheme = normalizeScheme(root.style && root.style.colorScheme);
-      if (scheme) return scheme;
-      scheme = normalizeScheme(root.getAttribute("data-theme") || root.getAttribute("data-color-scheme"));
-      if (scheme) return scheme;
-      try {
-        scheme = normalizeScheme(window.getComputedStyle(root).colorScheme);
-        if (scheme) return scheme;
-      } catch (err) {
-      }
-      if (root.classList) {
-        if (root.classList.contains("dark")) return "dark";
-        if (root.classList.contains("light")) return "light";
-      }
-      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
-    } catch (err) {
-    }
-    return "light";
+  function plateColors(scheme) {
+    var t = palette(scheme);
+    return {
+      surface: t.card,
+      border: t.line,
+      shadow: t.shadow,
+      text: t.text,
+      cpu: t.text,
+      gpu: t.text,
+      mem: t.text,
+      ok: t.accent,
+      warn: t.warn,
+      error: scheme === "light" ? "#d0384f" : "#ff6b7f",
+      idle: t.dim
+    };
   }
   function createPlate(deps) {
     var settings2 = deps.settings;
@@ -1919,9 +2059,8 @@
     var lastError = null;
     var lastPos = null;
     var theme = detectScheme();
-    var palette = PALETTES[theme];
-    var mediaQuery = null;
-    var themeObserver = null;
+    var palette2 = plateColors(theme);
+    var unwatch = null;
     function createSeg() {
       var wrap = document.createElement("span");
       wrap.style.cssText = "display:inline-flex;align-items:center;gap:" + PLATE_SEGMENT_GAP + "px;white-space:nowrap";
@@ -1930,11 +2069,12 @@
         "display:inline-block",
         "width:" + PLATE_DOT_SIZE + "px",
         "height:" + PLATE_DOT_SIZE + "px",
+        "border-radius:50%",
         "flex:0 0 auto",
-        "background:" + palette.idle
+        "background:" + palette2.idle
       ].join(";");
       var text = document.createElement("span");
-      text.style.cssText = "color:" + palette.text + ";white-space:nowrap";
+      text.style.cssText = "color:" + palette2.text + ";white-space:nowrap";
       wrap.appendChild(dot);
       wrap.appendChild(text);
       return { wrap, dot, text };
@@ -1956,18 +2096,17 @@
         "user-select:none",
         "width:max-content",
         "max-width:" + PLATE_MAX_ROW_WIDTH + "px",
-        'font-family:ui-monospace,"Cascadia Mono",Consolas,monospace',
+        "font-family:" + FONT_MONO,
         "font-size:" + PLATE_FONT_SIZE + "px",
         "line-height:" + PLATE_LINE_HEIGHT + "px",
         "font-variant-numeric:tabular-nums",
-        "letter-spacing:0",
-        "image-rendering:pixelated"
+        "letter-spacing:0"
       ].join(";");
       boxEl = document.createElement("div");
       boxEl.style.cssText = [
-        "padding:2px",
-        "border-radius:0",
-        "clip-path:polygon(" + CHAMFER + "px 0,calc(100% - " + CHAMFER + "px) 0,100% " + CHAMFER + "px,100% calc(100% - " + CHAMFER + "px),calc(100% - " + CHAMFER + "px) 100%," + CHAMFER + "px 100%,0 calc(100% - " + CHAMFER + "px),0 " + CHAMFER + "px)"
+        "border:1px solid transparent",
+        "border-radius:" + CARD_RADIUS + "px",
+        "overflow:hidden"
       ].join(";");
       rowEl = document.createElement("div");
       rowEl.style.cssText = [
@@ -1976,8 +2115,7 @@
         "align-items:center",
         "column-gap:" + PLATE_GROUP_GAP + "px",
         "row-gap:0px",
-        "padding:" + PLATE_PADDING_Y + "px " + PLATE_PADDING_X + "px",
-        "clip-path:polygon(3px 0,calc(100% - 3px) 0,100% 3px,100% calc(100% - 3px),calc(100% - 3px) 100%,3px 100%,0 calc(100% - 3px),0 3px)"
+        "padding:" + PLATE_PADDING_Y + "px " + PLATE_PADDING_X + "px"
       ].join(";");
       boxEl.appendChild(rowEl);
       el.appendChild(boxEl);
@@ -1988,16 +2126,18 @@
     function applyPalette() {
       if (!el) return;
       el.setAttribute("data-tn-pet-plate-scheme", theme);
-      el.style.filter = "drop-shadow(4px 4px 0 " + palette.drop + ")";
-      el.style.color = palette.text;
-      if (boxEl) boxEl.style.background = palette.border;
-      if (rowEl) rowEl.style.background = palette.surface;
+      el.style.filter = "drop-shadow(0 4px 10px " + palette2.shadow + ")";
+      el.style.color = palette2.text;
+      if (boxEl) {
+        boxEl.style.borderColor = palette2.border;
+        boxEl.style.background = palette2.surface;
+      }
     }
     function syncTheme() {
       var next = detectScheme();
       if (next === theme) return;
       theme = next;
-      palette = PALETTES[theme];
+      palette2 = plateColors(theme);
       applyPalette();
       render(lastSample);
     }
@@ -2015,8 +2155,8 @@
           rowEl.appendChild(node.wrap);
         }
         if (rowEl.childNodes[i] !== node.wrap) rowEl.insertBefore(node.wrap, rowEl.childNodes[i] || null);
-        node.dot.style.background = palette[seg.level] || palette.idle;
-        node.text.style.color = palette[seg.tone] || palette.text;
+        node.dot.style.background = palette2[seg.level] || palette2.idle;
+        node.text.style.color = palette2[seg.tone] || palette2.text;
         node.text.textContent = seg.text;
       }
       Object.keys(segNodes).forEach(function(key) {
@@ -2123,41 +2263,11 @@
       }
     }
     function watchTheme() {
-      if (!mediaQuery) {
-        try {
-          mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-          if (mediaQuery.addEventListener) mediaQuery.addEventListener("change", syncTheme);
-          else if (mediaQuery.addListener) mediaQuery.addListener(syncTheme);
-        } catch (err) {
-          mediaQuery = null;
-        }
-      }
-      if (!themeObserver) {
-        try {
-          themeObserver = new MutationObserver(syncTheme);
-          themeObserver.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ["style", "class", "data-theme", "data-color-scheme", "data-ds-theme-source"]
-          });
-        } catch (err) {
-          themeObserver = null;
-        }
-      }
+      if (!unwatch) unwatch = watchScheme(syncTheme);
     }
     function unwatchTheme() {
-      try {
-        if (mediaQuery) {
-          if (mediaQuery.removeEventListener) mediaQuery.removeEventListener("change", syncTheme);
-          else if (mediaQuery.removeListener) mediaQuery.removeListener(syncTheme);
-        }
-      } catch (err) {
-      }
-      mediaQuery = null;
-      try {
-        if (themeObserver) themeObserver.disconnect();
-      } catch (err) {
-      }
-      themeObserver = null;
+      if (unwatch) unwatch();
+      unwatch = null;
     }
     function start() {
       running = true;
@@ -4191,6 +4301,47 @@
   }
 
   // assets/src/ui/settings-page.js
+  var C = {
+    text: "var(--tn-text, inherit)",
+    dim: "var(--tn-text-dim, var(--dsh-text-2, #8f9abb))",
+    line: "var(--tn-line-strong, var(--dsh-border, rgba(127,127,127,.35)))",
+    hairline: "var(--tn-line, var(--dsh-border, rgba(127,127,127,.18)))",
+    field: "var(--tn-navy, transparent)",
+    card: "var(--tn-navy, transparent)"
+  };
+  var INPUT_STYLE = {
+    padding: "6px 9px",
+    borderRadius: CONTROL_RADIUS,
+    border: "1px solid " + C.line,
+    background: C.field,
+    color: C.text,
+    font: "inherit",
+    outline: "none"
+  };
+  var GHOST_BUTTON = {
+    border: "1px solid " + C.line,
+    background: "transparent",
+    color: C.text,
+    borderRadius: CONTROL_RADIUS,
+    cursor: "pointer",
+    padding: "2px 9px",
+    font: "inherit"
+  };
+  var KICKER = {
+    fontFamily: FONT_MONO,
+    fontSize: 10.5,
+    letterSpacing: LABEL_TRACKING,
+    textTransform: "uppercase",
+    color: C.dim
+  };
+  function SectionTitle(h, kicker, title) {
+    return h(
+      "div",
+      { style: { margin: "28px 0 6px", paddingTop: 16, borderTop: "1px solid " + C.hairline } },
+      h("div", { style: KICKER }, kicker),
+      h("h3", { style: { margin: "4px 0 0", fontSize: 15, fontWeight: 500, color: C.text } }, title)
+    );
+  }
   var STATE_GROUPS = [
     ["idle", "\u95F2\u65F6\u968F\u673A"],
     ["sadIdle", "\u60B2\u4F24\u65F6\u968F\u673A"],
@@ -4218,16 +4369,16 @@
       return h(
         "label",
         { style: { display: "flex", alignItems: "center", gap: 12, margin: "10px 0" } },
-        h("span", { style: { width: 150, color: "var(--dsh-text-2, #666)" } }, props.label),
+        h("span", { style: { width: 150, color: C.dim } }, props.label),
         h("input", {
           type: "number",
           value: props.value,
           min: props.min,
           step: props.step || 1,
           onChange: (e) => props.onChange(Number(e.target.value)),
-          style: { width: 140, padding: "6px 8px", borderRadius: 6, border: "1px solid var(--dsh-border, #ccc)", background: "transparent", color: "inherit" }
+          style: Object.assign({ width: 140, fontFamily: FONT_MONO }, INPUT_STYLE)
         }),
-        props.hint ? h("span", { style: { fontSize: 12, opacity: 0.65 } }, props.hint) : null
+        props.hint ? h("span", { style: { fontSize: 12, color: C.dim } }, props.hint) : null
       );
     }
     function ListEditor(props) {
@@ -4239,14 +4390,14 @@
         h(
           "div",
           { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 6 } },
-          h("strong", null, props.title),
+          h("strong", { style: { fontWeight: 500, color: C.text } }, props.title),
           h("button", {
             type: "button",
             onClick: () => update(list.concat("")),
-            style: { border: "1px solid var(--dsh-border, #bbb)", background: "transparent", color: "inherit", borderRadius: 6, cursor: "pointer", padding: "2px 8px" }
+            style: GHOST_BUTTON
           }, "+")
         ),
-        list.length === 0 ? h("div", { style: { fontSize: 12, opacity: 0.6 } }, "\u7A7A\uFF0C\u4E0D\u663E\u793A\u901A\u77E5") : null,
+        list.length === 0 ? h("div", { style: { fontSize: 12, color: C.dim } }, "\u7A7A\uFF0C\u4E0D\u663E\u793A\u901A\u77E5") : null,
         list.map((text, i) => h(
           "div",
           { key: i, style: { display: "flex", gap: 6, marginBottom: 4 } },
@@ -4258,12 +4409,12 @@
               next[i] = e.target.value;
               update(next);
             },
-            style: { flex: 1, padding: "5px 8px", borderRadius: 6, border: "1px solid var(--dsh-border, #ccc)", background: "transparent", color: "inherit" }
+            style: Object.assign({ flex: 1 }, INPUT_STYLE)
           }),
           h("button", {
             type: "button",
             onClick: () => update(list.filter((_, j) => j !== i)),
-            style: { border: "1px solid var(--dsh-border, #bbb)", background: "transparent", color: "inherit", borderRadius: 6, cursor: "pointer", padding: "2px 8px" }
+            style: GHOST_BUTTON
           }, "\u2212")
         ))
       );
@@ -4317,49 +4468,54 @@
       }
       return h(
         "div",
-        { style: { padding: "8px 4px 32px", maxWidth: 720 } },
-        h("h2", { style: { margin: "0 0 4px", fontSize: 20 } }, "Nascence \u684C\u5BA0"),
-        h("p", { style: { margin: "0 0 18px", opacity: 0.65, fontSize: 13 } }, "\u4F4E\u9891\u914D\u7F6E\u3002\u5927\u5C0F\u3001\u900F\u660E\u5EA6\u3001\u6C14\u6CE1\u6837\u5F0F\u4ECD\u5728\u53F3\u952E\u9762\u677F\u91CC\u3002"),
-        h(Field, {
-          label: "\u4F59\u989D\u4E0D\u8DB3\u9608\u503C",
-          value: settings2.lowThreshold === void 0 ? SETTINGS_DEFAULTS.lowThreshold : settings2.lowThreshold,
-          min: 0,
-          step: 1,
-          onChange: (v) => patch({ lowThreshold: v }),
-          hint: "\u5143"
-        }),
-        h(Field, {
-          label: "\u95F2\u65F6\u5BF9\u8BDD\u95F4\u9694",
-          value: settings2.idleChatterMinutes === void 0 ? SETTINGS_DEFAULTS.idleChatterMinutes : settings2.idleChatterMinutes,
-          min: 0,
-          step: 1,
-          onChange: (v) => patch({ idleChatterMinutes: v }),
-          hint: "\u5206\u949F\uFF1B0 = \u5173\u95ED"
-        }),
-        h(Field, {
-          label: "\u95F2\u65F6\u5BF9\u8BDD\u89E6\u53D1\u6982\u7387",
-          value: Math.round((settings2.idleChatterChance === void 0 ? SETTINGS_DEFAULTS.idleChatterChance : settings2.idleChatterChance) * 100),
-          min: 0,
-          step: 5,
-          onChange: (v) => patch({ idleChatterChance: Math.min(1, Math.max(0, v / 100)) }),
-          hint: "%"
-        }),
-        h("h3", { style: { margin: "26px 0 4px", fontSize: 16 } }, "\u95F2\u65F6\u5BF9\u8BDD\u6C60"),
+        { style: { padding: "8px 4px 32px", maxWidth: 720, fontFamily: FONT_SANS, color: C.text } },
+        h("div", { style: KICKER }, "Timeless Nascence"),
+        h("h2", { style: { margin: "4px 0 4px", fontSize: 18, fontWeight: 500 } }, "Nascence \u684C\u5BA0"),
+        h("p", { style: { margin: "0 0 18px", color: C.dim, fontSize: 13 } }, "\u4F4E\u9891\u914D\u7F6E\u3002\u5927\u5C0F\u3001\u900F\u660E\u5EA6\u3001\u6C14\u6CE1\u6837\u5F0F\u4E0E\u50CF\u7D20\u5B57\u4F53\u4ECD\u5728\u53F3\u952E\u9762\u677F\u91CC\u3002"),
+        h(
+          "div",
+          { style: { padding: "6px 16px", border: "1px solid " + C.hairline, borderRadius: CARD_RADIUS, background: C.card } },
+          h(Field, {
+            label: "\u4F59\u989D\u4E0D\u8DB3\u9608\u503C",
+            value: settings2.lowThreshold === void 0 ? SETTINGS_DEFAULTS.lowThreshold : settings2.lowThreshold,
+            min: 0,
+            step: 1,
+            onChange: (v) => patch({ lowThreshold: v }),
+            hint: "\u5143"
+          }),
+          h(Field, {
+            label: "\u95F2\u65F6\u5BF9\u8BDD\u95F4\u9694",
+            value: settings2.idleChatterMinutes === void 0 ? SETTINGS_DEFAULTS.idleChatterMinutes : settings2.idleChatterMinutes,
+            min: 0,
+            step: 1,
+            onChange: (v) => patch({ idleChatterMinutes: v }),
+            hint: "\u5206\u949F\uFF1B0 = \u5173\u95ED"
+          }),
+          h(Field, {
+            label: "\u95F2\u65F6\u5BF9\u8BDD\u89E6\u53D1\u6982\u7387",
+            value: Math.round((settings2.idleChatterChance === void 0 ? SETTINGS_DEFAULTS.idleChatterChance : settings2.idleChatterChance) * 100),
+            min: 0,
+            step: 5,
+            onChange: (v) => patch({ idleChatterChance: Math.min(1, Math.max(0, v / 100)) }),
+            hint: "%"
+          })
+        ),
+        SectionTitle(h, "Idle", "\u95F2\u65F6\u5BF9\u8BDD\u6C60"),
         STATE_GROUPS.map(([key, title]) => h(ListEditor, {
           key,
           title,
           value: settings2.dialogues && settings2.dialogues[key] || [],
           onChange: (v) => patchDialogue(key, v)
         })),
-        h("h3", { style: { margin: "26px 0 4px", fontSize: 16 } }, "\u70B9\u51FB\u4EA4\u4E92\u5BF9\u8BDD\u6C60"),
-        h("p", { style: { margin: "0 0 8px", opacity: 0.62, fontSize: 12 } }, "\u6BCF\u6B21\u70B9\u51FB\u4ECE\u300C\u901A\u7528\u6C60 + \u5F53\u524D\u72B6\u6001\u6C60\u300D\u4E2D\u62BD\u53D6\uFF1B\u4E09\u79CD\u72B6\u6001\u5404\u6709\u4E00\u4EFD\u72EC\u7ACB\u7684\u95F2\u65F6\u5BF9\u8BDD\u6C60\u3002"),
+        SectionTitle(h, "Interact", "\u70B9\u51FB\u4EA4\u4E92\u5BF9\u8BDD\u6C60"),
+        h("p", { style: { margin: "0 0 8px", color: C.dim, fontSize: 12 } }, "\u6BCF\u6B21\u70B9\u51FB\u4ECE\u300C\u901A\u7528\u6C60 + \u5F53\u524D\u72B6\u6001\u6C60\u300D\u4E2D\u62BD\u53D6\uFF1B\u4E09\u79CD\u72B6\u6001\u5404\u6709\u4E00\u4EFD\u72EC\u7ACB\u7684\u95F2\u65F6\u5BF9\u8BDD\u6C60\u3002"),
         INTERACT_GROUPS.map(([key, title]) => h(ListEditor, {
           key,
           title,
           value: settings2.dialogues && settings2.dialogues[key] || [],
           onChange: (v) => patchDialogue(key, v)
         })),
-        h("h3", { style: { margin: "26px 0 4px", fontSize: 16 } }, "\u7279\u6B8A\u4E8B\u4EF6\u5BF9\u8BDD\u6C60"),
+        SectionTitle(h, "Events", "\u7279\u6B8A\u4E8B\u4EF6\u5BF9\u8BDD\u6C60"),
         EVENT_GROUPS.map(([key, title]) => h(ListEditor, {
           key,
           title,
@@ -4372,7 +4528,7 @@
           h("button", {
             type: "button",
             onClick: close,
-            style: { padding: "8px 16px", borderRadius: 8, border: "1px solid var(--dsh-border, #bbb)", background: "transparent", color: "inherit", cursor: "pointer" }
+            style: Object.assign({}, GHOST_BUTTON, { padding: "7px 18px" })
           }, "\u5173\u95ED")
         )
       );

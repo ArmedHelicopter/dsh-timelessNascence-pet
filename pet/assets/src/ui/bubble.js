@@ -1,10 +1,11 @@
-// dsh-nascence-pet — 像素气泡（工厂）
+// dsh-nascence-pet — 对话气泡（工厂）
 //
-// 结构：一个 fixed 容器里放「SVG 背景（像素边框 + 硬阴影）+ 文本层」，
-// 文本用 Ark Pixel 12px 像素字体；整体 pointer-events:none，不挡下面 UI。
+// 结构：一个 fixed 容器里放「SVG 背景（圆角卡片 + 发丝线 + 尾巴）+ 文本层」，
+// 默认无衬线字体（像素字体是可选项，默认关闭）；整体 pointer-events:none，不挡下面 UI。
 // 依赖注入：getState() 读 /state、pet、size()、settings。
 
 import { PREFIX } from '../core/env.js'
+import { palette, detectScheme, pixelFontEnabled, FONT_SANS, FONT_PIXEL, CARD_RADIUS } from './theme.js'
 
 export function createBubble(deps) {
   var getState = deps.getState
@@ -13,22 +14,38 @@ export function createBubble(deps) {
   var settings = deps.settings
   var container = deps.container
 
-  // ————————————————————— 气泡（像素风）—————————————————————
-  // 结构：一个 fixed 容器里放「SVG 背景（像素边框 + 硬阴影）+ 文本层」，
-  // 文本用 Ark Pixel 12px 像素字体；整体 pointer-events:none，不挡下面 UI。
-  var BUBBLE_FONT = '"ArkPixel12", ui-monospace, monospace'
-  // 像素字体是 12px 设计的矢量轮廓：只有按整数倍渲染才严格清晰。
-  // 100% 基准：金额 48 / 降档 36 / 辅助 24（4× / 3× / 2×），整体再按 bubbleScale 缩放。
-  var BUBBLE_SIZE = 24        // 辅助行（2×）
-  var BUBBLE_SIZE_MID = 36    // 金额行降档（3×）
-  var BUBBLE_SIZE_BIG = 48    // 金额行（4×）
-  var BUBBLE_LINE = 30
+  // ————————————————————— 气泡 —————————————————————
+  // 默认：navy（深色）/ 白（浅色）圆角卡片 + 1px 发丝线，无衬线字体。
+  // 像素字体（可选）：Ark Pixel 12px 只有整数倍渲染才清晰 → 用 24/36/48 三档。
+  var BUBBLE_FONT = FONT_SANS
+  var BUBBLE_SIZE = 15        // 辅助行
+  var BUBBLE_SIZE_MID = 22    // 金额行降档
+  var BUBBLE_SIZE_BIG = 28    // 金额行
+  var BUBBLE_LINE = 22
+  var LINE_MID = 30
+  var LINE_BIG = 36
   var BUBBLE_PAD = 12
   var BUBBLE_HIDE_MS = 5200
   // 对话/事件气泡：当前 4.2s 作为最短基准，之后按可见字数延长。
   var BUBBLE_MIN_MS = 4200
   var BUBBLE_CHAR_MS = 90
-  var BUBBLE_CORNER = 6
+  var BUBBLE_CORNER = CARD_RADIUS
+  var pixelMode = false
+
+  /** 按当前字体偏好切换字号档位（像素字体保持整数倍） */
+  function syncMetrics() {
+    pixelMode = pixelFontEnabled()
+    if (pixelMode) {
+      BUBBLE_FONT = FONT_PIXEL
+      BUBBLE_SIZE = 24; BUBBLE_SIZE_MID = 36; BUBBLE_SIZE_BIG = 48
+      BUBBLE_LINE = 30; LINE_MID = 44; LINE_BIG = 56
+    } else {
+      BUBBLE_FONT = FONT_SANS
+      BUBBLE_SIZE = 15; BUBBLE_SIZE_MID = 22; BUBBLE_SIZE_BIG = 28
+      BUBBLE_LINE = 22; LINE_MID = 30; LINE_BIG = 36
+    }
+  }
+  syncMetrics()
   var TAIL_W = 14
   var TAIL_H = 10
 
@@ -44,9 +61,9 @@ export function createBubble(deps) {
     return Math.max(1, Math.round(base * bubbleFactor()))
   }
 
-  /** 基准字号 → 行高（56/44/30 三档，按缩放系数取整） */
+  /** 基准字号 → 行高（三档，按缩放系数取整） */
   function bubbleLineH(size) {
-    var base = size >= BUBBLE_SIZE_BIG ? 56 : (size >= BUBBLE_SIZE_MID ? 44 : BUBBLE_LINE)
+    var base = size >= BUBBLE_SIZE_BIG ? LINE_BIG : (size >= BUBBLE_SIZE_MID ? LINE_MID : BUBBLE_LINE)
     return Math.max(1, Math.round(base * bubbleFactor()))
   }
   var bubbleEl = null
@@ -80,6 +97,8 @@ export function createBubble(deps) {
   var bubbleMode = 'info'   // 'event'（事件反馈，过期即收）| 'info'（点击查看，常驻 5.2s）
 
   function ensureFont() {
+    syncMetrics()
+    if (!pixelMode) return
     if (document.getElementById('dsh-nascence-pet-font')) return
     var st = document.createElement('style')
     st.id = 'dsh-nascence-pet-font'
@@ -102,38 +121,30 @@ export function createBubble(deps) {
       'position:fixed', 'left:0', 'top:0', 'z-index:2147482002',
       'pointer-events:none', 'opacity:0',
       'transform-origin:center bottom',
-      'filter:none',
     ].join(';')
 
     bubbleSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    bubbleSvg.setAttribute('shape-rendering', 'crispEdges')
     bubbleSvg.style.cssText = 'position:absolute;left:0;top:0;overflow:visible'
     bubbleEl.appendChild(bubbleSvg)
 
     bubbleTextEl = document.createElement('div')
     bubbleTextEl.style.cssText = [
       'position:absolute', 'white-space:pre',
-      'font-family:' + BUBBLE_FONT,
-      'font-size:' + bubblePx(BUBBLE_SIZE) + 'px',
-      'line-height:' + bubbleLineH(BUBBLE_SIZE) + 'px',
-      'color:#e8ecf8', 'letter-spacing:0',
-      '-webkit-font-smoothing:none', 'font-smooth:never',
-      'text-rendering:geometricPrecision',
+      'letter-spacing:0',
     ].join(';')
     bubbleEl.appendChild(bubbleTextEl)
 
     ;(container || document.body).appendChild(bubbleEl)
   }
 
-  // 单行最大宽度（CSS px，100% 基准）。24px 像素字体下一个汉字正好 24px，
-  // 放宽到 420（约 17 字）让常见内容单行显示，超长仍会折行兜底。
+  // 单行最大宽度（CSS px，100% 基准）：放宽到 420 让常见内容单行显示，超长仍会折行兜底。
   var BUBBLE_MAX_W = 420
 
-  function measureText(text, size) {
+  function measureText(text, size, bold) {
     var px = bubblePx(size || BUBBLE_SIZE)
     var cv = measureText._cv || (measureText._cv = document.createElement('canvas'))
     var ctx = cv.getContext('2d')
-    ctx.font = px + 'px ' + BUBBLE_FONT
+    ctx.font = (bold ? (pixelMode ? '700 ' : '600 ') : '') + px + 'px ' + BUBBLE_FONT
     return ctx.measureText(text).width
   }
 
@@ -163,25 +174,31 @@ export function createBubble(deps) {
     return out
   }
 
-  // 像素气泡外框：四角切 4px 斜角；尾巴默认朝下（气泡在桌宠上方），
-  // 桌面边缘放不下时气泡翻到下方，尾巴改为朝上。
+  // 气泡外框：圆角卡片 + 小三角尾巴；尾巴默认朝下（气泡在桌宠上方），
+  // 桌面边缘放不下时气泡翻到下方，尾巴改为朝上。坐标偏移 0.5 让 1px 描边落在整像素上。
   function bubblePath(w, h, tailX, tailUp) {
-    var c = bubblePx(BUBBLE_CORNER)
+    var r = Math.min(bubblePx(BUBBLE_CORNER), Math.floor(w / 2), Math.floor(h / 3))
     var t = bubblePx(TAIL_H)
     var tw = bubblePx(TAIL_W)
+    var o = 0.5
+    var x0 = o
+    var x1 = w - o
+    var tm = tailX + tw / 2
     if (!tailUp) {
-      var bodyH = h - t
+      var y0 = o
+      var y1 = h - t - o
       return [
-        'M', c, 0, 'H', w - c, 'V', c, 'H', w, 'V', bodyH - c, 'H', w - c, 'V', bodyH,
-        'H', tailX + tw, 'V', h, 'H', tailX, 'V', bodyH,
-        'H', c, 'V', bodyH - c, 'H', 0, 'V', c, 'Z',
+        'M', x0 + r, y0, 'H', x1 - r, 'Q', x1, y0, x1, y0 + r, 'V', y1 - r, 'Q', x1, y1, x1 - r, y1,
+        'H', tailX + tw, 'L', tm, h - o, 'L', tailX, y1,
+        'H', x0 + r, 'Q', x0, y1, x0, y1 - r, 'V', y0 + r, 'Q', x0, y0, x0 + r, y0, 'Z',
       ].join(' ')
     }
-    var top = t
+    var top = t + o
+    var bottom = h - o
     return [
-      'M', c, top, 'H', tailX, 'V', 0, 'H', tailX + tw, 'V', top,
-      'H', w - c, 'V', top + c, 'H', w, 'V', h - c, 'H', w - c, 'V', h,
-      'H', c, 'V', h - c, 'H', 0, 'V', top + c, 'H', c, 'Z',
+      'M', x0 + r, top, 'H', tailX, 'L', tm, o, 'L', tailX + tw, top,
+      'H', x1 - r, 'Q', x1, top, x1, top + r, 'V', bottom - r, 'Q', x1, bottom, x1 - r, bottom,
+      'H', x0 + r, 'Q', x0, bottom, x0, bottom - r, 'V', top + r, 'Q', x0, top, x0 + r, top, 'Z',
     ].join(' ')
   }
 
@@ -198,9 +215,11 @@ export function createBubble(deps) {
     bubbleSvg.setAttribute('height', String(h + 6))
     bubbleSvg.setAttribute('viewBox', `0 0 ${w + 6} ${h + 6}`)
     var d = bubblePath(w, h, tailX, bubbleTailUp)
+    var t = palette(detectScheme())
     bubbleSvg.innerHTML =
-      '<path d="' + d + '" fill="#0a0e24" fill-opacity=".68" transform="translate(3,3)"/>' +
-      '<path d="' + d + '" fill="#111842" stroke="#5b7bff" stroke-width="2"/>'
+      '<path d="' + d + '" fill="' + t.card + '" stroke="' + t.line + '" stroke-width="1"/>'
+    bubbleEl.style.filter = 'drop-shadow(0 6px 16px ' + t.shadow + ')'
+    bubbleTextEl.style.color = t.text
   }
 
   // 气泡内容按「行」渲染，每行可独立字号/颜色/粗细。行对象：{ text, size, color, bold }
@@ -252,14 +271,14 @@ export function createBubble(deps) {
     var widest = 0
     var totalH = 0
     for (var i = 0; i < rows.length; i++) {
-      widest = Math.max(widest, measureText(rows[i].text, rows[i].size))
+      widest = Math.max(widest, measureText(rows[i].text, rows[i].size, rows[i].bold))
       totalH += bubbleLineH(rows[i].size)
     }
     var pad = bubblePx(BUBBLE_PAD)
     var tailH = bubblePx(TAIL_H)
     var w = Math.ceil(widest) + pad * 2 + 4
     var h = totalH + pad * 2 + tailH
-    // 对齐到偶数像素，保证像素边缘清晰
+    // 对齐到偶数像素，保证边缘清晰
     w = Math.ceil(w / 2) * 2
     h = Math.ceil(h / 2) * 2
     bubbleW = w
@@ -272,6 +291,8 @@ export function createBubble(deps) {
     bubbleTailUp = !!tailUp
     drawBubbleFrame()
 
+    bubbleTextEl.style.fontFamily = BUBBLE_FONT
+    bubbleTextEl.style.webkitFontSmoothing = pixelMode ? 'none' : ''
     bubbleTextEl.style.left = (pad + 2) + 'px'
     bubbleTextEl.style.top = ((tailUp ? tailH : 0) + pad + 1) + 'px'
     // 逐行建 span：字号/颜色/粗细各自独立，行高按字号取整数倍
@@ -280,7 +301,7 @@ export function createBubble(deps) {
       var rr = rows[ri]
       var style = 'display:block;font-size:' + bubblePx(rr.size) + 'px;line-height:' + bubbleLineH(rr.size) + 'px'
       if (rr.color) style += ';color:' + rr.color
-      if (rr.bold) style += ';font-weight:700'
+      if (rr.bold) style += ';font-weight:' + (pixelMode ? '700' : '600')
       html += '<span style="' + style + '">' + escapeHtml(rr.text) + '</span>'
     }
     bubbleTextEl.innerHTML = html
@@ -358,17 +379,18 @@ export function createBubble(deps) {
 
   // 气泡内容：金额行最大，其余为小字辅助行（分级排版由 bubbleTiers 开关控制）
   function bubbleLines() {
+    var tone = palette(detectScheme())
     // 事件反馈期间**只显示反馈内容**，不掺余额/花费/峰谷
     if ((bubbleEventRows || bubbleEventText) && Date.now() < bubbleEventUntil) {
       if (bubbleEventRows) {
         return bubbleEventRows.map(function (r) {
           var tier = r.tier
           var size = r.size
-          if (!size) size = tier === 'title' ? BUBBLE_SIZE + 6 : tier === 'number' ? BUBBLE_SIZE_BIG : tier === 'tag' ? BUBBLE_SIZE - 4 : BUBBLE_SIZE
+          if (!size) size = tier === 'title' ? BUBBLE_SIZE + (pixelMode ? 6 : 3) : tier === 'number' ? BUBBLE_SIZE_BIG : tier === 'tag' ? BUBBLE_SIZE - (pixelMode ? 4 : 2) : BUBBLE_SIZE
           return {
             text: r.text,
             size: size,
-            color: r.color || (tier === 'tag' ? '#9aa7d6' : tier === 'title' ? '#f5d76e' : tier === 'number' ? '#5b7bff' : ''),
+            color: r.color || (tier === 'tag' ? tone.dim : tier === 'title' ? tone.accent : ''),
             bold: r.bold === undefined ? (tier === 'title' || tier === 'number') : !!r.bold,
           }
         })
@@ -387,6 +409,7 @@ export function createBubble(deps) {
   }
 
   function infoLines() {
+    var tone = palette(detectScheme())
     var rows = []
     var s = getState()
     var b = s && s.balance
@@ -400,7 +423,7 @@ export function createBubble(deps) {
       var hint = ''
       if (b.low) hint = '星尘快耗尽了！'
       if (b.stale) hint = (hint ? hint + ' ' : '') + '未刷新'
-      if (hint) rows.push({ text: hint, size: BUBBLE_SIZE, color: '#f5d76e' })
+      if (hint) rows.push({ text: hint, size: BUBBLE_SIZE, color: tone.warn })
     } else if (b && b.signedOut) {
       rows.push({ text: '管理员还没有登录视界哦', size: BUBBLE_SIZE })
     } else {
@@ -414,14 +437,14 @@ export function createBubble(deps) {
         rows.push({ text: parts.join(' · '), size: BUBBLE_SIZE })
         // 使用源脚注：同样字号、颜色压淡
         var foot = sourceFootnote(sp)
-        if (foot) rows.push({ text: foot, size: BUBBLE_SIZE, color: '#9aa7d6' })
+        if (foot) rows.push({ text: foot, size: BUBBLE_SIZE, color: tone.dim })
       }
       var peak = s.period === 'peak'
       var left = s.periodNextChangeAt ? Math.max(0, s.periodNextChangeAt - Date.now()) : null
       rows.push({
         text: (peak ? '潮汐高峰' : '引力低潮') + (left !== null ? ' 距' + (peak ? '低潮' : '高峰') + ' ' + hhmmss(left) : ''),
         size: BUBBLE_SIZE,
-        color: peak ? '#8c6bff' : '#f5d76e',
+        color: peak ? tone.accent : tone.dim,
       })
     }
     return rows
