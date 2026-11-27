@@ -1,0 +1,65 @@
+{
+  "name": "dsh-closure-pet",
+  "version": "3.2.0",
+  "description": "可露希尔桌宠（基于游戏截图的二次创作）：透明动画、余额与花费提示",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./icon": "./icon.png",
+    "./package.json": "./package.json",
+    "./locale/*": "./locale/*"
+  },
+  "icon": "./icon.png",
+  "files": [
+    "locale",
+    "lib",
+    "assets",
+    "docs",
+    "tests",
+    "icon.png",
+    "cordis.patch.yml",
+    "README.md",
+    "NOTICE.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build:client": "node tools/build-client.mjs",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "check": "node --check lib/index.js && node --check assets/src/main.js && node --check assets/src/client-entry.js"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "desktop-pet",
+    "video",
+    "arknights",
+    "closure",
+    "pixel-art"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    }
+  },
+  "engines": {
+    "dsh": ">=0.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fengshiyangrouguan/dsh-closure-pet.git"
+  },
+  "homepage": "https://github.com/fengshiyangrouguan/dsh-closure-pet#readme",
+  "bugs": {
+    "url": "https://github.com/fengshiyangrouguan/dsh-closure-pet/issues"
+  },
+  "license": "MIT",
+  "author": "FSYRG",
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
+
