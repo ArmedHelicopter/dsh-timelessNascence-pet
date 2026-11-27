@@ -31,7 +31,20 @@ CLIPS = {
     "think_begin": ("think_begin.mp4", 0,   0,   3.0, False),
     "think_idle":  ("think_idle.mp4",  0,   0,   2.0, False),
     "think_exit":  ("think_begin.mp4", 0,   0,   3.0, True),
+    # idle variants (random, played from the Idle loop)
+    "idle_star":    ("idle_star.mp4",    0, 0, 2.0, False),
+    "idle_orbit":   ("idle_orbit.mp4",   0, 0, 2.0, False),
+    "idle_feather": ("idle_feather.mp4", 0, 0, 2.0, False),
+    # scene reactions
+    "nod":          ("nod.mp4",          0, 0, 2.4, False),
+    "concern":      ("concern.mp4",      0, 0, 2.4, False),
+    "surprise":     ("surprise.mp4",     0, 0, 2.4, False),
 }
+
+# Fixed crop box. Height 720 decides the scale (place(): min(888*0.98/w, 748*0.92/h)), so any width
+# up to ~910 keeps the character exactly the same size; 910 wide centred on the old box (x=639) leaves
+# room for props that swing far out (the Idle_Orbit black hole).
+FIXED_BOX = [184, 0, 1094, 720]
 
 
 def union_box():
@@ -45,8 +58,8 @@ def union_box():
 
 def main():
     os.makedirs(OUT, exist_ok=True)
-    box = union_box()
-    print("shared box", box)
+    box = FIXED_BOX
+    print("fixed box", box, "(union would be", union_box(), ")")
     only = set(sys.argv[1:])
     for name, (src, start, dur, speed, rev) in CLIPS.items():
         if only and name not in only:

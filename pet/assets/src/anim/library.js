@@ -25,9 +25,16 @@ export const CLIPS = {
   Talk: { src: 'talk.webm', duration: 5.000 },
   Interact_1: { src: 'interact_1.webm', duration: 4.000 },
   Interact_2: { src: 'interact_2.webm', duration: 4.000 },
+  Idle_Star: { src: 'idle_star.webm', duration: 4.000 },
+  Idle_Orbit: { src: 'idle_orbit.webm', duration: 4.000 },
+  Idle_Feather: { src: 'idle_feather.webm', duration: 4.000 },
+  Nod: { src: 'nod.webm', duration: 3.330 },
+  Concern: { src: 'concern.webm', duration: 3.330 },
+  Surprise: { src: 'surprise.webm', duration: 3.330 },
 }
 
 export const ANIMATION_NAMES = [
   'Idle', 'Sad_Idle', 'Think_Idle', 'Happy', 'Sad_Begin', 'Think_Begin',
   'Celebrate', 'Talk', 'Interact_1', 'Interact_2',
+  'Idle_Star', 'Idle_Orbit', 'Idle_Feather', 'Nod', 'Concern', 'Surprise',
 ]

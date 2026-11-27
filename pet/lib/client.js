@@ -222,16 +222,16 @@
   var HIT_GROW = 6;
   var HIT_FORMS = [
     ["r", -76.2, 307.4, 26.7, 337.8, 9.1],
-    ["r", -81.7, 276.4, 64.6, 307.4, 9.3],
+    ["r", -81.7, 276.4, 64.1, 307.4, 9.3],
     ["r", -97.2, 245.5, 80.1, 276.4, 9.3],
     ["r", -110.7, 214.5, 86.6, 245.5, 9.3],
-    ["r", -113.7, 183.6, 98.6, 214.5, 9.3],
+    ["r", -113.7, 183.6, 98.1, 214.5, 9.3],
     ["r", -106.2, 153.1, 88.1, 183.6, 9.2],
-    ["r", -109.2, 122.2, 94.1, 153.1, 9.3],
+    ["r", -109.2, 122.2, 93.6, 153.1, 9.3],
     ["r", -118.7, 91.2, 104.1, 122.2, 9.3],
-    ["r", -108.2, 60.3, 96.6, 91.2, 9.3],
-    ["r", -79.2, 29.3, 73.6, 60.3, 9.3],
-    ["r", -41.8, -1.6, 29.2, 29.3, 9.3]
+    ["r", -108.7, 60.3, 96.1, 91.2, 9.3],
+    ["r", -79.2, 29.3, 73.1, 60.3, 9.3],
+    ["r", -42.3, -1.6, 29.2, 29.3, 9.3]
   ];
   function hitFormIn(form, x, y) {
     var g = HIT_GROW;
@@ -302,7 +302,13 @@
     Celebrate: { src: "celebrate.webm", duration: 4 },
     Talk: { src: "talk.webm", duration: 5 },
     Interact_1: { src: "interact_1.webm", duration: 4 },
-    Interact_2: { src: "interact_2.webm", duration: 4 }
+    Interact_2: { src: "interact_2.webm", duration: 4 },
+    Idle_Star: { src: "idle_star.webm", duration: 4 },
+    Idle_Orbit: { src: "idle_orbit.webm", duration: 4 },
+    Idle_Feather: { src: "idle_feather.webm", duration: 4 },
+    Nod: { src: "nod.webm", duration: 3.33 },
+    Concern: { src: "concern.webm", duration: 3.33 },
+    Surprise: { src: "surprise.webm", duration: 3.33 }
   };
   var ANIMATION_NAMES = [
     "Idle",
@@ -314,7 +320,13 @@
     "Celebrate",
     "Talk",
     "Interact_1",
-    "Interact_2"
+    "Interact_2",
+    "Idle_Star",
+    "Idle_Orbit",
+    "Idle_Feather",
+    "Nod",
+    "Concern",
+    "Surprise"
   ];
 
   // assets/src/audio.js
@@ -2796,7 +2808,7 @@
       notice: new LowBalanceNotice()
     },
     "tool-success": {
-      videos: ["Happy"],
+      videos: ["Nod", "Happy"],
       priority: 30,
       queue: false,
       notice: null
@@ -2809,20 +2821,23 @@
       notice: null
     },
     "tool-fail": {
-      videos: [{ clip: "Sad_Begin", from: 0.4, to: 1.8 }],
+      videos: ["Concern"],
+      fallback: [{ clip: "Sad_Begin", from: 0.4, to: 1.8 }],
       priority: 70,
       queue: true,
       // 固定格式“工具调用失败：工具名”，不开放文案配置。
       notice: new ToolFailNotice()
     },
     "turn-interrupted": {
-      videos: [{ clip: "Sad_Begin", from: 0.4, to: 1.8 }],
+      videos: ["Surprise"],
+      fallback: [{ clip: "Sad_Begin", from: 0.4, to: 1.8 }],
       priority: 70,
       queue: false,
       notice: new InterruptedNotice()
     },
     error: {
-      videos: [{ clip: "Sad_Begin", from: 0.4, to: 1.8 }],
+      videos: ["Concern"],
+      fallback: [{ clip: "Sad_Begin", from: 0.4, to: 1.8 }],
       priority: 70,
       queue: true,
       notice: new ErrorNotice()
@@ -2854,6 +2869,13 @@
       fadeIn: 320,
       notice: new CreditedNotice()
     },
+    // 闲置时随机换一段待机小动作（无文字），播完回 Idle 循环。
+    idleVariant: {
+      videos: ["Idle_Star", "Idle_Orbit", "Idle_Feather"],
+      priority: 0,
+      queue: false,
+      notice: null
+    },
     idleChatter: {
       videos: ["Talk"],
       priority: 0,
@@ -2867,9 +2889,15 @@
   function clipOf(name) {
     return CLIPS[name] || null;
   }
+  function available(list) {
+    return (list || []).filter((v) => clipOf(typeof v === "string" ? v : v && v.clip));
+  }
   function eventClip(def) {
-    if (!def || !def.videos || !def.videos.length) return null;
-    const item = def.videos[Math.floor(Math.random() * def.videos.length)];
+    if (!def) return null;
+    let list = available(def.videos);
+    if (!list.length) list = available(def.fallback);
+    if (!list.length) return null;
+    const item = list[Math.floor(Math.random() * list.length)];
     return typeof item === "string" ? { clip: item } : item;
   }
   function createMachine(opts) {
@@ -3114,6 +3142,12 @@
         fire("idleChatter", fx);
         return fx;
       }
+      if (event.type === "IDLE_VARIANT_DUE") {
+        if (!s.active || s.active.kind !== "base" || s.base.state !== "idle") return fx;
+        if (s.target !== "idle" || s.work !== "idle" || s.queue.length) return fx;
+        fire("idleVariant", fx);
+        return fx;
+      }
       if (event.type === "IDLE_DONE") {
         if (s.active && s.active.kind === "base" && s.active.id === event.id && s.base.state === "idle") {
           s.base.idleReady = true;
@@ -3242,6 +3276,11 @@
       }
     }
     startChatter(idleChatterMs, chatterChance);
+    const idleVariantMs = deps.idleVariantMs === void 0 ? 3e4 : deps.idleVariantMs;
+    const idleVariantChance = deps.idleVariantChance === void 0 ? 0.5 : deps.idleVariantChance;
+    let variantTimer = idleVariantMs > 0 ? setInterval(() => {
+      if (Math.random() <= idleVariantChance) dispatch({ type: "IDLE_VARIANT_DUE" });
+    }, idleVariantMs) : 0;
     return {
       machine,
       getState: () => machine.state,
@@ -3273,6 +3312,10 @@
         if (chatterTimer) {
           clearInterval(chatterTimer);
           chatterTimer = 0;
+        }
+        if (variantTimer) {
+          clearInterval(variantTimer);
+          variantTimer = 0;
         }
         for (const t of timers) clearTimeout(t);
         timers.clear();
