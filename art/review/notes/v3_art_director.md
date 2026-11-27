@@ -12,3 +12,6 @@ v4: bold sticker restyle (fixed 9/12). v5: 3 stars + single chain, white outline
 v7: hooks restored. v8: client direction -> serene divine closed-mouth smile. v9: chain beside stars, softer hair shadows.
 v9 verdict: 只剩轻微问题 (minor: hook size, chain finesse, star colors, slight lavender hair drift, eye liner, 2nd shadow tone, gloves).
 MASTER = art/keyframes/v9_0.jpg
+
+v10-v12: client correction (thorn branch, not chain); AD self-corrected silver stars + sheer mesh top; v12 verdict 只剩轻微问题.
+MASTER = art/keyframes/v12_0.jpg

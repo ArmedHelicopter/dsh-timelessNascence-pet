@@ -5,7 +5,9 @@
   on her left side.
 - Eyes: blue iris with a LARGE bright-yellow four-pointed star in each pupil (her signature).
 - Outfit: white halter-neck top with bare shoulders; cobalt-blue hooded jacket worn OFF both shoulders, light-blue
-  hood lining; a row of silver hook-loops across the chest; thorn-like silver chain trim down the front edges; large
+  hood lining; a row of silver thorn-tipped hook-loops on a cord across the chest; a THORN BRANCH (briar stem, NOT a
+  chain): a thin dark-gunmetal twisted stem with sharp thorns pointing outward at alternating angles, running
+  diagonally from under the brooch down across the front to the hem; an arrow-head hook ornament on the sleeve; large
   silver four-pointed star ornaments on the hem; wide sleeves with a silver arrow/hook detail; HANDS VISIBLE (not
   hidden in sleeves), white fingerless glove on one hand, thin blue rings on fingers; white ascot/neckerchief with a
   blue wave pattern and a blue gem brooch; white dress; white knee socks; black loafers.
