@@ -29,10 +29,9 @@ promo/src/
 ### 复现步骤
 
 ```sh
-# 0) 依赖：Python 3 + playwright（Chromium）、ffmpeg
-python -m http.server  # ❌ 不要用这个：它不支持 Range
+# 依赖：Python 3 + playwright（Chromium）+ ffmpeg
 
-# 1) 起带 Range 的静态服务（仓库根目录）
+# 1) 起带 Range 的静态服务（在仓库根目录，从 8917 提供整个仓库）
 python promo/src/serve.py . 8917
 
 # 2) 预览若干帧（不用渲染整片）
