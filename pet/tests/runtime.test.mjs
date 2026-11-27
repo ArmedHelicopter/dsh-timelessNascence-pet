@@ -15,7 +15,7 @@ function harness() {
       return true
     },
   }
-  const rt = createRuntime({
+  const rt = createRuntime({ idleVariantMs: 0,
     player,
     log: () => {},
     showNotice: (spec, event) => notices.push({ spec, event }),

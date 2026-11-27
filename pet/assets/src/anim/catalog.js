@@ -41,7 +41,7 @@ export const EVENTS = {
   },
 
   'tool-success': {
-    videos: ['Happy'],
+    videos: ['Nod', 'Happy'],
     priority: 30,
     queue: false,
     notice: null,
@@ -56,7 +56,8 @@ export const EVENTS = {
   },
 
   'tool-fail': {
-    videos: [{ clip: 'Sad_Begin', from: 0.4, to: 1.8 }],
+    videos: ['Concern'],
+    fallback: [{ clip: 'Sad_Begin', from: 0.4, to: 1.8 }],
     priority: 70,
     queue: true,
     // 固定格式“工具调用失败：工具名”，不开放文案配置。
@@ -64,14 +65,16 @@ export const EVENTS = {
   },
 
   'turn-interrupted': {
-    videos: [{ clip: 'Sad_Begin', from: 0.4, to: 1.8 }],
+    videos: ['Surprise'],
+    fallback: [{ clip: 'Sad_Begin', from: 0.4, to: 1.8 }],
     priority: 70,
     queue: false,
     notice: new InterruptedNotice(),
   },
 
   error: {
-    videos: [{ clip: 'Sad_Begin', from: 0.4, to: 1.8 }],
+    videos: ['Concern'],
+    fallback: [{ clip: 'Sad_Begin', from: 0.4, to: 1.8 }],
     priority: 70,
     queue: true,
     notice: new ErrorNotice(),
@@ -106,6 +109,14 @@ export const EVENTS = {
     queue: false,
     fadeIn: 320,
     notice: new CreditedNotice(),
+  },
+
+  // 闲置时随机换一段待机小动作（无文字），播完回 Idle 循环。
+  idleVariant: {
+    videos: ['Idle_Star', 'Idle_Orbit', 'Idle_Feather'],
+    priority: 0,
+    queue: false,
+    notice: null,
   },
 
   idleChatter: {

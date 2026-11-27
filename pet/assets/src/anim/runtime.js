@@ -103,6 +103,13 @@ export function createRuntime(deps) {
   }
   startChatter(idleChatterMs, chatterChance)
 
+  // 待机小动作：默认每 30s 掷一次 50%；idleVariantMs=0 关闭（测试用）。
+  const idleVariantMs = deps.idleVariantMs === undefined ? 30000 : deps.idleVariantMs
+  const idleVariantChance = deps.idleVariantChance === undefined ? 0.5 : deps.idleVariantChance
+  let variantTimer = idleVariantMs > 0 ? setInterval(() => {
+    if (Math.random() <= idleVariantChance) dispatch({ type: 'IDLE_VARIANT_DUE' })
+  }, idleVariantMs) : 0
+
   return {
     machine,
     getState: () => machine.state,
@@ -127,6 +134,7 @@ export function createRuntime(deps) {
     },
     dispose: () => {
       if (chatterTimer) { clearInterval(chatterTimer); chatterTimer = 0 }
+      if (variantTimer) { clearInterval(variantTimer); variantTimer = 0 }
       for (const t of timers) clearTimeout(t)
       timers.clear()
     },

@@ -10,9 +10,17 @@ function clipOf(name) {
   return CLIPS[name] || null
 }
 
+function available(list) {
+  return (list || []).filter((v) => clipOf(typeof v === 'string' ? v : v && v.clip))
+}
+
+// 只从已登记的片段里挑；主列表一个都没有时退回 fallback（新片段未生成前保持旧行为）。
 function eventClip(def) {
-  if (!def || !def.videos || !def.videos.length) return null
-  const item = def.videos[Math.floor(Math.random() * def.videos.length)]
+  if (!def) return null
+  let list = available(def.videos)
+  if (!list.length) list = available(def.fallback)
+  if (!list.length) return null
+  const item = list[Math.floor(Math.random() * list.length)]
   return typeof item === 'string' ? { clip: item } : item
 }
 
@@ -282,6 +290,13 @@ export function createMachine(opts) {
     if (event.type === 'IDLE_CHATTER_DUE') {
       if (s.active && s.active.kind !== 'base') return fx
       fire('idleChatter', fx)
+      return fx
+    }
+    if (event.type === 'IDLE_VARIANT_DUE') {
+      // 只在真正闲着（Idle 循环中、没有工作、目标也是 idle）时换一段待机小动作。
+      if (!s.active || s.active.kind !== 'base' || s.base.state !== 'idle') return fx
+      if (s.target !== 'idle' || s.work !== 'idle' || s.queue.length) return fx
+      fire('idleVariant', fx)
       return fx
     }
     if (event.type === 'IDLE_DONE') {

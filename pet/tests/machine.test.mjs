@@ -143,3 +143,24 @@ test('低优先级 idleChatter 不打断转场', () => {
   assert.equal(after.length, 0)
   assert.equal(m.state.active.id, before)
 })
+
+test('闲置小动作：只在 Idle 循环且无工作时触发，片段未登记时不播', () => {
+  const m = createMachine({ target: 'idle' })
+  effects(m, { type: 'CONDITIONS', low: false, work: 'idle' })
+  const fx = effects(m, { type: 'IDLE_VARIANT_DUE' })
+  const plays = playEffects(fx)
+  // 新片段登记后会播其中之一；未登记时回到 Idle（不出错）。
+  assert.ok(plays.length <= 1)
+  if (plays.length) assert.match(plays[0].clip, /^(Idle_Star|Idle_Orbit|Idle_Feather|Idle)$/)
+
+  const busy = createMachine({ target: 'idle', work: 'outputting' })
+  effects(busy, { type: 'CONDITIONS', low: false, work: 'outputting' })
+  assert.equal(playEffects(effects(busy, { type: 'IDLE_VARIANT_DUE' })).length, 0)
+})
+
+test('tool-fail 优先用 Concern，未登记时退回 Sad 片段', () => {
+  const m = createMachine({ target: 'idle' })
+  effects(m, { type: 'CONDITIONS', low: false, work: 'idle' })
+  const fx = effects(m, { type: 'FIRE', name: 'tool-fail' })
+  assert.match(playEffects(fx)[0].clip, /^(Concern|Sad_Begin)$/)
+})
