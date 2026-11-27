@@ -20,6 +20,7 @@ const CONTENT_TYPES = {
   '.webm': 'video/webm',
   '.ogg': 'audio/ogg',
   '.wav': 'audio/wav',
+  '.mp3': 'audio/mpeg',
   '.css': 'text/css; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
 }

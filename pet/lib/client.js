@@ -56,7 +56,7 @@
     opacity: 1,
     sound: true,
     volume: 0.7,
-    voice: false,
+    voice: true,
     voiceLang: "zh",
     voiceVolume: 0.7,
     lowThreshold: LOW_THRESHOLD_DEFAULT,
