@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Nascence clips preview</title>
+<style>
+  body { margin: 0; background: radial-gradient(circle at 70% 30%, #1c2456, #0a0e24 70%); color: #e8ecf8;
+         font: 14px system-ui, sans-serif; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; }
+  figure { margin: 0; text-align: center; }
+  video { width: 100%; aspect-ratio: 888 / 748; }
+  figcaption { opacity: .8; }
+</style>
+<div class="grid" id="g"></div>
+<script>
+  const clips = ['idle', 'talk', 'happy', 'celebrate', 'interact_1', 'interact_2',
+                 'sad_begin', 'sad_idle', 'sad_exit', 'think_begin', 'think_idle', 'think_exit'];
+  const g = document.getElementById('g');
+  for (const c of clips) {
+    const f = document.createElement('figure');
+    f.innerHTML = `<video src="../assets/video/${c}.webm" autoplay muted loop playsinline></video><figcaption>${c}</figcaption>`;
+    g.appendChild(f);
+  }
+</script>

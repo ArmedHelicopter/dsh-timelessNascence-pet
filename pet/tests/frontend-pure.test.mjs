@@ -40,7 +40,8 @@ test('静态命中区：尺寸、覆盖率、中心/角落/越界', () => {
   let cells = 0
   for (let i = 0; i < mask.length; i++) cells += mask[i]
   const ratio = cells / mask.length
-  assert.ok(ratio > 0.5 && ratio < 0.75, 'mask coverage ' + ratio)
+  // Nascence has no floating props in the sprite, so she covers less of the frame than Closure did.
+  assert.ok(ratio > 0.3 && ratio < 0.75, 'mask coverage ' + ratio)
   assert.equal(hit.maskHit(mask, 0.5, 0.4), true)
   assert.equal(hit.maskHit(mask, 0.02, 0.02), false)
   assert.equal(hit.maskHit(mask, 1.2, 0.5), false)

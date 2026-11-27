@@ -15,3 +15,5 @@ MASTER = art/keyframes/v9_0.jpg
 
 v10-v12: client correction (thorn branch, not chain); AD self-corrected silver stars + sheer mesh top; v12 verdict 只剩轻微问题.
 MASTER = art/keyframes/v12_0.jpg
+
+v13-v14: client rules marble-white skin/no blush, pure white hair; v14 verdict 只剩轻微问题. MASTER = art/keyframes/v14_0.jpg (Flow size 347236)

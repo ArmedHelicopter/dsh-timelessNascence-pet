@@ -64,6 +64,11 @@ def key(im, bg):
     t = np.clip(gx / max(bgx, 1.0), 0, 1)          # 1 = pure background
     alpha = 1.0 - np.clip((t - 0.25) / 0.5, 0, 1)   # soft ramp
     alpha = cv2.GaussianBlur(alpha, (3, 3), 0)
+    # source videos carry 1-2px edge artifacts (thin lines) — never keep the outer border
+    alpha[:4, :] = 0
+    alpha[-4:, :] = 0
+    alpha[:, :4] = 0
+    alpha[:, -4:] = 0
     # despill: limit green to max(r, b) where partly transparent or greenish
     spill = g > np.maximum(r, b)
     g2 = np.where(spill, np.maximum(r, b) + (g - np.maximum(r, b)) * 0.15, g)
@@ -89,8 +94,19 @@ def auto_box(frames, bg):
     """Union bbox of opaque pixels over all frames (padded), so crop is stable."""
     acc = None
     for im in frames[:: max(1, len(frames) // 12)]:
-        a = key(im, bg)[..., 3] > 40
-        acc = a if acc is None else (acc | a)
+        a = (key(im, bg)[..., 3] > 128).astype(np.uint8)
+        a[:4, :] = 0
+        a[-4:, :] = 0
+        a[:, :4] = 0
+        a[:, -4:] = 0
+        a = cv2.morphologyEx(a, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+        n, lab, st, _ = cv2.connectedComponentsWithStats(a)
+        h, w = a.shape
+        keep = np.zeros_like(a, bool)
+        for i in range(1, n):
+            if st[i][4] > h * w * 0.0008:
+                keep |= lab == i
+        acc = keep if acc is None else (acc | keep)
     ys, xs = np.nonzero(acc)
     pad = 16
     return [max(0, xs.min() - pad), max(0, ys.min() - pad),
@@ -107,9 +123,12 @@ def main():
     ap.add_argument("--scale", type=float, default=0.92)
     ap.add_argument("--box", type=str, default="")
     ap.add_argument("--reverse", action="store_true")
+    ap.add_argument("--speed", type=float, default=1.0)
     a = ap.parse_args()
 
     frames = read_frames(a.inp, a.start, a.dur, a.fps)
+    if a.speed != 1.0:
+        frames = [frames[int(i)] for i in np.arange(0, len(frames), a.speed)]
     if not frames:
         sys.exit("no frames")
     bg = bg_color(frames[0])

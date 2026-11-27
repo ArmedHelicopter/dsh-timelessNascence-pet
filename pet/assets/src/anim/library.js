@@ -13,18 +13,18 @@ export const HAPPY_CHANCE = 0.25
 
 // 片段表：src 相对 /assets/video/；duration 只用于调试与取整，播放以 video 元素为准。
 export const CLIPS = {
-  Idle: { src: 'idle.webm', duration: 1.467, loop: true },
-  Sad_Idle: { src: 'sad_idle.webm', duration: 2.133, loop: true },
-  Think_Idle: { src: 'think_idle.webm', duration: 2.133, loop: true },
-  Happy: { src: 'happy.webm', duration: 2.833 },
-  Sad_Begin: { src: 'sad_begin.webm', duration: 2.567 },
-  Sad_Exit: { src: 'sad_exit.webm', duration: 2.567 },
-  Think_Begin: { src: 'think_begin.webm', duration: 1.567 },
-  Think_Exit: { src: 'think_exit.webm', duration: 1.567 },
-  Celebrate: { src: 'celebrate.webm', duration: 2.0 },
-  Talk: { src: 'talk.webm', duration: 5.0 },
-  Interact_1: { src: 'interact_1.webm', duration: 2.4 },
-  Interact_2: { src: 'interact_2.webm', duration: 2.167 },
+  Idle: { src: 'idle.webm', duration: 4.300, loop: true },
+  Sad_Idle: { src: 'sad_idle.webm', duration: 3.970, loop: true },
+  Think_Idle: { src: 'think_idle.webm', duration: 3.970, loop: true },
+  Happy: { src: 'happy.webm', duration: 3.970 },
+  Sad_Begin: { src: 'sad_begin.webm', duration: 2.670 },
+  Sad_Exit: { src: 'sad_exit.webm', duration: 2.670 },
+  Think_Begin: { src: 'think_begin.webm', duration: 2.670 },
+  Think_Exit: { src: 'think_exit.webm', duration: 2.670 },
+  Celebrate: { src: 'celebrate.webm', duration: 3.970 },
+  Talk: { src: 'talk.webm', duration: 4.970 },
+  Interact_1: { src: 'interact_1.webm', duration: 3.970 },
+  Interact_2: { src: 'interact_2.webm', duration: 3.970 },
 }
 
 export const ANIMATION_NAMES = [

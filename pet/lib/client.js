@@ -221,28 +221,17 @@
   var HIT_MASK_H = 108;
   var HIT_GROW = 6;
   var HIT_FORMS = [
-    ["e", 13, 265, 78, 48],
-    // 头 / 头发
-    ["e", -74.5, 232, 32, 23],
-    // 左双马尾
-    ["e", 60, 264, 30, 42],
-    // 右双马尾
-    ["e", -80, 123.5, 46, 50],
-    // 左袖
-    ["e", 70, 143, 46.5, 74],
-    // 右袖
-    ["r", -98, 71.5, 94, 318, 34],
-    // 躯干
-    ["r", -53.5, 9.5, 46, 96, 19],
-    // 腿
-    ["c", -38, 24, 15, 19.5, 30],
-    // 鞋
-    ["e", -158, 222, 71, 74],
-    // 左小飞机（含蝙蝠）
-    ["e", 141, 246, 67, 76],
-    // 右小飞机（含蝙蝠）
-    ["e", 93, 40, 87, 48]
-    // 右下角游戏卡
+    ["r", -65.7, 307.4, 39.7, 337.8, 9.1],
+    ["r", -85.7, 276.4, 76.1, 307.4, 9.3],
+    ["r", -99.2, 245.5, 91.6, 276.4, 9.3],
+    ["r", -161.7, 214.5, 94.1, 245.5, 9.3],
+    ["r", -149.2, 183.6, 95.1, 214.5, 9.3],
+    ["r", -129.7, 153.1, 101.6, 183.6, 9.2],
+    ["r", -130.7, 122.2, 102.6, 153.1, 9.3],
+    ["r", -126.2, 91.2, 98.1, 122.2, 9.3],
+    ["r", -115.7, 60.3, 87.6, 91.2, 9.3],
+    ["r", -94.2, 29.3, 68.6, 60.3, 9.3],
+    ["r", -49.3, -1.6, 22.2, 29.3, 9.3]
   ];
   function hitFormIn(form, x, y) {
     var g = HIT_GROW;
@@ -302,18 +291,18 @@
   var CLIP_FADE_MS = 320;
   var HAPPY_CHANCE = 0.25;
   var CLIPS = {
-    Idle: { src: "idle.webm", duration: 1.467, loop: true },
-    Sad_Idle: { src: "sad_idle.webm", duration: 2.133, loop: true },
-    Think_Idle: { src: "think_idle.webm", duration: 2.133, loop: true },
-    Happy: { src: "happy.webm", duration: 2.833 },
-    Sad_Begin: { src: "sad_begin.webm", duration: 2.567 },
-    Sad_Exit: { src: "sad_exit.webm", duration: 2.567 },
-    Think_Begin: { src: "think_begin.webm", duration: 1.567 },
-    Think_Exit: { src: "think_exit.webm", duration: 1.567 },
-    Celebrate: { src: "celebrate.webm", duration: 2 },
-    Talk: { src: "talk.webm", duration: 5 },
-    Interact_1: { src: "interact_1.webm", duration: 2.4 },
-    Interact_2: { src: "interact_2.webm", duration: 2.167 }
+    Idle: { src: "idle.webm", duration: 4.3, loop: true },
+    Sad_Idle: { src: "sad_idle.webm", duration: 3.97, loop: true },
+    Think_Idle: { src: "think_idle.webm", duration: 3.97, loop: true },
+    Happy: { src: "happy.webm", duration: 3.97 },
+    Sad_Begin: { src: "sad_begin.webm", duration: 2.67 },
+    Sad_Exit: { src: "sad_exit.webm", duration: 2.67 },
+    Think_Begin: { src: "think_begin.webm", duration: 2.67 },
+    Think_Exit: { src: "think_exit.webm", duration: 2.67 },
+    Celebrate: { src: "celebrate.webm", duration: 3.97 },
+    Talk: { src: "talk.webm", duration: 4.97 },
+    Interact_1: { src: "interact_1.webm", duration: 3.97 },
+    Interact_2: { src: "interact_2.webm", duration: 3.97 }
   };
   var ANIMATION_NAMES = [
     "Idle",

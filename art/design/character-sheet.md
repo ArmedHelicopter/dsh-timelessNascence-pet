@@ -13,6 +13,8 @@
   blue wave pattern and a blue gem brooch; white dress; white knee socks; black loafers.
 - Style note: borrow only the ART STYLE of dsh-closure-pet (chibi proportions, thick dark lines, cel shading,
   floating props) — never its character design (no hand-hiding mega sleeves).
+- Hair color: pure snow-white silver with faint cool grey shading — never lavender/purple.
+- Skin: very pale, cool white like polished marble/porcelain, sacred and statuesque; NO blush, no pink cheeks.
 - Mood: pure, flawless, quietly divine — a serene gentle smile (closed or softly parted lips, NO fang, never impish
   or devilish), calm kind eyes; playfulness only in gestures (wink, finger-frame, heart hands, "好宇宙…" spaced-out face).
 - Motif: cosmos, black hole with an accretion ring, orbit lines, four-pointed stars, moon, white feathers.
