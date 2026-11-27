@@ -11,7 +11,8 @@
   blue wave pattern and a blue gem brooch; white dress; white knee socks; black loafers.
 - Style note: borrow only the ART STYLE of dsh-closure-pet (chibi proportions, thick dark lines, cel shading,
   floating props) — never its character design (no hand-hiding mega sleeves).
-- Mood: calm, gentle, a bit mischievous (winks, finger-frame gesture, heart hands, "好宇宙…" spaced-out face).
+- Mood: pure, flawless, quietly divine — a serene gentle smile (closed or softly parted lips, NO fang, never impish
+  or devilish), calm kind eyes; playfulness only in gestures (wink, finger-frame, heart hands, "好宇宙…" spaced-out face).
 - Motif: cosmos, black hole with an accretion ring, orbit lines, four-pointed stars, moon, white feathers.
 
 ## Chibi pet style (matches dsh-closure-pet)
