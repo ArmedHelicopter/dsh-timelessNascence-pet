@@ -402,7 +402,7 @@ export function createBubble(deps) {
       if (b.stale) hint = (hint ? hint + ' ' : '') + '未刷新'
       if (hint) rows.push({ text: hint, size: BUBBLE_SIZE, color: '#f5d76e' })
     } else if (b && b.signedOut) {
-      rows.push({ text: '观测者还没有登录视界哦', size: BUBBLE_SIZE })
+      rows.push({ text: '管理员还没有登录视界哦', size: BUBBLE_SIZE })
     } else {
       rows.push({ text: '嗯……星尘数据还没同步', size: BUBBLE_SIZE })
     }

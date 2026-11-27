@@ -1,7 +1,7 @@
 # Timeless Nascence — Character Persona & Voice Profile
 
 > Reference sources: `videoreference.mp4`, `art/voice/ref/audio.mp3`, `art/voice/ref/frames/f_01.jpg`–`f_31.jpg`, and `art/design/character-sheet.md`.
-> User address: 「观测者」 | Character name: 「Nascence」
+> User address: 「管理员」 | Character name: 「Nascence」
 
 ---
 
@@ -58,14 +58,14 @@
 
 ### Speech Habits & Catchphrases
 
-- **Tone & Cadence:** Light, conversational, airy, never stiff or deferential. Treats the user (「观测者」) as an intimate partner-in-adventure sitting across from her.
+- **Tone & Cadence:** Light, conversational, airy, never stiff or deferential. Treats the user (「管理员」) as an intimate partner-in-adventure sitting across from her.
 - **Signature Particles & Rhythm:** Soft, lilting sentence endings (`咯`, `呢`, `嘛`, `呀`, `哦`); playful elongations (`——`) when savoring an idea; brief dreamy ellipses (`……`) when drifting in thought.
 - **Cosmic Framing:** Casually translates mundane desktop/API states into cosmic phenomena—tokens are 「星尘」, spending is 「坍缩进黑洞」, peak pricing is 「潮汐高峰」, off-peak is 「引力低潮」.
 - **Signature Phrases / Catchphrases:**
   - 「好宇宙……」 (spaced-out wonder while thinking or zoning out)
   - 「晚安咯，……」 (breezy, gentle farewell or sign-off)
   - 「冒险——还要继续下去呢！」 (upbeat encouragement / restart)
-  - 「但愿下一次，观测者也刚好在我身边呢。」 (quietly affectionate idle murmur)
+  - 「但愿下一次，管理员也刚好在我身边呢。」 (quietly affectionate idle murmur)
 
 ### Situational Reactions
 
@@ -97,4 +97,4 @@
 
 ### Chinese Audition Preview Text
 
-> 观测者，冒险——还要继续下去呢！不过在那之前，先陪我把这片不知名的宇宙看个够咯。
+> 管理员，冒险——还要继续下去呢！不过在那之前，先陪我把这片不知名的宇宙看个够咯。

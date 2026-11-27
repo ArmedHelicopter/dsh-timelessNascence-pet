@@ -55,5 +55,5 @@
 
 ## Naming
 - Pet package: `dsh-nascence-pet`, storage prefix `dshtn`, config file `$DSH_HOME/.dshtn.json`.
-- Skin package: `dsh-nascence-skin`; title bar wordmark `TMLS-EVENT-HORIZON`; sidebar logo `NASCENCE HARNESS`.
-- User is addressed as 「观测者」.
+- Skin package: `dsh-nascence-skin`; title bar wordmark `Timeless Nascence`; welcome line 「来探索新的宇宙吧，管理员」; sidebar logo `NASCENCE HARNESS`.
+- User is addressed as 「管理员」.

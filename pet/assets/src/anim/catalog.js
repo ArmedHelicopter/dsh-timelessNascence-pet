@@ -85,7 +85,7 @@ export const EVENTS = {
   },
 
   peak_time: {
-    videos: [{ clip: 'Sad_Begin', from: 0.4, to: 1.8 }],
+    videos: ['Talk'],
     priority: 75,
     queue: true,
     notice: new PeakTimeNotice(),

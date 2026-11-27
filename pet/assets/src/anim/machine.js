@@ -258,7 +258,9 @@ export function createMachine(opts) {
       const wasLow = s.low
       s.work = event.work || 'idle'
       s.low = !!event.low
-      s.target = s.work === 'thinking' ? 'think' : s.low ? 'sad' : 'idle'
+      // Nascence keeps her serene smile as the resting pose; low balance only raises a gentle
+      // text reminder (lowBalance) instead of switching the base state to sad.
+      s.target = s.work === 'thinking' ? 'think' : event.mood === 'sad' ? 'sad' : 'idle'
       if (s.work !== 'outputting') s.talkBlocked = false
       if (!wasLow && s.low) fire('lowBalance', fx)
       resolve(fx)

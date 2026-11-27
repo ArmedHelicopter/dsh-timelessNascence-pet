@@ -24,9 +24,18 @@ function ended(machine, fx, index) {
   return machine.dispatch({ type: 'CLIP_ENDED', id: play.id })
 }
 
-test('初始进入 Idle，等一轮后才进入 Sad', () => {
+test('余额不足只弹提醒，不切换到 Sad（Nascence 常态保持微笑）', () => {
   const m = createMachine({ target: 'idle' })
   let fx = effects(m, { type: 'CONDITIONS', low: true, work: 'idle' })
+  const idleId = playEffects(fx)[0].id
+  assert.equal(playEffects(fx)[0].clip, 'Idle')
+  fx = effects(m, { type: 'IDLE_DONE', id: idleId })
+  assert.ok(!playEffects(fx).some((p) => /^Sad/.test(p.clip)), 'low balance must not enter Sad')
+})
+
+test('初始进入 Idle，等一轮后才进入 Sad', () => {
+  const m = createMachine({ target: 'idle' })
+  let fx = effects(m, { type: 'CONDITIONS', low: true, mood: 'sad', work: 'idle' })
   assert.equal(playEffects(fx)[0].clip, 'Idle')
   assert.equal(playEffects(fx)[0].loop, true)
   assert.equal(playEffects(fx).length, 1)
@@ -39,7 +48,7 @@ test('初始进入 Idle，等一轮后才进入 Sad', () => {
 
 test('Sad 播完进入 Sad_Idle，再以反向 exit 回 Idle', () => {
   const m = createMachine({ target: 'sad' })
-  let fx = effects(m, { type: 'CONDITIONS', low: true, work: 'idle' })
+  let fx = effects(m, { type: 'CONDITIONS', low: true, mood: 'sad', work: 'idle' })
   assert.equal(playEffects(fx)[0].clip, 'Idle')
   fx = effects(m, { type: 'IDLE_DONE', id: m.state.active.id })
   assert.equal(playEffects(fx)[0].clip, 'Sad_Begin')
@@ -52,7 +61,7 @@ test('Sad 播完进入 Sad_Idle，再以反向 exit 回 Idle', () => {
 
 test('one-shot 结束回 base 时播 enter，不等待 Idle 一轮', () => {
   const m = createMachine({ target: 'sad' })
-  let fx = effects(m, { type: 'CONDITIONS', low: true, work: 'idle' })
+  let fx = effects(m, { type: 'CONDITIONS', low: true, mood: 'sad', work: 'idle' })
   fx = effects(m, { type: 'IDLE_DONE', id: m.state.active.id })
   fx = ended(m, fx) // Sad_Idle
   assert.equal(m.state.base.state, 'sad')
@@ -94,15 +103,15 @@ test('price 排队在 Talk 后，Talk 结束并停播后按优先级出队', () 
   // work 结束，Talk 这一遍播完后不再重播
   effects(m, { type: 'CONDITIONS', low: false, work: 'idle' })
   fx = effects(m, { type: 'CLIP_ENDED', id: talkId })
-  // 两个 price 同为 75，FIFO：peak 先出
-  assert.equal(playEffects(fx)[0].clip, 'Sad_Begin')
+  // 两个 price 同为 75，FIFO：peak 先出（Nascence 的峰时提示用 Talk，不再用悲伤片段）
+  assert.equal(playEffects(fx)[0].clip, 'Talk')
 })
 
 test('lowBalance 是 textOnly：不发 play、只发 notice，不改 base', () => {
   const m = createMachine({ target: 'idle' })
   effects(m, { type: 'CONDITIONS', low: false, work: 'idle' })
   const before = m.state.base.state
-  const fx = effects(m, { type: 'CONDITIONS', low: true, work: 'idle' })
+  const fx = effects(m, { type: 'CONDITIONS', low: true, mood: 'sad', work: 'idle' })
   // 条件变化只改 target，lowBalance 事件进入队列后出队
   const lowFx = effects(m, { type: 'FIRE', name: 'lowBalance' })
   assert.equal(playEffects(lowFx).length, 0)
@@ -123,7 +132,7 @@ test('同一优先级排队：第二个 credited 等第一个结束', () => {
 
 test('低优先级 idleChatter 不打断转场', () => {
   const m = createMachine({ target: 'sad' })
-  let fx = effects(m, { type: 'CONDITIONS', low: true, work: 'idle' })
+  let fx = effects(m, { type: 'CONDITIONS', low: true, mood: 'sad', work: 'idle' })
   assert.equal(m.state.active.clip, 'Idle')
   const idleId = m.state.active.id
   fx = effects(m, { type: 'IDLE_DONE', id: idleId })
