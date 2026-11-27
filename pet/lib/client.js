@@ -221,17 +221,17 @@
   var HIT_MASK_H = 108;
   var HIT_GROW = 6;
   var HIT_FORMS = [
-    ["r", -65.7, 307.4, 39.7, 337.8, 9.1],
-    ["r", -85.7, 276.4, 76.1, 307.4, 9.3],
-    ["r", -99.2, 245.5, 91.6, 276.4, 9.3],
-    ["r", -161.7, 214.5, 94.1, 245.5, 9.3],
-    ["r", -149.2, 183.6, 95.1, 214.5, 9.3],
-    ["r", -129.7, 153.1, 101.6, 183.6, 9.2],
-    ["r", -130.7, 122.2, 102.6, 153.1, 9.3],
-    ["r", -126.2, 91.2, 98.1, 122.2, 9.3],
-    ["r", -115.7, 60.3, 87.6, 91.2, 9.3],
-    ["r", -94.2, 29.3, 68.6, 60.3, 9.3],
-    ["r", -49.3, -1.6, 22.2, 29.3, 9.3]
+    ["r", -76.2, 307.4, 26.7, 337.8, 9.1],
+    ["r", -81.7, 276.4, 64.6, 307.4, 9.3],
+    ["r", -97.2, 245.5, 80.1, 276.4, 9.3],
+    ["r", -110.7, 214.5, 86.6, 245.5, 9.3],
+    ["r", -113.7, 183.6, 98.6, 214.5, 9.3],
+    ["r", -106.2, 153.1, 88.1, 183.6, 9.2],
+    ["r", -109.2, 122.2, 94.1, 153.1, 9.3],
+    ["r", -118.7, 91.2, 104.1, 122.2, 9.3],
+    ["r", -108.2, 60.3, 96.6, 91.2, 9.3],
+    ["r", -79.2, 29.3, 73.6, 60.3, 9.3],
+    ["r", -41.8, -1.6, 29.2, 29.3, 9.3]
   ];
   function hitFormIn(form, x, y) {
     var g = HIT_GROW;
@@ -291,18 +291,18 @@
   var CLIP_FADE_MS = 320;
   var HAPPY_CHANCE = 0.25;
   var CLIPS = {
-    Idle: { src: "idle.webm", duration: 4.3, loop: true },
-    Sad_Idle: { src: "sad_idle.webm", duration: 3.97, loop: true },
-    Think_Idle: { src: "think_idle.webm", duration: 3.97, loop: true },
-    Happy: { src: "happy.webm", duration: 3.97 },
+    Idle: { src: "idle.webm", duration: 4, loop: true },
+    Sad_Idle: { src: "sad_idle.webm", duration: 4, loop: true },
+    Think_Idle: { src: "think_idle.webm", duration: 4, loop: true },
+    Happy: { src: "happy.webm", duration: 4 },
     Sad_Begin: { src: "sad_begin.webm", duration: 2.67 },
     Sad_Exit: { src: "sad_exit.webm", duration: 2.67 },
     Think_Begin: { src: "think_begin.webm", duration: 2.67 },
     Think_Exit: { src: "think_exit.webm", duration: 2.67 },
-    Celebrate: { src: "celebrate.webm", duration: 3.97 },
-    Talk: { src: "talk.webm", duration: 4.97 },
-    Interact_1: { src: "interact_1.webm", duration: 3.97 },
-    Interact_2: { src: "interact_2.webm", duration: 3.97 }
+    Celebrate: { src: "celebrate.webm", duration: 4 },
+    Talk: { src: "talk.webm", duration: 5 },
+    Interact_1: { src: "interact_1.webm", duration: 4 },
+    Interact_2: { src: "interact_2.webm", duration: 4 }
   };
   var ANIMATION_NAMES = [
     "Idle",

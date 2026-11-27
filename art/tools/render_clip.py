@@ -124,7 +124,9 @@ def main():
     ap.add_argument("--box", type=str, default="")
     ap.add_argument("--reverse", action="store_true")
     ap.add_argument("--speed", type=float, default=1.0)
+    ap.add_argument("--keepx", type=str, default="", help="x0,x1 in source px; alpha outside is zeroed")
     a = ap.parse_args()
+    keepx = [int(v) for v in a.keepx.split(",")] if a.keepx else None
 
     frames = read_frames(a.inp, a.start, a.dur, a.fps)
     if a.speed != 1.0:
@@ -138,6 +140,9 @@ def main():
     with tempfile.TemporaryDirectory() as td:
         for i, im in enumerate(frames):
             rgba = key(im, bg)
+            if keepx:
+                rgba[:, :keepx[0], 3] = 0
+                rgba[:, keepx[1]:, 3] = 0
             canvas = place(rgba, box, a.scale)
             cv2.imwrite(os.path.join(td, f"f{i:04d}.png"), canvas)
         subprocess.run([FF, "-v", "error", "-y", "-framerate", str(a.fps), "-i", os.path.join(td, "f%04d.png"),

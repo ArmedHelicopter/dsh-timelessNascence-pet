@@ -19,7 +19,7 @@ import render_clip as rc  # noqa: E402
 
 # name: (source, start, dur, speed, reverse)
 CLIPS = {
-    "idle":        ("idle.mp4",        3.6, 4.3, 1.0, False),
+    "idle":        ("idle.mp4",        0,   0,   2.0, False),
     "happy":       ("happy.mp4",       0,   0,   2.0, False),
     "talk":        ("talk.mp4",        0,   0,   1.6, False),
     "interact_1":  ("interact_1.mp4",  0,   0,   2.0, False),
