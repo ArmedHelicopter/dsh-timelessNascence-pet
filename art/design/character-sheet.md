@@ -1,11 +1,16 @@
 # Timeless Nascence — Desk Pet & Skin Design Sheet
 
-## Character (from `reference/`)
-- Hair: silver-white short bob, wispy ends, a single ahoge; 2–3 four-pointed star hairclips on the left side.
-- Eyes: pale blue iris with a small gold four-pointed star highlight in the pupil (her signature).
-- Outfit: oversized cobalt-blue hooded jacket (sleeves past the hands, off-shoulder at times), silver chains and
-  small four-pointed star charms on the jacket hem, white sailor collar + white ascot tie, white pleated dress,
-  white knee socks, black loafers.
+## Character (authoritative: `reference/bili_poster-1795563598014.png`)
+- Hair: silver-white short bob, wispy ends, a single ahoge; two stacked dark-silver four-pointed star ornaments
+  on her left side.
+- Eyes: blue iris with a LARGE bright-yellow four-pointed star in each pupil (her signature).
+- Outfit: white halter-neck top with bare shoulders; cobalt-blue hooded jacket worn OFF both shoulders, light-blue
+  hood lining; a row of silver hook-loops across the chest; thorn-like silver chain trim down the front edges; large
+  silver four-pointed star ornaments on the hem; wide sleeves with a silver arrow/hook detail; HANDS VISIBLE (not
+  hidden in sleeves), white fingerless glove on one hand, thin blue rings on fingers; white ascot/neckerchief with a
+  blue wave pattern and a blue gem brooch; white dress; white knee socks; black loafers.
+- Style note: borrow only the ART STYLE of dsh-closure-pet (chibi proportions, thick dark lines, cel shading,
+  floating props) — never its character design (no hand-hiding mega sleeves).
 - Mood: calm, gentle, a bit mischievous (winks, finger-frame gesture, heart hands, "好宇宙…" spaced-out face).
 - Motif: cosmos, black hole with an accretion ring, orbit lines, four-pointed stars, moon, white feathers.
 

@@ -1,0 +1,25 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>copy ref</title>
+<body style="background:#111;color:#eee;font:16px sans-serif">
+<input id="f" value="refboard.jpg" style="width:300px">
+<button id="b" style="font-size:24px;padding:20px">COPY</button>
+<div id="s"></div>
+<img id="p" style="max-width:600px;display:block">
+<script>
+document.getElementById('b').onclick = async () => {
+  const s = document.getElementById('s');
+  try {
+    const name = document.getElementById('f').value;
+    document.getElementById('p').src = name;
+    const blob = await (await fetch(name)).blob();
+    const bmp = await createImageBitmap(blob);
+    const c = new OffscreenCanvas(bmp.width, bmp.height);
+    c.getContext('2d').drawImage(bmp, 0, 0);
+    const png = await c.convertToBlob({ type: 'image/png' });
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]);
+    s.textContent = 'copied ' + name + ' ' + png.size;
+  } catch (e) { s.textContent = 'ERR ' + e; }
+};
+</script>
+</body>
