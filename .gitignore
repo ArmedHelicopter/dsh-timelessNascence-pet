@@ -1,8 +1,11 @@
 node_modules/
-art/inbox/
 *.log
-skin/out*
-art/review/ref/style_target.png
+.DS_Store
+Thumbs.db
+
+# 本地私人素材：第三方参考图、参考视频、BGM —— 只在本机使用，不进入仓库
+_private/
+
+# 中间产物（可重新生成）
 art/review/shots/
-art/inbox/
 art/sources/old_v12/

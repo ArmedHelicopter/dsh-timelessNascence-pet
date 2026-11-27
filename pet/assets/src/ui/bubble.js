@@ -103,7 +103,7 @@ export function createBubble(deps) {
     var st = document.createElement('style')
     st.id = 'dsh-nascence-pet-font'
     st.textContent = '@font-face{font-family:ArkPixel12;src:url("' + PREFIX
-      + '/assets/fonts/ark-pixel-12px-zh_hans.woff2") format("woff2");font-display:block}'
+      + '/assets/fonts/ark-pixel-12px.woff2") format("woff2");font-display:block}'
     document.head.appendChild(st)
     // 字体是异步加载的：加载完重排一次，避免用回退字体量错宽度
     try {

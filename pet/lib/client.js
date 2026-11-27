@@ -1321,7 +1321,7 @@
       if (document.getElementById("dsh-nascence-pet-font")) return;
       var st = document.createElement("style");
       st.id = "dsh-nascence-pet-font";
-      st.textContent = '@font-face{font-family:ArkPixel12;src:url("' + PREFIX + '/assets/fonts/ark-pixel-12px-zh_hans.woff2") format("woff2");font-display:block}';
+      st.textContent = '@font-face{font-family:ArkPixel12;src:url("' + PREFIX + '/assets/fonts/ark-pixel-12px.woff2") format("woff2");font-display:block}';
       document.head.appendChild(st);
       try {
         document.fonts.load("12px ArkPixel12").then(function() {

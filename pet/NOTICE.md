@@ -17,7 +17,7 @@
 
 ## 字体
 
-- `assets/fonts/ark-pixel-12px-zh_hans.woff2` —— Ark Pixel Font，作者 TakWolf，
+- `assets/fonts/ark-pixel-12px.woff2` —— Ark Pixel Font，作者 TakWolf，
   SIL Open Font License 1.1。许可证全文见 `assets/fonts/OFL.txt`。
   分发时须随附该许可证文件；不得单独售卖该字体；修改版不得使用保留字体名。
 

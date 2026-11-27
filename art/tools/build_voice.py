@@ -1,6 +1,6 @@
-"""Build pet/assets/voice/ from the ElevenLabs takes saved in art/inbox/voice_takes/.
+"""Build pet/assets/voice/ from the TTS takes saved in art/voice/takes/.
 
-Input: art/inbox/voice_takes/line_<i>.mp3 (index into art/voice/lines.json).
+Input: art/voice/takes/line_<i>.mp3 (index into art/voice/lines.json).
 Output: pet/assets/voice/zh_<i>.mp3 (loudness-normalised, trimmed) + manifest.json {text: {zh, zhMs}}.
 """
 import json
@@ -10,8 +10,8 @@ import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-FF = r"C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg-win-x86_64-v9.0.2.exe"
-TAKES = os.path.join(ROOT, "art", "inbox", "voice_takes")
+FF = os.environ.get("FFMPEG", "ffmpeg")
+TAKES = os.path.join(ROOT, "art", "voice", "takes")
 OUT = os.path.join(ROOT, "pet", "assets", "voice")
 
 lines = json.load(open(os.path.join(ROOT, "art", "voice", "lines.json"), encoding="utf-8"))
