@@ -1,0 +1,74 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Nascence review</title>
+<style>
+  html, body { margin: 0; background: #1b1d24; color: #e8ecf8; font: 18px/1.3 system-ui, sans-serif; }
+  .row { display: flex; gap: 16px; padding: 12px; height: calc(100vh - 70px); box-sizing: border-box; }
+  .col { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+  .col h2 { margin: 4px 0 8px; font-size: 20px; }
+  canvas { max-width: 100%; max-height: calc(100vh - 130px); background: #2a2d36; image-rendering: auto; }
+  header { padding: 10px 16px; font-size: 22px; font-weight: 700; background: #111842; }
+</style>
+<header id="t"></header>
+<div class="row">
+  <div class="col"><h2 id="rh">REFERENCE (authoritative design)</h2><canvas id="ref"></canvas></div>
+  <div class="col"><h2 id="ch">CANDIDATE</h2><canvas id="cand"></canvas></div>
+</div>
+<script>
+// Fixed detail panels. Candidate crops are fractions of the character's bounding box
+// (non-green pixels), so they stay fixed across versions.
+const P = new URLSearchParams(location.search);
+const panel = P.get('panel') || 'full';
+const img = P.get('img');
+const ver = P.get('v') || '';
+const PANELS = {
+  style:    { ref: 'ref/style_target.png', box: [0, 0, 1, 1], label: 'ART STYLE target (left) vs candidate (right)' },
+  full:     { ref: 'ref/full.png', box: [0, 0, 1, 1], label: 'Full body / overall' },
+  ornament: { ref: 'ref/hair_ornament.jpg', box: [0.50, 0.02, 1.00, 0.42], label: 'Hair ornament (two stacked stars, her left side)' },
+  eyes:     { ref: 'ref/eyes.jpg',          box: [0.15, 0.18, 0.85, 0.40], label: 'Eyes / pupils (blue iris, yellow star pupil)' },
+  chest:    { ref: 'ref/chest.jpg',         box: [0.15, 0.38, 0.85, 0.62], label: 'Chest (hook loops on cord, brooch, ascot)' },
+  buttons:  { ref: 'ref/jacket_front.jpg',  box: [0.10, 0.45, 0.90, 0.90], label: 'Jacket front (three star ornaments like buttons, chain trim)' },
+};
+const cfg = PANELS[panel];
+document.getElementById('t').textContent = `Nascence chibi review — ${cfg.label} ${ver ? '— ' + ver : ''}`;
+document.getElementById('ch').textContent = 'CANDIDATE ' + ver;
+if (panel === 'style') document.getElementById('rh').textContent = 'STYLE TARGET (art style only, different character)';
+
+function load(src) {
+  return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+}
+function draw(cv, im, sx, sy, sw, sh) {
+  const scale = Math.min(1600 / sw, 1000 / sh, 4);
+  cv.width = Math.round(sw * scale); cv.height = Math.round(sh * scale);
+  const g = cv.getContext('2d'); g.imageSmoothingQuality = 'high';
+  g.drawImage(im, sx, sy, sw, sh, 0, 0, cv.width, cv.height);
+}
+function bbox(im) {
+  const c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
+  const g = c.getContext('2d'); g.drawImage(im, 0, 0);
+  const d = g.getImageData(0, 0, c.width, c.height).data;
+  let x0 = c.width, y0 = c.height, x1 = 0, y1 = 0;
+  for (let y = 0; y < c.height; y += 2) for (let x = 0; x < c.width; x += 2) {
+    const k = (y * c.width + x) * 4, r = d[k], gg = d[k + 1], b = d[k + 2];
+    const green = gg > 120 && gg > r * 1.35 && gg > b * 1.35;
+    if (!green) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  }
+  return [x0, y0, x1 - x0, y1 - y0];
+}
+// Character body bbox: ignore floating props by using the column band around the center.
+function bodyBox(im) {
+  const [x, y, w, h] = bbox(im);
+  const cx = x + w / 2, bw = Math.min(w, h * 0.62);
+  return [cx - bw / 2, y, bw, h];
+}
+(async () => {
+  const r = await load(cfg.ref);
+  draw(document.getElementById('ref'), r, 0, 0, r.width, r.height);
+  if (!img) return;
+  const c = await load(img);
+  const [bx, by, bw, bh] = (panel === 'full' || panel === 'style') ? [0, 0, c.width, c.height] : bodyBox(c);
+  const [fx0, fy0, fx1, fy1] = cfg.box;
+  draw(document.getElementById('cand'), c, bx + bw * fx0, by + bh * fy0, bw * (fx1 - fx0), bh * (fy1 - fy0));
+  document.title = 'ready ' + panel;
+})();
+</script>

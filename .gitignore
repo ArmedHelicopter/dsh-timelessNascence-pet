@@ -2,3 +2,5 @@ node_modules/
 art/inbox/
 *.log
 skin/out*
+art/review/ref/style_target.png
+art/review/shots/
