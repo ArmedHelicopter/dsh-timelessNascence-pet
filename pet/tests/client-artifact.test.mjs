@@ -17,12 +17,12 @@ test('manifest: dsh.client, ./client and version', () => {
 })
 
 test('客户端产物：注册 shell.overlay 与 settings.section', () => {
-  assert.ok(clientSrc.includes('data-cl-pet-plate'), 'bundle 应包含硬件挂牌')
+  assert.ok(clientSrc.includes('data-tn-pet-plate'), 'bundle 应包含硬件挂牌')
   let def = null
   const fakeWindow = { __ModuleLoader__: { load(d) { def = d } } }
   new Function('window', clientSrc)(fakeWindow)
   assert.ok(def, '应调用 __ModuleLoader__.load')
-  assert.equal(def.id, 'dsh-closure-pet')
+  assert.equal(def.id, 'dsh-nascence-pet')
 
   const fakeReact = {
     createElement: (type, props, children) => ({ type, props, children }),
@@ -51,8 +51,8 @@ test('客户端产物：注册 shell.overlay 与 settings.section', () => {
   const section = registrations.find((r) => r.options.name === 'settings.section')
   assert.ok(overlay)
   assert.ok(section)
-  assert.equal(overlay.options.id, 'dsh-closure-pet')
-  assert.equal(section.options.id, 'dsh-closure-pet')
+  assert.equal(overlay.options.id, 'dsh-nascence-pet')
+  assert.equal(section.options.id, 'dsh-nascence-pet')
   assert.equal(typeof section.component, 'function')
 })
 

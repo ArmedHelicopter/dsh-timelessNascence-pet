@@ -1,4 +1,4 @@
-// dsh-closure-pet — 动画数据表
+// dsh-nascence-pet — 动画数据表
 //
 // 每段动画对应一个透明视频片段：素材路径、时长与是否循环都写在这里。
 // 需要改动画只改这张表；状态机在 machine.js / catalog.js，不在这里。

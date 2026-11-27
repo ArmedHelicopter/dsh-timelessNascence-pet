@@ -1,6 +1,6 @@
-// dsh-closure-pet — 谷价贴画（工厂）
+// dsh-nascence-pet — 谷价贴画（工厂）
 //
-// 只在谷价时段、点击桌宠时弹一下：像素风绿底 + 横向扫描线 + 像素字体。
+// 只在谷价时段、点击桌宠时弹一下：像素风深空蓝底 + 星金扫描线 + 像素字体。
 // 依赖注入：getState() 读 /state、settings、size()、pet。
 
 export function createSticker(deps) {
@@ -50,31 +50,31 @@ export function createSticker(deps) {
     ctx.scale(S, S)
     ctx.imageSmoothingEnabled = false
 
-    // 底：橄榄绿
-    ctx.fillStyle = '#3f6a12'
+    // 底：深空蓝（deep）
+    ctx.fillStyle = '#111842'
     ctx.fillRect(0, 0, LOG_W, LOG_H)
     // 横向扫描线（每 2 个逻辑像素一条）
-    ctx.fillStyle = 'rgba(0,0,0,.22)'
+    ctx.fillStyle = 'rgba(10,14,36,.35)'
     for (var y = 0; y < LOG_H; y += 2) ctx.fillRect(0, y, LOG_W, 1)
-    // 顶部一道高光
-    ctx.fillStyle = 'rgba(255,255,255,.10)'
+    // 顶部一道钴蓝高光
+    ctx.fillStyle = 'rgba(91,123,255,.22)'
     ctx.fillRect(0, 0, LOG_W, 1)
-    // 双层描边
-    ctx.strokeStyle = '#2a4506'
+    // 双层描边（钴蓝 + 星金）
+    ctx.strokeStyle = '#2446e0'
     ctx.lineWidth = 1
     ctx.strokeRect(0.5, 0.5, LOG_W - 1, LOG_H - 1)
-    ctx.strokeStyle = 'rgba(182,242,74,.28)'
+    ctx.strokeStyle = 'rgba(245,215,110,.35)'
     ctx.strokeRect(1.5, 1.5, LOG_W - 3, LOG_H - 3)
 
-    // 文字 −99%
-    ctx.fillStyle = '#b6f24a'
+    // 文字 −50%（星金）
+    ctx.fillStyle = '#f5d76e'
     ctx.font = '12px ArkPixel12, monospace'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillText('-99%', LOG_W / 2, LOG_H / 2 + 0.5)
+    ctx.fillText('-50%', LOG_W / 2, LOG_H / 2 + 0.5)
 
-    // 底部一条亮线（扫描线残留感）
-    ctx.fillStyle = 'rgba(182,242,74,.5)'
+    // 底部一条亮线（星金扫描线残留感）
+    ctx.fillStyle = 'rgba(245,215,110,.55)'
     ctx.fillRect(6, LOG_H - 4, LOG_W - 12, 1)
   }
 
@@ -82,7 +82,7 @@ export function createSticker(deps) {
     if (stickerEl) return
     stickerCanvas = document.createElement('canvas')
     stickerEl = document.createElement('div')
-    stickerEl.id = 'dsh-closure-pet-sticker'
+    stickerEl.id = 'dsh-nascence-pet-sticker'
     // z-index 与桌宠同级但后插入 → 盖在桌宠身上（"贴"上去）
     stickerEl.style.cssText = [
       'position:fixed', 'z-index:2147482000', 'pointer-events:none',

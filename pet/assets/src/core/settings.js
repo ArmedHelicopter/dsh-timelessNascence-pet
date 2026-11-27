@@ -1,7 +1,7 @@
-// dsh-closure-pet — 用户设置
+// dsh-nascence-pet — 用户设置
 //
 // settings 是可变对象：面板、宿主配置、默认值都直接改它的字段。
-// 持久化有两份：localStorage（浏览器侧，立即生效）+ PUT /config（宿主落盘到 $DSH_HOME/.dshcl.json）。
+// 持久化有两份：localStorage（浏览器侧，立即生效）+ PUT /config（宿主落盘到 $DSH_HOME/.dshtn.json）。
 
 import { PREFIX, SETTINGS_KEY } from './env.js'
 import { SETTINGS_DEFAULTS, normalizeSettings } from '../shared/protocol.js'
@@ -37,7 +37,7 @@ export function saveSettings(immediate) {
       dialogues: settings.dialogues || {},
     }))
   } catch (err) {}
-  // 同时写回宿主（$DSH_HOME/.dshcl.json），换浏览器/清缓存也能恢复
+  // 同时写回宿主（$DSH_HOME/.dshtn.json），换浏览器/清缓存也能恢复
   clearTimeout(saveTimer)
   var push = function () {
     try {

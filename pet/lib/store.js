@@ -1,7 +1,7 @@
-// dsh-closure-pet — 宿主：运行时状态、花费累计、持久化、余额轮询
+// dsh-nascence-pet — 宿主：运行时状态、花费累计、持久化、余额轮询
 //
 // 前端每秒拉 /state；这里用计数器（而不是布尔）让前端能识别"事件发生了几次"，
-// 轮询丢一帧也不会漏。持久化写到 $DSH_HOME/.dshcl.json（node_modules 可能只读）。
+// 轮询丢一帧也不会漏。持久化写到 $DSH_HOME/.dshtn.json（node_modules 可能只读）。
 
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -14,7 +14,7 @@ export const TOPUP_DELTA = 5      // 一次上涨超过 5 元 → 认为充值�
 
 export function createStore(opts) {
   const dshHome = opts.dshHome
-  const configPath = path.join(dshHome, '.dshcl.json')
+  const configPath = path.join(dshHome, '.dshtn.json')
 
   const runtime = {
     seq: 0,
@@ -48,7 +48,7 @@ export function createStore(opts) {
       // 使用源拆分：key = provider + '\u0000' + model → { provider, model, cost, tokens }
       bySource: {},
     },
-    // —— 持久化设置（前端可以改，宿主写 $DSH_HOME/.dshcl.json）——
+    // —— 持久化设置（前端可以改，宿主写 $DSH_HOME/.dshtn.json）——
     settings: { ...SETTINGS_DEFAULTS },
   }
 
@@ -119,7 +119,7 @@ export function createStore(opts) {
       await fs.writeFile(tmp, JSON.stringify(configPayload(), null, 2), 'utf8')
       await fs.rename(tmp, configPath)
     } catch (err) {
-      console.warn('[closure-pet] 写配置失败：' + String((err && err.message) || err))
+      console.warn('[nascence-pet] 写配置失败：' + String((err && err.message) || err))
     } finally {
       configSaving = false
     }

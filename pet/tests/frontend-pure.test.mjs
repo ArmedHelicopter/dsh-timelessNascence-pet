@@ -25,7 +25,7 @@ test('env 常量', () => {
 
 test('settings 默认值与 localStorage 合并', () => {
   assert.equal(settingsMod.settings.size, 1)
-  store['dshcl-settings'] = JSON.stringify({ size: 1.5, mirror: 'never', bubble: false, opacity: 0.8, volume: 0.1 })
+  store['dshtn-settings'] = JSON.stringify({ size: 1.5, mirror: 'never', bubble: false, opacity: 0.8, volume: 0.1 })
   settingsMod.loadSettings()
   assert.equal(settingsMod.settings.size, 1.5)
   assert.equal(settingsMod.settings.mirror, 'never')

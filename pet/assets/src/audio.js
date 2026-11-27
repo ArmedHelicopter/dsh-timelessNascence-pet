@@ -1,6 +1,6 @@
-// dsh-closure-pet — 音效
+// dsh-nascence-pet — 音效
 //
-// 音频取自游戏内 autochess 皮肤的 UI 音效（无人声），转成 56k Opus。
+// 音频由 tools/make-sfx.mjs 合成生成 WAV（click / fail / coin / turnfail）。
 // 浏览器自动播放策略：AudioContext 初始 suspended，首次点击时 resume。
 // 依赖注入：getSettings() 返回 { sound, volume }，避免模块直接耦合设置对象。
 
@@ -33,7 +33,7 @@ export function createAudio(getSettings) {
     if (!ctx) return
     SOUND_FILES.forEach(function (name) {
       soundBuffers[name] = null // 占位：加载中
-      fetch(PREFIX + '/assets/audio/' + name + '.ogg', { cache: 'force-cache' })
+      fetch(PREFIX + '/assets/audio/' + name + '.wav', { cache: 'force-cache' })
         .then(function (r) { return r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status))) })
         .then(function (buf) { return ctx.decodeAudioData(buf) })
         .then(function (decoded) { soundBuffers[name] = decoded })

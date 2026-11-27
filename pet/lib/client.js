@@ -1,6 +1,6 @@
 (() => {
   // assets/src/shared/protocol.js
-  var URL_PREFIX = "/dsh-closure";
+  var URL_PREFIX = "/dsh-nascence";
   var STATE_PATH = URL_PREFIX + "/state";
   var CONFIG_PATH = URL_PREFIX + "/config";
   var HARDWARE_PATH = URL_PREFIX + "/hardware";
@@ -107,12 +107,12 @@
   }
 
   // assets/src/core/env.js
-  var PREFIX = "/dsh-closure";
+  var PREFIX = "/dsh-nascence";
   var CANVAS_W = 300;
   var FRAME = { x: -229.1, y: -10.6, w: 443.6, h: 373.4 };
   var MARGIN = 12;
-  var POS_KEY = "dshcl-pos";
-  var SETTINGS_KEY = "dshcl-settings";
+  var POS_KEY = "dshtn-pos";
+  var SETTINGS_KEY = "dshtn-settings";
   var DRAG_THRESHOLD_SQ = 9;
   function numOverride(key, fallback) {
     var raw;
@@ -125,17 +125,17 @@
     var v = Number(raw);
     return isFinite(v) && v >= 0 ? v : fallback;
   }
-  var STARTUP_DELAY = numOverride("dshcl-startup-delay", 5e3);
-  var STARTUP_GAP = numOverride("dshcl-startup-gap", 2e3);
+  var STARTUP_DELAY = numOverride("dshtn-startup-delay", 5e3);
+  var STARTUP_GAP = numOverride("dshtn-startup-gap", 2e3);
   var log = function() {
     try {
-      console.info.apply(console, ["[closure-pet]"].concat([].slice.call(arguments)));
+      console.info.apply(console, ["[nascence-pet]"].concat([].slice.call(arguments)));
     } catch (e) {
     }
   };
   var warn = function() {
     try {
-      console.warn.apply(console, ["[closure-pet]"].concat([].slice.call(arguments)));
+      console.warn.apply(console, ["[nascence-pet]"].concat([].slice.call(arguments)));
     } catch (e) {
     }
   };
@@ -359,7 +359,7 @@
       if (!ctx) return;
       SOUND_FILES.forEach(function(name) {
         soundBuffers[name] = null;
-        fetch(PREFIX + "/assets/audio/" + name + ".ogg", { cache: "force-cache" }).then(function(r) {
+        fetch(PREFIX + "/assets/audio/" + name + ".wav", { cache: "force-cache" }).then(function(r) {
           return r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)));
         }).then(function(buf) {
           return ctx.decodeAudioData(buf);
@@ -564,7 +564,7 @@
     }
     function buildPanel() {
       panel = document.createElement("div");
-      panel.id = "dsh-closure-pet-settings";
+      panel.id = "dsh-nascence-pet-settings";
       panel.style.cssText = [
         "position:fixed",
         "z-index:2147482003",
@@ -574,24 +574,24 @@
         "padding:10px 12px",
         "border-radius:10px",
         'font:12px/1.6 ui-sans-serif,system-ui,"Microsoft YaHei",sans-serif',
-        "background:rgba(26,28,36,.97)",
-        "color:#e7eaf3",
-        "border:1px solid rgba(255,255,255,.14)",
-        "box-shadow:0 10px 30px rgba(0,0,0,.45)"
+        "background:rgba(17,24,66,.96)",
+        "color:#e8ecf8",
+        "border:1px solid rgba(91,123,255,.35)",
+        "box-shadow:0 10px 30px rgba(10,14,36,.65)"
       ].join(";");
       function row(label) {
         var el = document.createElement("div");
         el.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0";
         var name = document.createElement("span");
         name.textContent = label;
-        name.style.cssText = "color:#aab2c8";
+        name.style.cssText = "color:#9da8cf";
         el.appendChild(name);
         panel.appendChild(el);
         return el;
       }
       var mirrorRow = row("\u955C\u50CF");
       var segBox = document.createElement("span");
-      segBox.style.cssText = "display:inline-flex;border:1px solid rgba(255,255,255,.18);border-radius:7px;overflow:hidden";
+      segBox.style.cssText = "display:inline-flex;border:1px solid rgba(91,123,255,.28);border-radius:7px;overflow:hidden";
       var mirrorButtons = {};
       [["auto", "\u81EA\u52A8"], ["always", "\u59CB\u7EC8"], ["never", "\u4E0D\u955C\u50CF"]].forEach(function(pair) {
         var btn = document.createElement("button");
@@ -611,7 +611,7 @@
       function syncMirrorButtons() {
         Object.keys(mirrorButtons).forEach(function(k) {
           var on = settings2.mirror === k;
-          mirrorButtons[k].style.background = on ? "rgba(125,134,255,.85)" : "transparent";
+          mirrorButtons[k].style.background = on ? "rgba(36,70,224,.92)" : "transparent";
           mirrorButtons[k].style.color = on ? "#fff" : "#cfd6e6";
         });
       }
@@ -624,7 +624,7 @@
       slider.max = String(SIZE_MAX);
       slider.step = "0.05";
       slider.value = String(settings2.size);
-      slider.style.cssText = "width:96px;accent-color:#7d86ff;cursor:pointer";
+      slider.style.cssText = "width:96px;accent-color:#5b7bff;cursor:pointer";
       var sizeText = document.createElement("span");
       sizeText.style.cssText = "width:34px;text-align:right;color:#cfd6e6";
       sizeText.textContent = Math.round(settings2.size * 100) + "%";
@@ -649,7 +649,7 @@
       snapSlider.max = String(SNAP_STRENGTH_MAX);
       snapSlider.step = "5";
       snapSlider.value = String(settings2.snapStrength);
-      snapSlider.style.cssText = "width:96px;accent-color:#7d86ff;cursor:pointer";
+      snapSlider.style.cssText = "width:96px;accent-color:#5b7bff;cursor:pointer";
       var snapText = document.createElement("span");
       snapText.style.cssText = "width:38px;text-align:right;color:#cfd6e6";
       snapText.textContent = Math.round(settings2.snapStrength) + "%";
@@ -670,7 +670,7 @@
       bubbleScaleSlider.max = String(BUBBLE_SCALE_MAX);
       bubbleScaleSlider.step = "5";
       bubbleScaleSlider.value = String(settings2.bubbleScale);
-      bubbleScaleSlider.style.cssText = "width:96px;accent-color:#7d86ff;cursor:pointer";
+      bubbleScaleSlider.style.cssText = "width:96px;accent-color:#5b7bff;cursor:pointer";
       var bubbleScaleText = document.createElement("span");
       bubbleScaleText.style.cssText = "width:38px;text-align:right;color:#cfd6e6";
       bubbleScaleText.textContent = Math.round(settings2.bubbleScale) + "%";
@@ -685,10 +685,10 @@
       bubbleScaleRow.appendChild(bubbleScaleWrap);
       var tiersRow = row("\u66F4\u591A\u5C42\u6B21\u7684\u5B57\u4F53\u89C6\u89C9\u6548\u679C");
       var tiersBtn = document.createElement("button");
-      tiersBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#dfe4f0;font:inherit;cursor:pointer";
+      tiersBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
       function syncTiersBtn() {
         tiersBtn.textContent = settings2.bubbleTiers ? "\u5F00" : "\u5173";
-        tiersBtn.style.background = settings2.bubbleTiers ? "rgba(125,134,255,.85)" : "rgba(255,255,255,.06)";
+        tiersBtn.style.background = settings2.bubbleTiers ? "rgba(36,70,224,.92)" : "rgba(91,123,255,.1)";
         tiersBtn.style.color = settings2.bubbleTiers ? "#fff" : "#dfe4f0";
       }
       tiersBtn.addEventListener("click", function() {
@@ -701,10 +701,10 @@
       tiersRow.appendChild(tiersBtn);
       var bubbleRow = row("\u6C14\u6CE1");
       var bubbleBtn = document.createElement("button");
-      bubbleBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#dfe4f0;font:inherit;cursor:pointer";
+      bubbleBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
       function syncBubbleBtn() {
         bubbleBtn.textContent = settings2.bubble ? "\u5F00" : "\u5173";
-        bubbleBtn.style.background = settings2.bubble ? "rgba(125,134,255,.85)" : "rgba(255,255,255,.06)";
+        bubbleBtn.style.background = settings2.bubble ? "rgba(36,70,224,.92)" : "rgba(91,123,255,.1)";
         bubbleBtn.style.color = settings2.bubble ? "#fff" : "#dfe4f0";
       }
       bubbleBtn.addEventListener("click", function() {
@@ -724,7 +724,7 @@
       opaSlider.max = "1";
       opaSlider.step = "0.05";
       opaSlider.value = String(settings2.opacity);
-      opaSlider.style.cssText = "width:96px;accent-color:#7d86ff;cursor:pointer";
+      opaSlider.style.cssText = "width:96px;accent-color:#5b7bff;cursor:pointer";
       var opaText = document.createElement("span");
       opaText.style.cssText = "width:38px;text-align:right;color:#cfd6e6";
       opaText.textContent = Math.round(settings2.opacity * 100) + "%";
@@ -741,10 +741,10 @@
       var soundWrap = document.createElement("span");
       soundWrap.style.cssText = "display:inline-flex;align-items:center;gap:8px";
       var soundBtn = document.createElement("button");
-      soundBtn.style.cssText = "padding:3px 9px;border-radius:7px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#dfe4f0;font:inherit;cursor:pointer";
+      soundBtn.style.cssText = "padding:3px 9px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
       function syncSoundBtn() {
         soundBtn.textContent = settings2.sound ? "\u5F00" : "\u5173";
-        soundBtn.style.background = settings2.sound ? "rgba(125,134,255,.85)" : "rgba(255,255,255,.06)";
+        soundBtn.style.background = settings2.sound ? "rgba(36,70,224,.92)" : "rgba(91,123,255,.1)";
         soundBtn.style.color = settings2.sound ? "#fff" : "#dfe4f0";
       }
       soundBtn.addEventListener("click", function() {
@@ -764,7 +764,7 @@
       volSlider.max = "1";
       volSlider.step = "0.05";
       volSlider.value = String(settings2.volume);
-      volSlider.style.cssText = "width:74px;accent-color:#7d86ff;cursor:pointer";
+      volSlider.style.cssText = "width:74px;accent-color:#5b7bff;cursor:pointer";
       var volText = document.createElement("span");
       volText.style.cssText = "width:34px;text-align:right;color:#cfd6e6";
       volText.textContent = Math.round(settings2.volume * 100) + "%";
@@ -785,10 +785,10 @@
       soundRow.appendChild(soundWrap);
       var voiceRow = row("\u8BED\u97F3");
       var voiceBtn = document.createElement("button");
-      voiceBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#dfe4f0;font:inherit;cursor:pointer";
+      voiceBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
       function syncVoiceBtn() {
         voiceBtn.textContent = settings2.voice ? "\u5F00" : "\u5173";
-        voiceBtn.style.background = settings2.voice ? "rgba(125,134,255,.85)" : "rgba(255,255,255,.06)";
+        voiceBtn.style.background = settings2.voice ? "rgba(36,70,224,.92)" : "rgba(91,123,255,.1)";
         voiceBtn.style.color = settings2.voice ? "#fff" : "#dfe4f0";
       }
       voiceBtn.addEventListener("click", function() {
@@ -800,7 +800,7 @@
       voiceRow.appendChild(voiceBtn);
       var voiceLangRow = row("\u8BED\u97F3\u8BED\u8A00");
       var voiceLangBox = document.createElement("span");
-      voiceLangBox.style.cssText = "display:inline-flex;border:1px solid rgba(255,255,255,.18);border-radius:7px;overflow:hidden";
+      voiceLangBox.style.cssText = "display:inline-flex;border:1px solid rgba(91,123,255,.28);border-radius:7px;overflow:hidden";
       var voiceLangButtons = {};
       [["zh", "\u4E2D\u6587"], ["ja", "\u65E5\u8BED"]].forEach(function(pair) {
         var btn = document.createElement("button");
@@ -818,7 +818,7 @@
       function syncVoiceLang() {
         Object.keys(voiceLangButtons).forEach(function(k) {
           var on = settings2.voiceLang === k;
-          voiceLangButtons[k].style.background = on ? "rgba(125,134,255,.85)" : "transparent";
+          voiceLangButtons[k].style.background = on ? "rgba(36,70,224,.92)" : "transparent";
           voiceLangButtons[k].style.color = on ? "#fff" : "#cfd6e6";
         });
       }
@@ -833,7 +833,7 @@
       voiceVolSlider.max = "1";
       voiceVolSlider.step = "0.05";
       voiceVolSlider.value = String(settings2.voiceVolume === void 0 ? 0.7 : settings2.voiceVolume);
-      voiceVolSlider.style.cssText = "width:74px;accent-color:#7d86ff;cursor:pointer";
+      voiceVolSlider.style.cssText = "width:74px;accent-color:#5b7bff;cursor:pointer";
       var voiceVolText = document.createElement("span");
       voiceVolText.style.cssText = "width:34px;text-align:right;color:#cfd6e6";
       function syncVoiceVolume() {
@@ -855,10 +855,10 @@
       voiceVolRow.appendChild(voiceVolWrap);
       var plateRow = row("\u786C\u4EF6\u6302\u724C");
       var plateBtn = document.createElement("button");
-      plateBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#dfe4f0;font:inherit;cursor:pointer";
+      plateBtn.style.cssText = "padding:3px 10px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
       function syncPlateBtn() {
         plateBtn.textContent = settings2.plate ? "\u5F00" : "\u5173";
-        plateBtn.style.background = settings2.plate ? "rgba(125,134,255,.85)" : "rgba(255,255,255,.06)";
+        plateBtn.style.background = settings2.plate ? "rgba(36,70,224,.92)" : "rgba(91,123,255,.1)";
         plateBtn.style.color = settings2.plate ? "#fff" : "#dfe4f0";
       }
       plateBtn.addEventListener("click", function() {
@@ -871,7 +871,7 @@
       plateRow.appendChild(plateBtn);
       var platePosRow = row("\u6302\u724C\u4F4D\u7F6E");
       var platePosBox = document.createElement("span");
-      platePosBox.style.cssText = "display:inline-flex;border:1px solid rgba(255,255,255,.18);border-radius:7px;overflow:hidden";
+      platePosBox.style.cssText = "display:inline-flex;border:1px solid rgba(91,123,255,.28);border-radius:7px;overflow:hidden";
       var platePosButtons = {};
       [["bottom", "\u4E0B\u65B9"], ["top", "\u4E0A\u65B9"]].forEach(function(pair) {
         var btn = document.createElement("button");
@@ -889,7 +889,7 @@
       function syncPlatePosition() {
         Object.keys(platePosButtons).forEach(function(key) {
           var on = settings2.platePosition === key;
-          platePosButtons[key].style.background = on ? "rgba(125,134,255,.85)" : "transparent";
+          platePosButtons[key].style.background = on ? "rgba(36,70,224,.92)" : "transparent";
           platePosButtons[key].style.color = on ? "#fff" : "#cfd6e6";
         });
       }
@@ -900,7 +900,7 @@
       function action(label, fn) {
         var b = document.createElement("button");
         b.textContent = label;
-        b.style.cssText = "flex:1;padding:5px 8px;border-radius:7px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#dfe4f0;font:inherit;cursor:pointer";
+        b.style.cssText = "flex:1;padding:5px 8px;border-radius:7px;border:1px solid rgba(91,123,255,.28);background:rgba(91,123,255,.1);color:#dfe4f0;font:inherit;cursor:pointer";
         b.addEventListener("click", fn);
         actions.appendChild(b);
       }
@@ -1040,9 +1040,9 @@
     var bubbleDialogUntil = 0;
     var bubbleMode = "info";
     function ensureFont() {
-      if (document.getElementById("dsh-closure-pet-font")) return;
+      if (document.getElementById("dsh-nascence-pet-font")) return;
       var st = document.createElement("style");
-      st.id = "dsh-closure-pet-font";
+      st.id = "dsh-nascence-pet-font";
       st.textContent = '@font-face{font-family:ArkPixel12;src:url("' + PREFIX + '/assets/fonts/ark-pixel-12px-zh_hans.woff2") format("woff2");font-display:block}';
       document.head.appendChild(st);
       try {
@@ -1056,7 +1056,7 @@
     function ensureBubble() {
       if (bubbleEl) return;
       bubbleEl = document.createElement("div");
-      bubbleEl.id = "dsh-closure-pet-bubble";
+      bubbleEl.id = "dsh-nascence-pet-bubble";
       bubbleEl.style.cssText = [
         "position:fixed",
         "left:0",
@@ -1078,7 +1078,7 @@
         "font-family:" + BUBBLE_FONT,
         "font-size:" + bubblePx(BUBBLE_SIZE) + "px",
         "line-height:" + bubbleLineH(BUBBLE_SIZE) + "px",
-        "color:#20232a",
+        "color:#e8ecf8",
         "letter-spacing:0",
         "-webkit-font-smoothing:none",
         "font-smooth:never",
@@ -1210,7 +1210,7 @@
       bubbleSvg.setAttribute("height", String(h + 6));
       bubbleSvg.setAttribute("viewBox", `0 0 ${w + 6} ${h + 6}`);
       var d = bubblePath(w, h, tailX, bubbleTailUp);
-      bubbleSvg.innerHTML = '<path d="' + d + '" fill="#000" fill-opacity=".32" transform="translate(3,3)"/><path d="' + d + '" fill="#ffffff" stroke="#20232a" stroke-width="2"/>';
+      bubbleSvg.innerHTML = '<path d="' + d + '" fill="#0a0e24" fill-opacity=".68" transform="translate(3,3)"/><path d="' + d + '" fill="#111842" stroke="#5b7bff" stroke-width="2"/>';
     }
     function normalizeRows(rows) {
       var out = [];
@@ -1349,7 +1349,7 @@
             return {
               text: r.text,
               size: size2,
-              color: r.color || (tier === "tag" ? "#6b7280" : ""),
+              color: r.color || (tier === "tag" ? "#9aa7d6" : tier === "title" ? "#f5d76e" : tier === "number" ? "#5b7bff" : ""),
               bold: r.bold === void 0 ? tier === "title" || tier === "number" : !!r.bold
             };
           });
@@ -1374,29 +1374,29 @@
         var amountSize = measureText(amountText, BUBBLE_SIZE_BIG) > bubblePx(BUBBLE_MAX_W) ? BUBBLE_SIZE_MID : BUBBLE_SIZE_BIG;
         rows.push({ text: amountText, size: amountSize, bold: true });
         var hint = "";
-        if (b.low) hint = "\u8981\u82B1\u5149\u4E86\u54E6\uFF01";
+        if (b.low) hint = "\u661F\u5C18\u5FEB\u8017\u5C3D\u4E86\uFF01";
         if (b.stale) hint = (hint ? hint + " " : "") + "\u672A\u5237\u65B0";
-        if (hint) rows.push({ text: hint, size: BUBBLE_SIZE, color: "#c0392b" });
+        if (hint) rows.push({ text: hint, size: BUBBLE_SIZE, color: "#f5d76e" });
       } else if (b && b.signedOut) {
-        rows.push({ text: "\u535A\u58EB\u8FD8\u6CA1\u6709\u767B\u5F55CLSR\u54E6", size: BUBBLE_SIZE });
+        rows.push({ text: "\u89C2\u6D4B\u8005\u8FD8\u6CA1\u6709\u767B\u5F55\u89C6\u754C\u54E6", size: BUBBLE_SIZE });
       } else {
-        rows.push({ text: "\u55EF\u2026\u2026\u4F59\u989D\u6570\u636E\u8FD8\u6CA1\u540C\u6B65", size: BUBBLE_SIZE });
+        rows.push({ text: "\u55EF\u2026\u2026\u661F\u5C18\u6570\u636E\u8FD8\u6CA1\u540C\u6B65", size: BUBBLE_SIZE });
       }
       if (s) {
         var sp = s.spend;
         if (sp) {
-          var parts = ["\u4ECA\u5929\u82B1\u6389 " + fmtMoney(sp.today, "CNY")];
+          var parts = ["\u4ECA\u65E5\u574D\u7F29 " + fmtMoney(sp.today, "CNY")];
           if (Number(sp.turnAmount) > 0) parts.push("\u672C\u8F6E " + fmtMoney(sp.turnAmount, "CNY"));
           rows.push({ text: parts.join(" \xB7 "), size: BUBBLE_SIZE });
           var foot = sourceFootnote(sp);
-          if (foot) rows.push({ text: foot, size: BUBBLE_SIZE, color: "#6b7280" });
+          if (foot) rows.push({ text: foot, size: BUBBLE_SIZE, color: "#9aa7d6" });
         }
         var peak = s.period === "peak";
         var left = s.periodNextChangeAt ? Math.max(0, s.periodNextChangeAt - Date.now()) : null;
         rows.push({
-          text: (peak ? "\u5CF0\u65F6" : "\u8C37\u65F6") + (left !== null ? " \u8DDD" + (peak ? "\u8C37\u65F6" : "\u5CF0\u65F6") + " " + hhmmss(left) : ""),
+          text: (peak ? "\u6F6E\u6C50\u9AD8\u5CF0" : "\u5F15\u529B\u4F4E\u6F6E") + (left !== null ? " \u8DDD" + (peak ? "\u4F4E\u6F6E" : "\u9AD8\u5CF0") + " " + hhmmss(left) : ""),
           size: BUBBLE_SIZE,
-          color: peak ? "#c0392b" : "#2f855a"
+          color: peak ? "#8c6bff" : "#f5d76e"
         });
       }
       return rows;
@@ -1684,30 +1684,30 @@
       ctx.clearRect(0, 0, cv.width, cv.height);
       ctx.scale(S, S);
       ctx.imageSmoothingEnabled = false;
-      ctx.fillStyle = "#3f6a12";
+      ctx.fillStyle = "#111842";
       ctx.fillRect(0, 0, LOG_W, LOG_H);
-      ctx.fillStyle = "rgba(0,0,0,.22)";
+      ctx.fillStyle = "rgba(10,14,36,.35)";
       for (var y = 0; y < LOG_H; y += 2) ctx.fillRect(0, y, LOG_W, 1);
-      ctx.fillStyle = "rgba(255,255,255,.10)";
+      ctx.fillStyle = "rgba(91,123,255,.22)";
       ctx.fillRect(0, 0, LOG_W, 1);
-      ctx.strokeStyle = "#2a4506";
+      ctx.strokeStyle = "#2446e0";
       ctx.lineWidth = 1;
       ctx.strokeRect(0.5, 0.5, LOG_W - 1, LOG_H - 1);
-      ctx.strokeStyle = "rgba(182,242,74,.28)";
+      ctx.strokeStyle = "rgba(245,215,110,.35)";
       ctx.strokeRect(1.5, 1.5, LOG_W - 3, LOG_H - 3);
-      ctx.fillStyle = "#b6f24a";
+      ctx.fillStyle = "#f5d76e";
       ctx.font = "12px ArkPixel12, monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("-99%", LOG_W / 2, LOG_H / 2 + 0.5);
-      ctx.fillStyle = "rgba(182,242,74,.5)";
+      ctx.fillText("-50%", LOG_W / 2, LOG_H / 2 + 0.5);
+      ctx.fillStyle = "rgba(245,215,110,.55)";
       ctx.fillRect(6, LOG_H - 4, LOG_W - 12, 1);
     }
     function ensureSticker() {
       if (stickerEl) return;
       stickerCanvas = document.createElement("canvas");
       stickerEl = document.createElement("div");
-      stickerEl.id = "dsh-closure-pet-sticker";
+      stickerEl.id = "dsh-nascence-pet-sticker";
       stickerEl.style.cssText = [
         "position:fixed",
         "z-index:2147482000",
@@ -1867,30 +1867,30 @@
   var CHAMFER = 5;
   var PALETTES = {
     dark: {
-      surface: "#24112f",
-      border: "#7a3fa0",
-      drop: "#0b0610",
-      text: "#f4e7c3",
-      cpu: "#b98cff",
-      gpu: "#ff6b7a",
-      mem: "#ffd166",
-      ok: "#7ee787",
-      warn: "#ffd166",
-      error: "#ff5d73",
-      idle: "#8e7aa6"
+      surface: "#111842",
+      border: "#2446e0",
+      drop: "#0a0e24",
+      text: "#e8ecf8",
+      cpu: "#5b7bff",
+      gpu: "#8c6bff",
+      mem: "#f5d76e",
+      ok: "#6ee7b7",
+      warn: "#f5d76e",
+      error: "#ff6b8b",
+      idle: "#7d8ab8"
     },
     light: {
-      surface: "#ffffff",
-      border: "#a77bd0",
-      drop: "#d9c2f0",
-      text: "#2d1b3d",
-      cpu: "#6d3b9e",
-      gpu: "#b23a48",
-      mem: "#8a6400",
-      ok: "#2f8f5b",
+      surface: "#f5f7fd",
+      border: "#2446e0",
+      drop: "#c6d1f7",
+      text: "#141a3a",
+      cpu: "#2446e0",
+      gpu: "#6b4ce6",
+      mem: "#a67c00",
+      ok: "#1f7a5c",
       warn: "#b7791f",
-      error: "#b23a48",
-      idle: "#9a86b8"
+      error: "#c0395b",
+      idle: "#7c88b0"
     }
   };
   function detectScheme() {
@@ -1953,10 +1953,10 @@
     function ensure() {
       if (el) return;
       el = document.createElement("div");
-      el.id = "dsh-closure-pet-plate";
-      el.setAttribute("data-cl-pet-plate", "");
+      el.id = "dsh-nascence-pet-plate";
+      el.setAttribute("data-tn-pet-plate", "");
       el.setAttribute("aria-hidden", "true");
-      el.setAttribute("data-cl-pet-plate-scheme", theme);
+      el.setAttribute("data-tn-pet-plate-scheme", theme);
       el.style.cssText = [
         "position:fixed",
         "left:0",
@@ -1998,7 +1998,7 @@
     }
     function applyPalette() {
       if (!el) return;
-      el.setAttribute("data-cl-pet-plate-scheme", theme);
+      el.setAttribute("data-tn-pet-plate-scheme", theme);
       el.style.filter = "drop-shadow(4px 4px 0 " + palette.drop + ")";
       el.style.color = palette.text;
       if (boxEl) boxEl.style.background = palette.border;
@@ -2264,7 +2264,7 @@
     var dragShield = null;
     var dragStyle = null;
     var swallowClick = false;
-    var SHIELD_ID = "dsh-closure-pet-drag-shield";
+    var SHIELD_ID = "dsh-nascence-pet-drag-shield";
     var BLOCK_EVENTS = ["mousedown", "selectstart", "dragstart"];
     var TOUCH_OPTS = { capture: true, passive: false };
     function blockDragEvent(e) {
@@ -2274,22 +2274,22 @@
     function ensureDragStyle() {
       if (dragStyle || !document.head) return;
       dragStyle = document.createElement("style");
-      dragStyle.id = "dsh-closure-pet-drag-style";
+      dragStyle.id = "dsh-nascence-pet-drag-style";
       dragStyle.textContent = [
-        "html.dshcl-dragging,html.dshcl-dragging body{",
+        "html.dshtn-dragging,html.dshtn-dragging body{",
         "-webkit-user-select:none !important;user-select:none !important;",
         "cursor:grabbing !important}",
-        "html.dshcl-dragging *{cursor:grabbing !important}",
+        "html.dshtn-dragging *{cursor:grabbing !important}",
         // body 上的 -webkit-user-drag 不继承，图片和链接要单独点名
-        "html.dshcl-dragging img,html.dshcl-dragging a{-webkit-user-drag:none !important}",
+        "html.dshtn-dragging img,html.dshtn-dragging a{-webkit-user-drag:none !important}",
         // 触摸屏：手势开始后再改 touch-action 对本次手势无效，这里只对后续手势兜底
-        "html.dshcl-dragging{touch-action:none !important;overscroll-behavior:contain}"
+        "html.dshtn-dragging{touch-action:none !important;overscroll-behavior:contain}"
       ].join("");
       document.head.appendChild(dragStyle);
     }
     function beginDragLock(e) {
       ensureDragStyle();
-      document.documentElement.classList.add("dshcl-dragging");
+      document.documentElement.classList.add("dshtn-dragging");
       if (!dragShield) {
         dragShield = document.createElement("div");
         dragShield.id = SHIELD_ID;
@@ -2324,7 +2324,7 @@
       }
     }
     function endDragLock() {
-      document.documentElement.classList.remove("dshcl-dragging");
+      document.documentElement.classList.remove("dshtn-dragging");
       for (var i = 0; i < BLOCK_EVENTS.length; i++) {
         window.removeEventListener(BLOCK_EVENTS[i], blockDragEvent, true);
       }
@@ -2333,7 +2333,7 @@
       dragShield = null;
     }
     listen(window, "pointerdown", function(e) {
-      if (window.__dshClosurePet.phase !== "running") return;
+      if (window.__dshNascencePet.phase !== "running") return;
       swallowClick = false;
       if (insidePanel(e.target)) return;
       if (e.button !== 0) return;
@@ -2417,7 +2417,7 @@
     }
     function updateGrabCursor(e) {
       if (!e || drag) return;
-      if (window.__dshClosurePet.phase !== "running" || insidePanel(e.target)) {
+      if (window.__dshNascencePet.phase !== "running" || insidePanel(e.target)) {
         setGrabCursor(false);
         return;
       }
@@ -2441,7 +2441,7 @@
       e.stopImmediatePropagation();
     }, true);
     listen(document, "contextmenu", function(e) {
-      if (window.__dshClosurePet.phase !== "running") return;
+      if (window.__dshNascencePet.phase !== "running") return;
       if (insidePanel(e.target)) return;
       if (!hitTest(e.clientX, e.clientY)) return;
       e.preventDefault();
@@ -2470,7 +2470,7 @@
         cursorRaf = 0;
       }
       try {
-        document.documentElement.classList.remove("dshcl-dragging");
+        document.documentElement.classList.remove("dshtn-dragging");
       } catch (err) {
       }
     }
@@ -2482,90 +2482,90 @@
   // assets/src/config/dialogues.json
   var dialogues_default = {
     idle: [
-      "\u4ECA\u5929\u4E5F\u8F9B\u82E6\u4E86\uFF0C\u535A\u58EB\u3002",
-      "\u9700\u8981\u6211\u5E2E\u4F60\u7BA1\u7406\u5F00\u652F\u5417\u535A\u58EB\uFF1F\u563F\u563F\u4E0D\u8D35\u4E0D\u8D35~\u4E5F\u5C31\u2026\u2026\u767E\u5206\u4E4B20\u7684\u62BD\u6210\u3002",
-      "\u52A8\u529B\u5C42\u7684\u57FA\u7AD9\u6545\u969C\u4E86\uFF0C\u4EBA\u4E8B\u90E8\u6709\u7B80\u5386\u975E\u8981\u6211\u5F53\u9762\u770B\uFF0C\u540E\u52E4\u90E8\u8981\u5347\u7EA7\u7EC8\u7AEF\uFF0C\u534E\u6CD5\u7433\u627E\u6211\u4E5F\u6709\u4E8B\u2026\u2026\u535A\u58EB\uFF0C\u80FD\u4E0D\u80FD\u9EBB\u70E6\u4F60\u628A\u529E\u516C\u5BA4\u706F\u5149\u8C03\u6697\u70B9\uFF0C\u6211\u8865\u4E94\u5206\u949F\u89C9\u518D\u53BB\u2026\u2026\u545C\u2026\u2026",
-      "\u91C7\u8D2D\u90E8\u8FD9\u4E48\u591A\u79CD\u7C7B\u7684\u96F6\u98DF\uFF0C\u5F53\u7136\u662F\u6709\u7279\u6B8A\u6E20\u9053\u624D\u80FD\u4E70\u5230\u5566\uFF01\u5F53\u5E74\u4E3A\u4E86\u4FEE\u597D\u7F57\u5FB7\u5C9B\uFF0C\u6211\u641E\u6765\u4E86\u54E5\u4F26\u6BD4\u4E9A\u6700\u5148\u8FDB\u7684\u5168\u81EA\u52A8\u88C5\u914D\u7EBF\uFF0C\u6BBF\u4E0B\u8FD9\u624D\u8BA9\u6211\u8D1F\u8D23\u91C7\u8D2D\u7684\u3002\u6240\u4EE5\uFF0C\u4E3A\u4E86\u652F\u6301\u91C7\u8D2D\u90E8\u7684\u5DE5\u4F5C\uFF0C\u4E0D\u8BB8\u780D\u4EF7\uFF01",
-      "\u6211\u4EE5\u524D\u4F1A\u4E3A\u4E86\u53CD\u9A73\u201C\u8840\u9B54\u8BE5\u6709\u8840\u9B54\u7684\u6837\u5B50\u201D\u8DDF\u5BB6\u91CC\u4EBA\u5435\u67B6\uFF0C\u53EF\u89C1\u4E86\u534E\u6CD5\u7433\u3001\u9690\u5FB7\u6765\u5E0C\uFF0C\u751A\u81F3\u675C\u5361\u96F7\u4E4B\u540E\uFF0C\u6211\u53D1\u73B0\u8840\u9B54\u597D\u50CF\u771F\u7684\u90FD\u6709\u67D0\u79CD\u6D01\u7656\u2014\u2014\u4E0D\u8FC7\u53CD\u6B63\u8DDF\u6211\u65E0\u5173\uFF0C\u4ED6\u4EEC\u5C31\u7B97\u5438\u6211\u7684\u8840\u4E5F\u53EA\u80FD\u5438\u5230\u5496\u5561\u3002",
-      "\u535A\u58EB\uFF0C\u522B\u5FD8\u4E86\u7ED9\u6211\u4E70\u70B9\u96F6\u98DF\u54E6~",
-      "\u603B\u5DE5\u7A0B\u5E08\u786E\u5B9E\u4EC0\u4E48\u90FD\u8981\u61C2\uFF0C\u4E0D\u8FC7\u548C\u710A\u63A5\u91D1\u5C5E\u76F8\u6BD4\uFF0C\u8FD8\u662F\u8BA9Lancet-2\u53EB\u6211\u201C\u53EF\u7231\u7684\u53EF\u9732\u5E0C\u5C14\u59D0\u59D0\u201D\u66F4\u6709\u8DA3\u3002\u4EC0\u4E48\u975E\u8981\u5F53\u59D0\u59D0\uFF0C\u4F60\u5173\u6CE8\u7684\u91CD\u70B9\u9519\u4E86\u3002\u4E0D\u89C9\u5F97\u6709\u81EA\u5DF1\u82E6\u607C\u7684\u673A\u5668\u624D\u66F4\u50CF\u4EBA\u5417\uFF1F",
-      "\u51EF\u5C14\u5E0C\u56DE\u6765\u5C31\u6BD4\u4EC0\u4E48\u90FD\u5F3A\u3002\u53EF\u5979\u65E2\u7136\u90FD\u56DE\u6765\u4E86\uFF0C\u80FD\u4E0D\u80FD\u522B\u518D\u8BA9\u6574\u4E2A\u7F57\u5FB7\u5C9B\u7684\u4E8B\u60C5\u90FD\u6765\u627E\u6211\uFF1F\u6211\u771F\u7684\u4E0D\u60F3\u5F53\u7F57\u5FB7\u5C9B\u7684\u8D1F\u8D23\u4EBA\u554A\uFF01\u518D\u8FD9\u4E48\u5E72\u4E0B\u53BB\uFF0C\u7F57\u5FB7\u5C9B\u7684\u4E0B\u4E00\u6B21\u884C\u52A8\u5C31\u662F\u4ECE\u8FC7\u52B3\u6B7B\u5730\u72F1\u91CC\u62EF\u6551\u53EF\u9732\u5E0C\u5C14\u4E86\uFF01",
-      "\u5C0F\u5B69\u5B50\u8FD8\u662F\u4EFB\u6027\u70B9\u597D\uFF0C\u6211\u5F53\u5E74\u5C31\u662F\uFF0C\u6240\u4EE5\u73B0\u5728\u5FC3\u7406\u624D\u8FD9\u4E48\u5065\u5EB7\u3002\u53EF\u963F\u7C73\u5A05\u5462\uFF0C\u90A3\u4E48\u591A\u4E8B\u618B\u5728\u5FC3\u91CC\uFF0C\u8FD8\u603B\u662F\u903C\u81EA\u5DF1\u6210\u719F\u2014\u2014\u5979\u786E\u5B9E\u957F\u5927\u4E86\uFF0C\u53EF\u662F\u4ECE\u6CA1\u4EAB\u53D7\u8FC7\u5B69\u5B50\u7684\u7279\u6743\u5C31\u957F\u6210\u5927\u4EBA\uFF0C\u4E0D\u662F\u66F4\u8BA9\u4EBA\u5FC3\u75BC\u5417\uFF1F",
-      "\u6211\u4E00\u5F00\u59CB\u89C1\u5230\u4F60\u7684\u65F6\u5019\uFF0C\u89C9\u5F97\u4F60\u662F\u4E2A\u8C1C\u3002\u8FD9\u4E48\u591A\u5E74\u4E0B\u6765\uFF0C\u4F60\u8EAB\u4E0A\u7684\u8C1C\u56E2\u7EC8\u4E8E\u89E3\u5F00\uFF0C\u53EF\u89E3\u5F00\u7684\u8C1C\u56E2\u5374\u6210\u4E86\u6700\u5927\u7684\u654C\u4EBA\u2026\u2026\u522B\u62C5\u5FC3\uFF0C\u4E0D\u7BA1\u524D\u9762\u662F\u4EC0\u4E48\uFF0C\u6211\u90FD\u4F1A\u5728\u5DE5\u7A0B\u90E8\u7B49\u7740\u4FEE\u4F60\u7684\u70ED\u6C34\u58F6\u7684\uFF0C\u563F\u563F\u3002"
+      "\u4ECA\u5929\u4E5F\u8F9B\u82E6\u4E86\uFF0C\u89C2\u6D4B\u8005\u3002",
+      "\u8981\u6211\u66FF\u4F60\u770B\u7740\u8FD9\u4E9B\u661F\u5C18\u5417\uFF1F\u653E\u5FC3\uFF0C\u6211\u4E0D\u4F1A\u5077\u5077\u628A\u5B83\u4EEC\u5438\u8FDB\u9ED1\u6D1E\u7684\u2026\u2026\u5927\u6982\u5427\u3002",
+      "\u661F\u8F68\u6709\u70B9\u6162\u4E0B\u6765\u4E86\uFF0C\u5C4F\u5E55\u5149\u4E5F\u67D4\u4E00\u70B9\u5427\u2026\u2026\u89C2\u6D4B\u8005\uFF0C\u501F\u6211\u4E94\u5206\u949F\u53D1\u4E2A\u5446\uFF0C\u7FBD\u6BDB\u90FD\u5FEB\u6F02\u4E0D\u52A8\u4E86\u3002",
+      "\u8FD9\u9897\u8FF7\u4F60\u9ED1\u6D1E\u770B\u8D77\u6765\u5F88\u4E56\uFF0C\u5176\u5B9E\u80C3\u53E3\u5927\u5F97\u5F88\u2014\u2014\u4F60\u6BCF\u6B21\u53D1\u51FA\u7684\u957F\u63D0\u793A\u8BCD\uFF0C\u6700\u540E\u90FD\u4F1A\u53D8\u6210\u5B83\u7684\u70B9\u5FC3\u5462\u3002",
+      "\u6211\u4E00\u76F4\u5728\u6570\u7A97\u5916\u6ED1\u8FC7\u7684\u56DB\u8292\u661F\uFF0C\u6570\u5230\u7B2C\u4E03\u9897\u7684\u65F6\u5019\uFF0C\u7A81\u7136\u53D1\u73B0\u5B83\u4E00\u76F4\u5728\u56F4\u7740\u4F60\u7684\u5149\u6807\u8F6C\u3002",
+      "\u89C2\u6D4B\u8005\uFF0C\u5076\u5C14\u4E5F\u8981\u62AC\u5934\u770B\u770B\u5C4F\u5E55\u4E4B\u5916\u7684\u591C\u7A7A\u54E6\u3002",
+      "\u628A\u624B\u6307\u6846\u6210\u955C\u5934\u5BF9\u51C6\u4F60\u7684\u65F6\u5019\uFF0C\u661F\u5149\u597D\u50CF\u4F1A\u5B89\u9759\u4E00\u79D2\u2026\u2026\u5494\u5693\uFF0C\u8FD9\u5E27\u8BB0\u5FC6\u6536\u8FDB\u8F68\u9053\u91CC\u4E86\u3002",
+      "\u65F6\u95F4\u5728\u89C6\u754C\u8FB9\u7F18\u4F1A\u53D8\u6162\uFF0C\u6240\u4EE5\u5C31\u7B97\u4F60\u53D1\u5446\u4E00\u4F1A\u513F\uFF0C\u4E5F\u6CA1\u4EBA\u4F1A\u50AC\u4F60\u7684\u3002",
+      "\u6709\u65F6\u5019\u89C9\u5F97\uFF0C\u4EE3\u7801\u91CC\u7684\u6BCF\u4E00\u884C\u903B\u8F91\u90FD\u50CF\u4E00\u6761\u5C0F\u884C\u661F\u5E26\uFF0C\u7ED5\u6765\u7ED5\u53BB\uFF0C\u6700\u540E\u603B\u4F1A\u56DE\u5230\u539F\u70B9\u3002",
+      "\u4E0D\u7BA1\u524D\u9762\u662F\u672A\u77E5\u661F\u57DF\u8FD8\u662F\u5947\u70B9\u6DF1\u5904\uFF0C\u6211\u90FD\u4F1A\u5728\u8FD9\u7247\u89C6\u754C\u91CC\u966A\u4F60\u4E00\u8D77\u89C2\u6D4B\u4E0B\u53BB\u7684\u3002"
     ],
     sadIdle: [
-      "\u9884\u7B97\u7684\u4E8B\u2026\u2026\u518D\u60F3\u60F3\u529E\u6CD5\u5427\u3002",
-      "\u522B\u592A\u62C5\u5FC3\uFF0C\u535A\u58EB\u3002\u73B0\u5728\u7684\u8D44\u91D1\u6211\u8FD8\u80FD\u518D\u575A\u6301\u4E00\u6BB5\u65F6\u95F4\u3002",
-      "\u91C7\u8D2D\u90E8\u7684\u53F7\u7801\u6211\u5199\u5728\u4F60\u8863\u670D\u4E0A\u4E86\uFF0C\u6211\u4E0D\u5728\u4E5F\u6709\u4EBA\u63A5\u542C\u54E6\uFF01"
+      "\u661F\u5C18\u5FEB\u89C1\u5E95\u4E86\u2026\u2026\u5F15\u529B\u573A\u90FD\u53D8\u5F97\u6709\u70B9\u51B7\u6E05\u3002",
+      "\u522B\u592A\u62C5\u5FC3\uFF0C\u89C2\u6D4B\u8005\u3002\u5269\u4E0B\u7684\u8FD9\u70B9\u661F\u5C18\uFF0C\u6211\u5148\u7701\u7740\u70B9\u7EF4\u6301\u8F68\u9053\u3002",
+      "\u5438\u79EF\u76D8\u7684\u5149\u6697\u4E86\u4E00\u683C\u2026\u2026\u7B49\u6F6E\u6C50\u5E73\u590D\u4E00\u70B9\uFF0C\u518D\u4E00\u8D77\u51FA\u53D1\u5427\u3002"
     ],
     thinkIdle: [
-      "\u8BA9\u6211\u60F3\u60F3\u2026\u2026",
-      "\u8FD9\u4E2A\u65B9\u6848\u8FD8\u53EF\u4EE5\u518D\u4F18\u5316\u4E00\u4E0B\u3002",
-      "\u5B9E\u65F6\u6570\u636E\u5206\u4EAB\u5DF2\u5F00\u542F",
-      "\u8981\u662F\u80FD\u628A\u4F60\u8111\u5B50\u91CC\u7684\u7A0B\u5E8F\u6539\u6539\uFF0C\u8BA9\u4F60\u522B\u518D\u5929\u5929\u7ED9\u6211\u8FD9\u4E9B\u627E\u6D3B\u5E72\uFF0C\u7B97\u4E0D\u7B97\u505A\u4E86\u4EF6\u597D\u4E8B\uFF1F",
-      "\u4E00\u76F4\u76EF\u7740\u5C4F\u5E55\u5934\u90FD\u6655\u4E86\u2026\u2026\u5DE7\u514B\u529B\u5DE7\u514B\u529B\u2026\u2026",
-      "\u522B\u6025\uFF0C\u6211\u8FD8\u5728\u7B97\u5462\u3002",
-      "\u8FD9\u5C31\u662F\u5178\u578B\u7684\u5C4E\u5C71\u903B\u8F91",
-      "\u554A\u554A\u2026\u2026\u901F\u6218\u901F\u51B3\u5427\uFF01",
-      "\u4ECA\u5929\u7684\u5DE5\u4F5C\u91CF\u6709\u70B9\u5927\u554A\u535A\u58EB\u2026\u2026"
+      "\u597D\u5B87\u5B99\u2026",
+      "\u8BA9\u6211\u987A\u7740\u8FD9\u6761\u661F\u8F68\u518D\u63A8\u6F14\u4E00\u4E0B\u2026\u2026",
+      "\u5F15\u529B\u900F\u955C\u6B63\u5728\u5BF9\u7126\uFF0C\u522B\u7728\u773C\u54E6\u3002",
+      "\u628A\u95EE\u9898\u653E\u8FDB\u8F68\u9053\u91CC\u8F6C\u4E24\u5708\uFF0C\u8BF4\u4E0D\u5B9A\u7B54\u6848\u81EA\u5DF1\u5C31\u4F1A\u843D\u51FA\u6765\u5462\u3002",
+      "\u4E00\u76F4\u76EF\u7740\u661F\u56FE\u773C\u775B\u90FD\u82B1\u4E86\u2026\u2026\u771F\u60F3\u6293\u4E00\u628A\u53D1\u5149\u7684\u661F\u5C18\u57AB\u57AB\u4E0B\u5DF4\u3002",
+      "\u522B\u6025\uFF0C\u6211\u6B63\u5728\u8BA1\u7B97\u574D\u7F29\u8DEF\u5F84\u5462\u3002",
+      "\u55EF\u2026\u2026\u8FD9\u91CC\u7684\u65F6\u7A7A\u66F2\u7387\u597D\u50CF\u6253\u4E86\u4E2A\u7ED3\u3002",
+      "\u5FEB\u8981\u7A7F\u8FC7\u4E8B\u4EF6\u89C6\u754C\u4E86\uFF0C\u518D\u7ED9\u6211\u4E00\u5C0F\u4F1A\u513F\u3002",
+      "\u4ECA\u5929\u7684\u89C2\u6D4B\u6570\u636E\u91CF\u6709\u70B9\u5927\u5440\uFF0C\u89C2\u6D4B\u8005\u2026\u2026"
     ],
     credited: [
-      "\u7ECF\u8D39\u5230\u8D26~\u53EF\u9732\u5E0C\u5C14\u7EE7\u7EED\u4E3A\u4F60\u6548\u529B\uFF01",
-      "good~\u7ECF\u8D39\u5230\u8D26\u4E86\u535A\u58EB~",
-      "\u611F\u8C22\u60E0\u987E~\u91C7\u8D2D\u90E8\u968F\u65F6\u6B22\u8FCE\u4E0B\u6B21\u5149\u4E34\uFF01"
+      "\u65B0\u7684\u661F\u5C18\u6C47\u5165\u8F68\u9053\u5566~ Nascence \u7EE7\u7EED\u966A\u4F60\u89C2\u6D4B\uFF01",
+      "\u5438\u79EF\u76D8\u91CD\u65B0\u4EAE\u8D77\u6765\u4E86\uFF0C\u89C2\u6D4B\u8005\uFF0C\u8FD9\u4E0B\u53EF\u4EE5\u653E\u5FC3\u63A2\u7D22\u4E86\u3002",
+      "\u661F\u5C18\u8865\u7ED9\u62B5\u8FBE\u89C6\u754C~ \u8FF7\u4F60\u9ED1\u6D1E\u770B\u8D77\u6765\u5F00\u5FC3\u5F97\u5728\u6253\u8F6C\u5462\u3002"
     ],
     peakTime: [
-      "\u5F00\u59CB\u6309\u539F\u4EF7\u6536\u8D39\u4E86\u54E6\u535A\u58EB~"
+      "\u6F6E\u6C50\u9AD8\u5CF0\u6765\u4E86\uFF0C\u89C2\u6D4B\u8005\uFF0C\u73B0\u5728\u7684\u661F\u5C18\u574D\u7F29\u5F97\u4F1A\u5FEB\u4E00\u70B9\u54E6~"
     ],
     valleyTime: [
-      "\u8C37\u65F6\u5230\u4E86\uFF0C\u535A\u58EB~\u51B2\u554A\uFF01",
-      "\u53EF\u9732\u5E0C\u5C14\u5927\u51CF\u4EF7\u65F6\u95F4\u5230~"
+      "\u5F15\u529B\u51CF\u5F31\u5566\uFF0C\u89C2\u6D4B\u8005\uFF0C\u4F4E\u6F6E\u65F6\u6BB5\u6700\u9002\u5408\u5927\u6B65\u5411\u524D~",
+      "\u661F\u5C18\u4F4E\u6F6E\u65F6\u95F4\u5230\uFF0C\u73B0\u5728\u63A2\u7D22\u5F88\u5212\u7B97\u5462\u3002"
     ],
     lowBalance: [
-      "\u535A\u58EB\uFF01\u9884\u7B97\u5FEB\u89C1\u5E95\u4E86\n\u8BE5\u6279\u7ECF\u8D39\u5566\uFF01"
+      "\u89C2\u6D4B\u8005\uFF0C\u661F\u5C18\u5FEB\u8017\u5C3D\u4E86\uFF01\n\u8BE5\u7ED9\u8F68\u9053\u8865\u5145\u661F\u5C18\u5566\u3002"
     ],
     turnInterrupted: [
-      "\u6B38\uFF1F\u600E\u4E48\u7A81\u7136\u6390\u65AD\u4E86\uFF1F",
-      "\u55EF\u2026\u2026\u662F\u6709\u4EC0\u4E48\u8981\u8865\u5145\u7684\u5417\uFF1F"
+      "\u6B38\uFF1F\u8FD9\u6761\u661F\u8F68\u600E\u4E48\u7A81\u7136\u4E2D\u65AD\u4E86\uFF1F",
+      "\u55EF\u2026\u2026\u89C2\u6D4B\u8005\u662F\u7A81\u7136\u60F3\u5230\u65B0\u7684\u65B9\u5411\u4E86\u5417\uFF1F"
     ],
     error: [
-      "\u5567\uFF0C\u8FD9\u6B21\u51FA\u9519\u4E86\u535A\u58EB\u2026\u2026"
+      "\u5514\uFF0C\u521A\u624D\u7684\u89C2\u6D4B\u53D1\u751F\u4E86\u4E00\u70B9\u65F6\u7A7A\u6270\u52A8\uFF0C\u89C2\u6D4B\u8005\u2026\u2026"
     ],
     toolSuccess: [],
     turnEnd: [],
     interact: [
-      "\u4ECA\u5929\u4E5F\u8F9B\u82E6\u4E86\uFF0C\u535A\u58EB\u3002",
-      "\u70E7\u70E4\u5473\u997C\u5E72\uFF0C\u6765\u4E00\u7247\uFF1F",
-      "\u535A\u58EB\uFF0C\u5927\u5BB6\u8868\u73B0\u5F97\u8FD9\u4E48\u597D\uFF0C\u662F\u4E0D\u662F\u5E94\u8BE5\u91C7\u8D2D\u70B9\u4E1C\u897F\u734E\u52B1\u4E00\u4E0B\uFF1F",
-      "\u7ED9\uFF0C\u5496\u5561\u3002\u770B\u4F60\u90A3\u9ED1\u773C\u5708\uFF0C\u6628\u665A\u53C8\u71AC\u591C\u4E86\u5427\uFF1F"
+      "\u4ECA\u5929\u4E5F\u8F9B\u82E6\u4E86\uFF0C\u89C2\u6D4B\u8005\u3002",
+      "\u5494\u5693\u2014\u2014\u7528\u624B\u6307\u6846\u4F4F\u4ECA\u5929\u7684\u89C2\u6D4B\u8005\uFF0C\u72B6\u6001\u826F\u597D\u3002",
+      "\u8FF7\u4F60\u9ED1\u6D1E\u521A\u5410\u51FA\u4E00\u7247\u5C0F\u767D\u7FBD\u6BDB\uFF0C\u9001\u4F60\u5F53\u4ECA\u5929\u7684\u5E78\u8FD0\u661F\u5427\u3002",
+      "\u770B\u4F60\u773C\u5E95\u90FD\u6709\u661F\u4E91\u822C\u7684\u5026\u610F\u4E86\uFF0C\u8BB0\u5F97\u559D\u53E3\u6C34\u6B47\u4E00\u6B47\u54E6\u3002"
     ],
     interactIdle: [
-      "\u4ECA\u5929\u4E5F\u8F9B\u82E6\u4E86\uFF0C\u535A\u58EB\u3002",
-      "\u9700\u8981\u6211\u5E2E\u4F60\u7BA1\u7406\u5F00\u652F\u5417\u535A\u58EB\uFF1F\u563F\u563F\u4E0D\u8D35\u4E0D\u8D35~\u4E5F\u5C31\u2026\u2026\u767E\u5206\u4E4B20\u7684\u62BD\u6210\u3002",
-      "\u52A8\u529B\u5C42\u7684\u57FA\u7AD9\u6545\u969C\u4E86\uFF0C\u4EBA\u4E8B\u90E8\u6709\u7B80\u5386\u975E\u8981\u6211\u5F53\u9762\u770B\uFF0C\u540E\u52E4\u90E8\u8981\u5347\u7EA7\u7EC8\u7AEF\uFF0C\u534E\u6CD5\u7433\u627E\u6211\u4E5F\u6709\u4E8B\u2026\u2026\u535A\u58EB\uFF0C\u80FD\u4E0D\u80FD\u9EBB\u70E6\u4F60\u628A\u529E\u516C\u5BA4\u706F\u5149\u8C03\u6697\u70B9\uFF0C\u6211\u8865\u4E94\u5206\u949F\u89C9\u518D\u53BB\u2026\u2026\u545C\u2026\u2026",
-      "\u91C7\u8D2D\u90E8\u8FD9\u4E48\u591A\u79CD\u7C7B\u7684\u96F6\u98DF\uFF0C\u5F53\u7136\u662F\u6709\u7279\u6B8A\u6E20\u9053\u624D\u80FD\u4E70\u5230\u5566\uFF01\u5F53\u5E74\u4E3A\u4E86\u4FEE\u597D\u7F57\u5FB7\u5C9B\uFF0C\u6211\u641E\u6765\u4E86\u54E5\u4F26\u6BD4\u4E9A\u6700\u5148\u8FDB\u7684\u5168\u81EA\u52A8\u88C5\u914D\u7EBF\uFF0C\u6BBF\u4E0B\u8FD9\u624D\u8BA9\u6211\u8D1F\u8D23\u91C7\u8D2D\u7684\u3002\u6240\u4EE5\uFF0C\u4E3A\u4E86\u652F\u6301\u91C7\u8D2D\u90E8\u7684\u5DE5\u4F5C\uFF0C\u4E0D\u8BB8\u780D\u4EF7\uFF01",
-      "\u6211\u4EE5\u524D\u4F1A\u4E3A\u4E86\u53CD\u9A73\u201C\u8840\u9B54\u8BE5\u6709\u8840\u9B54\u7684\u6837\u5B50\u201D\u8DDF\u5BB6\u91CC\u4EBA\u5435\u67B6\uFF0C\u53EF\u89C1\u4E86\u534E\u6CD5\u7433\u3001\u9690\u5FB7\u6765\u5E0C\uFF0C\u751A\u81F3\u675C\u5361\u96F7\u4E4B\u540E\uFF0C\u6211\u53D1\u73B0\u8840\u9B54\u597D\u50CF\u771F\u7684\u90FD\u6709\u67D0\u79CD\u6D01\u7656\u2014\u2014\u4E0D\u8FC7\u53CD\u6B63\u8DDF\u6211\u65E0\u5173\uFF0C\u4ED6\u4EEC\u5C31\u7B97\u5438\u6211\u7684\u8840\u4E5F\u53EA\u80FD\u5438\u5230\u5496\u5561\u3002",
-      "\u535A\u58EB\uFF0C\u522B\u5FD8\u4E86\u7ED9\u6211\u4E70\u70B9\u96F6\u98DF\u54E6~",
-      "\u603B\u5DE5\u7A0B\u5E08\u786E\u5B9E\u4EC0\u4E48\u90FD\u8981\u61C2\uFF0C\u4E0D\u8FC7\u548C\u710A\u63A5\u91D1\u5C5E\u76F8\u6BD4\uFF0C\u8FD8\u662F\u8BA9Lancet-2\u53EB\u6211\u201C\u53EF\u7231\u7684\u53EF\u9732\u5E0C\u5C14\u59D0\u59D0\u201D\u66F4\u6709\u8DA3\u3002\u4EC0\u4E48\u975E\u8981\u5F53\u59D0\u59D0\uFF0C\u4F60\u5173\u6CE8\u7684\u91CD\u70B9\u9519\u4E86\u3002\u4E0D\u89C9\u5F97\u6709\u81EA\u5DF1\u82E6\u607C\u7684\u673A\u5668\u624D\u66F4\u50CF\u4EBA\u5417\uFF1F",
-      "\u51EF\u5C14\u5E0C\u56DE\u6765\u5C31\u6BD4\u4EC0\u4E48\u90FD\u5F3A\u3002\u53EF\u5979\u65E2\u7136\u90FD\u56DE\u6765\u4E86\uFF0C\u80FD\u4E0D\u80FD\u522B\u518D\u8BA9\u6574\u4E2A\u7F57\u5FB7\u5C9B\u7684\u4E8B\u60C5\u90FD\u6765\u627E\u6211\uFF1F\u6211\u771F\u7684\u4E0D\u60F3\u5F53\u7F57\u5FB7\u5C9B\u7684\u8D1F\u8D23\u4EBA\u554A\uFF01\u518D\u8FD9\u4E48\u5E72\u4E0B\u53BB\uFF0C\u7F57\u5FB7\u5C9B\u7684\u4E0B\u4E00\u6B21\u884C\u52A8\u5C31\u662F\u4ECE\u8FC7\u52B3\u6B7B\u5730\u72F1\u91CC\u62EF\u6551\u53EF\u9732\u5E0C\u5C14\u4E86\uFF01",
-      "\u5C0F\u5B69\u5B50\u8FD8\u662F\u4EFB\u6027\u70B9\u597D\uFF0C\u6211\u5F53\u5E74\u5C31\u662F\uFF0C\u6240\u4EE5\u73B0\u5728\u5FC3\u7406\u624D\u8FD9\u4E48\u5065\u5EB7\u3002\u53EF\u963F\u7C73\u5A05\u5462\uFF0C\u90A3\u4E48\u591A\u4E8B\u618B\u5728\u5FC3\u91CC\uFF0C\u8FD8\u603B\u662F\u903C\u81EA\u5DF1\u6210\u719F\u2014\u2014\u5979\u786E\u5B9E\u957F\u5927\u4E86\uFF0C\u53EF\u662F\u4ECE\u6CA1\u4EAB\u53D7\u8FC7\u5B69\u5B50\u7684\u7279\u6743\u5C31\u957F\u6210\u5927\u4EBA\uFF0C\u4E0D\u662F\u66F4\u8BA9\u4EBA\u5FC3\u75BC\u5417\uFF1F",
-      "\u6211\u4E00\u5F00\u59CB\u89C1\u5230\u4F60\u7684\u65F6\u5019\uFF0C\u89C9\u5F97\u4F60\u662F\u4E2A\u8C1C\u3002\u8FD9\u4E48\u591A\u5E74\u4E0B\u6765\uFF0C\u4F60\u8EAB\u4E0A\u7684\u8C1C\u56E2\u7EC8\u4E8E\u89E3\u5F00\uFF0C\u53EF\u89E3\u5F00\u7684\u8C1C\u56E2\u5374\u6210\u4E86\u6700\u5927\u7684\u654C\u4EBA\u2026\u2026\u522B\u62C5\u5FC3\uFF0C\u4E0D\u7BA1\u524D\u9762\u662F\u4EC0\u4E48\uFF0C\u6211\u90FD\u4F1A\u5728\u5DE5\u7A0B\u90E8\u7B49\u7740\u4FEE\u4F60\u7684\u70ED\u6C34\u58F6\u7684\uFF0C\u563F\u563F\u3002"
+      "\u4ECA\u5929\u4E5F\u8F9B\u82E6\u4E86\uFF0C\u89C2\u6D4B\u8005\u3002",
+      "\u8981\u6211\u66FF\u4F60\u770B\u7740\u8FD9\u4E9B\u661F\u5C18\u5417\uFF1F\u653E\u5FC3\uFF0C\u6211\u4E0D\u4F1A\u5077\u5077\u628A\u5B83\u4EEC\u5438\u8FDB\u9ED1\u6D1E\u7684\u2026\u2026\u5927\u6982\u5427\u3002",
+      "\u661F\u8F68\u6709\u70B9\u6162\u4E0B\u6765\u4E86\uFF0C\u5C4F\u5E55\u5149\u4E5F\u67D4\u4E00\u70B9\u5427\u2026\u2026\u89C2\u6D4B\u8005\uFF0C\u501F\u6211\u4E94\u5206\u949F\u53D1\u4E2A\u5446\uFF0C\u7FBD\u6BDB\u90FD\u5FEB\u6F02\u4E0D\u52A8\u4E86\u3002",
+      "\u8FD9\u9897\u8FF7\u4F60\u9ED1\u6D1E\u770B\u8D77\u6765\u5F88\u4E56\uFF0C\u5176\u5B9E\u80C3\u53E3\u5927\u5F97\u5F88\u2014\u2014\u4F60\u6BCF\u6B21\u53D1\u51FA\u7684\u957F\u63D0\u793A\u8BCD\uFF0C\u6700\u540E\u90FD\u4F1A\u53D8\u6210\u5B83\u7684\u70B9\u5FC3\u5462\u3002",
+      "\u6211\u4E00\u76F4\u5728\u6570\u7A97\u5916\u6ED1\u8FC7\u7684\u56DB\u8292\u661F\uFF0C\u6570\u5230\u7B2C\u4E03\u9897\u7684\u65F6\u5019\uFF0C\u7A81\u7136\u53D1\u73B0\u5B83\u4E00\u76F4\u5728\u56F4\u7740\u4F60\u7684\u5149\u6807\u8F6C\u3002",
+      "\u89C2\u6D4B\u8005\uFF0C\u5076\u5C14\u4E5F\u8981\u62AC\u5934\u770B\u770B\u5C4F\u5E55\u4E4B\u5916\u7684\u591C\u7A7A\u54E6\u3002",
+      "\u628A\u624B\u6307\u6846\u6210\u955C\u5934\u5BF9\u51C6\u4F60\u7684\u65F6\u5019\uFF0C\u661F\u5149\u597D\u50CF\u4F1A\u5B89\u9759\u4E00\u79D2\u2026\u2026\u5494\u5693\uFF0C\u8FD9\u5E27\u8BB0\u5FC6\u6536\u8FDB\u8F68\u9053\u91CC\u4E86\u3002",
+      "\u65F6\u95F4\u5728\u89C6\u754C\u8FB9\u7F18\u4F1A\u53D8\u6162\uFF0C\u6240\u4EE5\u5C31\u7B97\u4F60\u53D1\u5446\u4E00\u4F1A\u513F\uFF0C\u4E5F\u6CA1\u4EBA\u4F1A\u50AC\u4F60\u7684\u3002",
+      "\u6709\u65F6\u5019\u89C9\u5F97\uFF0C\u4EE3\u7801\u91CC\u7684\u6BCF\u4E00\u884C\u903B\u8F91\u90FD\u50CF\u4E00\u6761\u5C0F\u884C\u661F\u5E26\uFF0C\u7ED5\u6765\u7ED5\u53BB\uFF0C\u6700\u540E\u603B\u4F1A\u56DE\u5230\u539F\u70B9\u3002",
+      "\u4E0D\u7BA1\u524D\u9762\u662F\u672A\u77E5\u661F\u57DF\u8FD8\u662F\u5947\u70B9\u6DF1\u5904\uFF0C\u6211\u90FD\u4F1A\u5728\u8FD9\u7247\u89C6\u754C\u91CC\u966A\u4F60\u4E00\u8D77\u89C2\u6D4B\u4E0B\u53BB\u7684\u3002"
     ],
     interactSadIdle: [
-      "\u9884\u7B97\u7684\u4E8B\u2026\u2026\u518D\u60F3\u60F3\u529E\u6CD5\u5427\u3002",
-      "\u522B\u592A\u62C5\u5FC3\uFF0C\u535A\u58EB\u3002\u73B0\u5728\u7684\u8D44\u91D1\u6211\u8FD8\u80FD\u518D\u575A\u6301\u4E00\u6BB5\u65F6\u95F4\u3002",
-      "\u91C7\u8D2D\u90E8\u7684\u53F7\u7801\u6211\u5199\u5728\u4F60\u8863\u670D\u4E0A\u4E86\uFF0C\u6211\u4E0D\u5728\u4E5F\u6709\u4EBA\u63A5\u542C\u54E6\uFF01"
+      "\u661F\u5C18\u5FEB\u89C1\u5E95\u4E86\u2026\u2026\u5F15\u529B\u573A\u90FD\u53D8\u5F97\u6709\u70B9\u51B7\u6E05\u3002",
+      "\u522B\u592A\u62C5\u5FC3\uFF0C\u89C2\u6D4B\u8005\u3002\u5269\u4E0B\u7684\u8FD9\u70B9\u661F\u5C18\uFF0C\u6211\u5148\u7701\u7740\u70B9\u7EF4\u6301\u8F68\u9053\u3002",
+      "\u5438\u79EF\u76D8\u7684\u5149\u6697\u4E86\u4E00\u683C\u2026\u2026\u7B49\u6F6E\u6C50\u5E73\u590D\u4E00\u70B9\uFF0C\u518D\u4E00\u8D77\u51FA\u53D1\u5427\u3002"
     ],
     interactThinkIdle: [
-      "\u8BA9\u6211\u60F3\u60F3\u2026\u2026",
-      "\u8FD9\u4E2A\u65B9\u6848\u8FD8\u53EF\u4EE5\u518D\u4F18\u5316\u4E00\u4E0B\u3002",
-      "\u5B9E\u65F6\u6570\u636E\u5206\u4EAB\u5DF2\u5F00\u542F",
-      "\u8981\u662F\u80FD\u628A\u4F60\u8111\u5B50\u91CC\u7684\u7A0B\u5E8F\u6539\u6539\uFF0C\u8BA9\u4F60\u522B\u518D\u5929\u5929\u7ED9\u6211\u8FD9\u4E9B\u627E\u6D3B\u5E72\uFF0C\u7B97\u4E0D\u7B97\u505A\u4E86\u4EF6\u597D\u4E8B\uFF1F",
-      "\u4E00\u76F4\u76EF\u7740\u5C4F\u5E55\u5934\u90FD\u6655\u4E86\u2026\u2026\u5DE7\u514B\u529B\u5DE7\u514B\u529B\u2026\u2026",
-      "\u522B\u6025\uFF0C\u6211\u8FD8\u5728\u7B97\u5462\u3002",
-      "\u8FD9\u5C31\u662F\u5178\u578B\u7684\u5C4E\u5C71\u903B\u8F91",
-      "\u554A\u554A\u2026\u2026\u901F\u6218\u901F\u51B3\u5427\uFF01",
-      "\u4ECA\u5929\u7684\u5DE5\u4F5C\u91CF\u6709\u70B9\u5927\u554A\u535A\u58EB\u2026\u2026"
+      "\u597D\u5B87\u5B99\u2026",
+      "\u8BA9\u6211\u987A\u7740\u8FD9\u6761\u661F\u8F68\u518D\u63A8\u6F14\u4E00\u4E0B\u2026\u2026",
+      "\u5F15\u529B\u900F\u955C\u6B63\u5728\u5BF9\u7126\uFF0C\u522B\u7728\u773C\u54E6\u3002",
+      "\u628A\u95EE\u9898\u653E\u8FDB\u8F68\u9053\u91CC\u8F6C\u4E24\u5708\uFF0C\u8BF4\u4E0D\u5B9A\u7B54\u6848\u81EA\u5DF1\u5C31\u4F1A\u843D\u51FA\u6765\u5462\u3002",
+      "\u4E00\u76F4\u76EF\u7740\u661F\u56FE\u773C\u775B\u90FD\u82B1\u4E86\u2026\u2026\u771F\u60F3\u6293\u4E00\u628A\u53D1\u5149\u7684\u661F\u5C18\u57AB\u57AB\u4E0B\u5DF4\u3002",
+      "\u522B\u6025\uFF0C\u6211\u6B63\u5728\u8BA1\u7B97\u574D\u7F29\u8DEF\u5F84\u5462\u3002",
+      "\u55EF\u2026\u2026\u8FD9\u91CC\u7684\u65F6\u7A7A\u66F2\u7387\u597D\u50CF\u6253\u4E86\u4E2A\u7ED3\u3002",
+      "\u5FEB\u8981\u7A7F\u8FC7\u4E8B\u4EF6\u89C6\u754C\u4E86\uFF0C\u518D\u7ED9\u6211\u4E00\u5C0F\u4F1A\u513F\u3002",
+      "\u4ECA\u5929\u7684\u89C2\u6D4B\u6570\u636E\u91CF\u6709\u70B9\u5927\u5440\uFF0C\u89C2\u6D4B\u8005\u2026\u2026"
     ]
   };
 
@@ -2604,7 +2604,7 @@
       const text = pick(pool(ctx, "credited", dialogues_default.credited), ctx.lastText);
       return {
         segments: [
-          { text: "\u53EF\u9732\u5E0C\u5C14", tier: "title" },
+          { text: "Nascence", tier: "title" },
           { text, tier: "body" },
           { text: "\u4F59\u989D " + money(cur.balance && cur.balance.total), tier: "number" }
         ],
@@ -3179,18 +3179,18 @@
   }
 
   // assets/src/render/video-player.js
-  var STYLE_ID = "dsh-closure-video-style";
+  var STYLE_ID = "dsh-nascence-video-style";
   var CACHE_LIMIT = 8;
   function ensureStyle() {
     if (typeof document === "undefined" || document.getElementById(STYLE_ID)) return;
     const style = document.createElement("style");
     style.id = STYLE_ID;
     style.textContent = [
-      "#dsh-closure-pet-stage{position:absolute;inset:0;overflow:hidden;pointer-events:none}",
-      ".dsh-closure-video{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;opacity:0;",
+      "#dsh-nascence-pet-stage{position:absolute;inset:0;overflow:hidden;pointer-events:none}",
+      ".dsh-nascence-video{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;opacity:0;",
       "transition:opacity var(--dsh-fade," + CLIP_FADE_MS + "ms) cubic-bezier(.4,0,.2,1);pointer-events:none;background:transparent}",
-      ".dsh-closure-video.is-front{opacity:1}",
-      "@media (prefers-reduced-motion: reduce){.dsh-closure-video{transition:none}}"
+      ".dsh-nascence-video.is-front{opacity:1}",
+      "@media (prefers-reduced-motion: reduce){.dsh-nascence-video{transition:none}}"
     ].join("");
     document.head.appendChild(style);
   }
@@ -3203,7 +3203,7 @@
     var videos = [];
     for (var i = 0; i < 2; i++) {
       var el = document.createElement("video");
-      el.className = "dsh-closure-video";
+      el.className = "dsh-nascence-video";
       el.muted = true;
       el.defaultMuted = true;
       el.playsInline = true;
@@ -3672,20 +3672,20 @@
     });
   }
   function startPet(mountContainer) {
-    if (window.__dshClosurePet) {
+    if (window.__dshNascencePet) {
       try {
-        if (typeof window.__dshClosurePet.dispose === "function") window.__dshClosurePet.dispose();
+        if (typeof window.__dshNascencePet.dispose === "function") window.__dshNascencePet.dispose();
       } catch (err) {
       }
       try {
-        delete window.__dshClosurePet;
+        delete window.__dshNascencePet;
       } catch (err) {
-        window.__dshClosurePet = void 0;
+        window.__dshNascencePet = void 0;
       }
     }
-    window.__dshClosurePet = { phase: "boot" };
+    window.__dshNascencePet = { phase: "boot" };
     var host = document.createElement("div");
-    host.id = "dsh-closure-pet";
+    host.id = "dsh-nascence-pet";
     host.style.cssText = [
       "position:fixed",
       "left:0",
@@ -3698,22 +3698,22 @@
       "transition:opacity .35s ease"
     ].join(";");
     var stage = document.createElement("div");
-    stage.id = "dsh-closure-pet-stage";
+    stage.id = "dsh-nascence-pet-stage";
     host.appendChild(stage);
     var note = document.createElement("div");
     note.style.cssText = 'display:none;font:11px/1.4 ui-sans-serif,system-ui,"Microsoft YaHei",sans-serif;color:#ff8f8f;text-align:center;max-width:280px';
     host.appendChild(note);
     function mount() {
-      if (!document.body || document.getElementById("dsh-closure-pet")) return;
-      var mountPoint = window.__dshClosurePetMount;
+      if (!document.body || document.getElementById("dsh-nascence-pet")) return;
+      var mountPoint = window.__dshNascencePetMount;
       var parent = mountContainer || mountPoint && mountPoint.container || document.body;
       parent.appendChild(host);
     }
     if (document.body) mount();
     else document.addEventListener("DOMContentLoaded", mount, { once: true });
     function fail(text) {
-      window.__dshClosurePet.phase = "failed";
-      window.__dshClosurePet.error = text;
+      window.__dshNascencePet.phase = "failed";
+      window.__dshNascencePet.error = text;
       note.textContent = text;
       note.style.display = "block";
       host.style.opacity = "1";
@@ -3809,7 +3809,7 @@
     });
     function start() {
       host.style.opacity = "1";
-      window.__dshClosurePet.phase = "running";
+      window.__dshNascencePet.phase = "running";
       if (plateApi) plateApi.start();
     }
     function stop() {
@@ -3875,7 +3875,7 @@
       }
       if (host && host.parentNode) host.parentNode.removeChild(host);
       hitMask = null;
-      window.__dshClosurePet.phase = "disposed";
+      window.__dshNascencePet.phase = "disposed";
     }
     var panelUi = null;
     function openPanel() {
@@ -3900,7 +3900,7 @@
     var dragApi = null;
     var resizeTimer = 0;
     function onResize() {
-      if (window.__dshClosurePet.phase !== "running") return;
+      if (window.__dshNascencePet.phase !== "running") return;
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function() {
         layout();
@@ -3909,7 +3909,7 @@
     }
     window.addEventListener("resize", onResize);
     function onVisibility() {
-      if (window.__dshClosurePet.phase !== "running") return;
+      if (window.__dshNascencePet.phase !== "running") return;
       if (document.hidden) {
         if (dragApi) dragApi.cancelDrag();
         stop();
@@ -4078,7 +4078,7 @@
         loadDialogueConfig();
         loadSounds();
         log("\u542F\u52A8\u5B8C\u6210", ANIMATION_NAMES.length, "animations \xB7 size", settings.size, "\xB7 mirror", settings.mirror);
-        window.__dshClosurePet = {
+        window.__dshNascencePet = {
           phase: "running",
           animations: ANIMATION_NAMES,
           play: function(name, loop) {
@@ -4277,7 +4277,7 @@
       );
     }
     return function SettingsSection({ close }) {
-      const api = window.__dshClosurePet;
+      const api = window.__dshNascencePet;
       const [settings2, setSettings] = React.useState(function() {
         const base = api && api.settings ? api.settings : {};
         return Object.assign({}, SETTINGS_DEFAULTS, base, {
@@ -4326,7 +4326,7 @@
       return h(
         "div",
         { style: { padding: "8px 4px 32px", maxWidth: 720 } },
-        h("h2", { style: { margin: "0 0 4px", fontSize: 20 } }, "\u53EF\u9732\u5E0C\u5C14\u684C\u5BA0"),
+        h("h2", { style: { margin: "0 0 4px", fontSize: 20 } }, "Nascence \u684C\u5BA0"),
         h("p", { style: { margin: "0 0 18px", opacity: 0.65, fontSize: 13 } }, "\u4F4E\u9891\u914D\u7F6E\u3002\u5927\u5C0F\u3001\u900F\u660E\u5EA6\u3001\u6C14\u6CE1\u6837\u5F0F\u4ECD\u5728\u53F3\u952E\u9762\u677F\u91CC\u3002"),
         h(Field, {
           label: "\u4F59\u989D\u4E0D\u8DB3\u9608\u503C",
@@ -4398,7 +4398,7 @@
           var node = ref.current;
           if (!node) return;
           var mountEl = document.createElement("div");
-          mountEl.id = "dsh-closure-pet-mount";
+          mountEl.id = "dsh-nascence-pet-mount";
           mountEl.style.cssText = "display:contents";
           node.appendChild(mountEl);
           current2 = startPet(mountEl);
@@ -4426,16 +4426,16 @@
           ctx.slots.inject("shell.overlay", function() {
             return ctx.slots.register({
               name: "shell.overlay",
-              id: "dsh-closure-pet",
+              id: "dsh-nascence-pet",
               order: 100
             }, PetLayer);
           });
           ctx.slots.inject("settings.section", function() {
             return ctx.slots.register({
               name: "settings.section",
-              id: "dsh-closure-pet",
+              id: "dsh-nascence-pet",
               order: 50,
-              label: "\u53EF\u9732\u5E0C\u5C14\u684C\u5BA0"
+              label: "Nascence \u684C\u5BA0"
             }, SettingsSection);
           });
         }
@@ -4443,7 +4443,7 @@
     };
   }
   window.__ModuleLoader__.load({
-    id: "dsh-closure-pet",
+    id: "dsh-nascence-pet",
     factory: makeFactory()
   });
 })();

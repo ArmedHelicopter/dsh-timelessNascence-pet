@@ -1,10 +1,10 @@
-// dsh-closure-pet — 前端组合根
+// dsh-nascence-pet — 前端组合根
 //
 // 行为约定（沿用鲸鱼挂件）：
 //   · 位移² < 9（<3px）= 点击，否则 = 拖拽
 //   · 拖拽 1:1 跟手，松手 settle() 滑向吸附位（横/纵轴各按 1/4 区独立判定）
 //   · 按下桌宠到松手之间「冻结」页面交互：不选区、不拖图、不悬停高亮、不点穿
-//   · 一律 left/top 像素定位；位置存 localStorage['dshcl-pos']
+//   · 一律 left/top 像素定位；位置存 localStorage['dshtn-pos']
 //
 // 设置项：见 core/settings.js（右键桌宠打开面板）
 //
@@ -54,19 +54,19 @@ import { createState } from './io/state.js'
 import { createVoice } from './voice.js'
 
 export function startPet(mountContainer) {
-  if (window.__dshClosurePet) {
+  if (window.__dshNascencePet) {
     // 热启用/重复挂载：先把上一实例收干净，避免旧实例挡住新实例。
-    try { if (typeof window.__dshClosurePet.dispose === 'function') window.__dshClosurePet.dispose() } catch (err) {}
-    try { delete window.__dshClosurePet } catch (err) { window.__dshClosurePet = undefined }
+    try { if (typeof window.__dshNascencePet.dispose === 'function') window.__dshNascencePet.dispose() } catch (err) {}
+    try { delete window.__dshNascencePet } catch (err) { window.__dshNascencePet = undefined }
   }
-  window.__dshClosurePet = { phase: 'boot' }
+  window.__dshNascencePet = { phase: 'boot' }
 
   // ————————————————————— 设置 —————————————————————
   // settings / loadSettings / saveSettings 见 core/settings.js（加载时已合并 localStorage）
 
   // ————————————————————— DOM —————————————————————
   var host = document.createElement('div')
-  host.id = 'dsh-closure-pet'
+  host.id = 'dsh-nascence-pet'
   host.style.cssText = [
     'position:fixed', 'left:0', 'top:0',
     'z-index:2147482000', 'pointer-events:none',
@@ -76,7 +76,7 @@ export function startPet(mountContainer) {
 
   // 舞台：固定尺寸由 layout() 写到 host 上；两路视频由播放器塞进来。
   var stage = document.createElement('div')
-  stage.id = 'dsh-closure-pet-stage'
+  stage.id = 'dsh-nascence-pet-stage'
   host.appendChild(stage)
 
   var note = document.createElement('div')
@@ -84,8 +84,8 @@ export function startPet(mountContainer) {
   host.appendChild(note)
 
   function mount() {
-    if (!document.body || document.getElementById('dsh-closure-pet')) return
-    var mountPoint = window.__dshClosurePetMount
+    if (!document.body || document.getElementById('dsh-nascence-pet')) return
+    var mountPoint = window.__dshNascencePetMount
     var parent = mountContainer || (mountPoint && mountPoint.container) || document.body
     parent.appendChild(host)
   }
@@ -93,8 +93,8 @@ export function startPet(mountContainer) {
   else document.addEventListener('DOMContentLoaded', mount, { once: true })
 
   function fail(text) {
-    window.__dshClosurePet.phase = 'failed'
-    window.__dshClosurePet.error = text
+    window.__dshNascencePet.phase = 'failed'
+    window.__dshNascencePet.error = text
     note.textContent = text
     note.style.display = 'block'
     host.style.opacity = '1'
@@ -181,7 +181,7 @@ export function startPet(mountContainer) {
 
   function start() {
     host.style.opacity = '1'
-    window.__dshClosurePet.phase = 'running'
+    window.__dshNascencePet.phase = 'running'
     if (plateApi) plateApi.start()
   }
 
@@ -212,7 +212,7 @@ export function startPet(mountContainer) {
     try { document.removeEventListener('visibilitychange', onVisibility) } catch (err) {}
     if (host && host.parentNode) host.parentNode.removeChild(host)
     hitMask = null
-    window.__dshClosurePet.phase = 'disposed'
+    window.__dshNascencePet.phase = 'disposed'
   }
 
   // ————————————————————— 设置面板 —————————————————————
@@ -235,14 +235,14 @@ export function startPet(mountContainer) {
   // ————————————————————— 视口变化 —————————————————————
   var resizeTimer = 0
   function onResize() {
-    if (window.__dshClosurePet.phase !== 'running') return
+    if (window.__dshNascencePet.phase !== 'running') return
     clearTimeout(resizeTimer)
     resizeTimer = setTimeout(function () { layout(); repositionForAnchor() }, 200)
   }
   window.addEventListener('resize', onResize)
 
   function onVisibility() {
-    if (window.__dshClosurePet.phase !== 'running') return
+    if (window.__dshNascencePet.phase !== 'running') return
     if (document.hidden) {
       if (dragApi) dragApi.cancelDrag() // 切后台时可能收不到 pointerup，先把挡板和拦截器撤掉
       stop()
@@ -375,7 +375,7 @@ export function startPet(mountContainer) {
       loadSounds()
       log('启动完成', ANIMATION_NAMES.length, 'animations · size', settings.size, '· mirror', settings.mirror)
 
-      window.__dshClosurePet = {
+      window.__dshNascencePet = {
         phase: 'running',
         animations: ANIMATION_NAMES,
         play: function (name, loop) {

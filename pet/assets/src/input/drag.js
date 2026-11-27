@@ -1,4 +1,4 @@
-// dsh-closure-pet — 点击 / 拖拽 / 右键（工厂）
+// dsh-nascence-pet — 点击 / 拖拽 / 右键（工厂）
 //
 // 拖动时冻结页面其它交互：命中 pointerdown 就 preventDefault + stopImmediatePropagation，
 // 按下期间拦住 mousedown/selectstart/dragstart，铺透明挡板，松手吞掉合成 click。
@@ -36,7 +36,7 @@ export function createDrag(deps) {
   //      原生拖拽都是这次按下的默认动作；页面的 pointerdown 监听也不再收到它；
   //   2. 按下到松手之间，在捕获阶段拦掉 mousedown / selectstart / dragstart
   //      （pointerdown 的 preventDefault 并不保证压掉兼容的 mousedown，必须再兜一层）；
-  //   3. <html class="dshcl-dragging"> 期间 user-select:none、光标 grabbing；
+  //   3. <html class="dshtn-dragging"> 期间 user-select:none、光标 grabbing；
   //   4. 铺一层透明挡板吃掉指针命中：页面收不到 hover，iframe / webview 也抢不走指针；
   //   5. 松手后吞掉浏览器顺手合成的那一次 click，避免"拖到按钮上松手就点出去了"。
   var drag = null
@@ -44,7 +44,7 @@ export function createDrag(deps) {
   var dragStyle = null
   // 一次性开关：只吞「桌宠松手后紧跟的那个 click」，任何新的 pointerdown 都会撤销它
   var swallowClick = false
-  var SHIELD_ID = 'dsh-closure-pet-drag-shield'
+  var SHIELD_ID = 'dsh-nascence-pet-drag-shield'
   var BLOCK_EVENTS = ['mousedown', 'selectstart', 'dragstart']
   var TOUCH_OPTS = { capture: true, passive: false }
 
@@ -56,23 +56,23 @@ export function createDrag(deps) {
   function ensureDragStyle() {
     if (dragStyle || !document.head) return
     dragStyle = document.createElement('style')
-    dragStyle.id = 'dsh-closure-pet-drag-style'
+    dragStyle.id = 'dsh-nascence-pet-drag-style'
     dragStyle.textContent = [
-      'html.dshcl-dragging,html.dshcl-dragging body{',
+      'html.dshtn-dragging,html.dshtn-dragging body{',
       '-webkit-user-select:none !important;user-select:none !important;',
       'cursor:grabbing !important}',
-      'html.dshcl-dragging *{cursor:grabbing !important}',
+      'html.dshtn-dragging *{cursor:grabbing !important}',
       // body 上的 -webkit-user-drag 不继承，图片和链接要单独点名
-      'html.dshcl-dragging img,html.dshcl-dragging a{-webkit-user-drag:none !important}',
+      'html.dshtn-dragging img,html.dshtn-dragging a{-webkit-user-drag:none !important}',
       // 触摸屏：手势开始后再改 touch-action 对本次手势无效，这里只对后续手势兜底
-      'html.dshcl-dragging{touch-action:none !important;overscroll-behavior:contain}',
+      'html.dshtn-dragging{touch-action:none !important;overscroll-behavior:contain}',
     ].join('')
     document.head.appendChild(dragStyle)
   }
 
   function beginDragLock(e) {
     ensureDragStyle()
-    document.documentElement.classList.add('dshcl-dragging')
+    document.documentElement.classList.add('dshtn-dragging')
     if (!dragShield) {
       dragShield = document.createElement('div')
       dragShield.id = SHIELD_ID
@@ -99,7 +99,7 @@ export function createDrag(deps) {
   }
 
   function endDragLock() {
-    document.documentElement.classList.remove('dshcl-dragging')
+    document.documentElement.classList.remove('dshtn-dragging')
     for (var i = 0; i < BLOCK_EVENTS.length; i++) {
       window.removeEventListener(BLOCK_EVENTS[i], blockDragEvent, true)
     }
@@ -111,7 +111,7 @@ export function createDrag(deps) {
   // 放在 window 捕获阶段：比页面自己的 document/元素级监听都早，
   // 命中桌宠时才能把这次按下完整"截胡"（阻断传播后页面收不到它）。
   listen(window, 'pointerdown', function (e) {
-    if (window.__dshClosurePet.phase !== 'running') return
+    if (window.__dshNascencePet.phase !== 'running') return
     // 只要出现新的按下，就说明用户有了新意图：撤销上次松手留下的 click 吞口
     swallowClick = false
     if (insidePanel(e.target)) return
@@ -193,7 +193,7 @@ export function createDrag(deps) {
   }
   function updateGrabCursor(e) {
     if (!e || drag) return
-    if (window.__dshClosurePet.phase !== 'running' || insidePanel(e.target)) {
+    if (window.__dshNascencePet.phase !== 'running' || insidePanel(e.target)) {
       setGrabCursor(false)
       return
     }
@@ -224,7 +224,7 @@ export function createDrag(deps) {
   }, true)
 
   listen(document, 'contextmenu', function (e) {
-    if (window.__dshClosurePet.phase !== 'running') return
+    if (window.__dshNascencePet.phase !== 'running') return
     if (insidePanel(e.target)) return
     if (!hitTest(e.clientX, e.clientY)) return
     e.preventDefault()
@@ -248,7 +248,7 @@ export function createDrag(deps) {
     dragStyle = null
     setGrabCursor(false)
     if (cursorRaf) { cancelAnimationFrame(cursorRaf); cursorRaf = 0 }
-    try { document.documentElement.classList.remove('dshcl-dragging') } catch (err) {}
+    try { document.documentElement.classList.remove('dshtn-dragging') } catch (err) {}
   }
 
   return { isDragging: function () { return !!drag }, cancelDrag: cancelDrag, dispose: dispose }

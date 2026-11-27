@@ -1,6 +1,6 @@
-// dsh-closure-pet — 硬件状态挂牌（像素风 HUD）
+// dsh-nascence-pet — 硬件状态挂牌（像素风 HUD）
 //
-// CPU / 内存 / GPU 读数来自 GET /dsh-closure/hardware。
+// CPU / 内存 / GPU 读数来自 GET /dsh-nascence/hardware。
 // 挂在桌宠上方或下方（设置里可选，默认下方），页面隐藏、屏保亮板或开关关闭时停采样。
 
 import { HARDWARE_PATH } from '../shared/protocol.js'
@@ -17,14 +17,14 @@ var CHAMFER = 5
 
 var PALETTES = {
   dark: {
-    surface: '#24112f', border: '#7a3fa0', drop: '#0b0610',
-    text: '#f4e7c3', cpu: '#b98cff', gpu: '#ff6b7a', mem: '#ffd166',
-    ok: '#7ee787', warn: '#ffd166', error: '#ff5d73', idle: '#8e7aa6',
+    surface: '#111842', border: '#2446e0', drop: '#0a0e24',
+    text: '#e8ecf8', cpu: '#5b7bff', gpu: '#8c6bff', mem: '#f5d76e',
+    ok: '#6ee7b7', warn: '#f5d76e', error: '#ff6b8b', idle: '#7d8ab8',
   },
   light: {
-    surface: '#ffffff', border: '#a77bd0', drop: '#d9c2f0',
-    text: '#2d1b3d', cpu: '#6d3b9e', gpu: '#b23a48', mem: '#8a6400',
-    ok: '#2f8f5b', warn: '#b7791f', error: '#b23a48', idle: '#9a86b8',
+    surface: '#f5f7fd', border: '#2446e0', drop: '#c6d1f7',
+    text: '#141a3a', cpu: '#2446e0', gpu: '#6b4ce6', mem: '#a67c00',
+    ok: '#1f7a5c', warn: '#b7791f', error: '#c0395b', idle: '#7c88b0',
   },
 }
 
@@ -90,10 +90,10 @@ export function createPlate(deps) {
   function ensure() {
     if (el) return
     el = document.createElement('div')
-    el.id = 'dsh-closure-pet-plate'
-    el.setAttribute('data-cl-pet-plate', '')
+    el.id = 'dsh-nascence-pet-plate'
+    el.setAttribute('data-tn-pet-plate', '')
     el.setAttribute('aria-hidden', 'true')
-    el.setAttribute('data-cl-pet-plate-scheme', theme)
+    el.setAttribute('data-tn-pet-plate-scheme', theme)
     el.style.cssText = [
       'position:fixed', 'left:0', 'top:0', 'display:none',
       'z-index:2147482001',
@@ -129,7 +129,7 @@ export function createPlate(deps) {
 
   function applyPalette() {
     if (!el) return
-    el.setAttribute('data-cl-pet-plate-scheme', theme)
+    el.setAttribute('data-tn-pet-plate-scheme', theme)
     el.style.filter = 'drop-shadow(4px 4px 0 ' + palette.drop + ')'
     el.style.color = palette.text
     if (boxEl) boxEl.style.background = palette.border

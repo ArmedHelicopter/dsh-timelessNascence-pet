@@ -1,6 +1,6 @@
-// dsh-closure-pet — 客户端 bundle 入口
+// dsh-nascence-pet — 客户端 bundle 入口
 //
-// 构建后由 DSH 的 client-modules 以 /plugins/dsh-closure-pet/client.js 提供；
+// 构建后由 DSH 的 client-modules 以 /plugins/dsh-nascence-pet/client.js 提供；
 // 真正 UI 在 main.js，打包进同一个 bundle，不再从宿主路由动态 import。
 
 import { startPet } from './main.js'
@@ -17,7 +17,7 @@ export function makeFactory() {
         var node = ref.current
         if (!node) return
         var mountEl = document.createElement('div')
-        mountEl.id = 'dsh-closure-pet-mount'
+        mountEl.id = 'dsh-nascence-pet-mount'
         // display:contents：不参与布局，子元素（position:fixed 的桌宠）仍相对视口
         mountEl.style.cssText = 'display:contents'
         node.appendChild(mountEl)
@@ -47,16 +47,16 @@ export function makeFactory() {
         ctx.slots.inject('shell.overlay', function () {
           return ctx.slots.register({
             name: 'shell.overlay',
-            id: 'dsh-closure-pet',
+            id: 'dsh-nascence-pet',
             order: 100,
           }, PetLayer)
         })
         ctx.slots.inject('settings.section', function () {
           return ctx.slots.register({
             name: 'settings.section',
-            id: 'dsh-closure-pet',
+            id: 'dsh-nascence-pet',
             order: 50,
-            label: '可露希尔桌宠',
+            label: 'Nascence 桌宠',
           }, SettingsSection)
         })
       },
@@ -65,6 +65,6 @@ export function makeFactory() {
 }
 
 window.__ModuleLoader__.load({
-  id: 'dsh-closure-pet',
+  id: 'dsh-nascence-pet',
   factory: makeFactory(),
 })

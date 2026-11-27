@@ -1,4 +1,4 @@
-// dsh-closure-pet — 静态命中区
+// dsh-nascence-pet — 静态命中区
 //
 // 不读 GPU 像素：命中区按 Idle 姿态拟合成 11 个图元，栅格化成 128×108 掩码，
 // 按下时只做坐标换算 + 查表。掩码在 FRAME 坐标系里，与位置 / size / dpr / 镜像无关。

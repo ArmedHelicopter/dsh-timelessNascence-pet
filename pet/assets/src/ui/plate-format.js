@@ -1,4 +1,4 @@
-// dsh-closure-pet — 硬件挂牌的纯排版逻辑（无 DOM）
+// dsh-nascence-pet — 硬件挂牌的纯排版逻辑（无 DOM）
 //
 // 采样 → 挂牌段：CPU 23% · GPU0 35% 2.9/8.0G 65°C · 内存 80%
 // 浏览器与 node --test 都直接 import，不碰 document。

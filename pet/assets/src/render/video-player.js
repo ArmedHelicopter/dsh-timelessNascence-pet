@@ -1,4 +1,4 @@
-// dsh-closure-pet — 透明视频播放器
+// dsh-nascence-pet — 透明视频播放器
 //
 // A/B 两个 <video> 交替当后台：新片段先加载到后台，能出画后再交换 is-front，
 // 靠 0.18s 的 opacity 过渡完成交叉淡化，避免换动画时硬切。
@@ -6,7 +6,7 @@
 
 import { CLIP_FADE_MS, CLIPS } from '../anim/library.js'
 
-const STYLE_ID = 'dsh-closure-video-style'
+const STYLE_ID = 'dsh-nascence-video-style'
 const CACHE_LIMIT = 8
 
 function ensureStyle() {
@@ -14,11 +14,11 @@ function ensureStyle() {
   const style = document.createElement('style')
   style.id = STYLE_ID
   style.textContent = [
-    '#dsh-closure-pet-stage{position:absolute;inset:0;overflow:hidden;pointer-events:none}',
-    '.dsh-closure-video{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;opacity:0;',
+    '#dsh-nascence-pet-stage{position:absolute;inset:0;overflow:hidden;pointer-events:none}',
+    '.dsh-nascence-video{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;opacity:0;',
     'transition:opacity var(--dsh-fade,' + CLIP_FADE_MS + 'ms) cubic-bezier(.4,0,.2,1);pointer-events:none;background:transparent}',
-    '.dsh-closure-video.is-front{opacity:1}',
-    '@media (prefers-reduced-motion: reduce){.dsh-closure-video{transition:none}}',
+    '.dsh-nascence-video.is-front{opacity:1}',
+    '@media (prefers-reduced-motion: reduce){.dsh-nascence-video{transition:none}}',
   ].join('')
   document.head.appendChild(style)
 }
@@ -32,7 +32,7 @@ export function createVideoPlayer(deps) {
   var videos = []
   for (var i = 0; i < 2; i++) {
     var el = document.createElement('video')
-    el.className = 'dsh-closure-video'
+    el.className = 'dsh-nascence-video'
     el.muted = true
     el.defaultMuted = true
     el.playsInline = true
