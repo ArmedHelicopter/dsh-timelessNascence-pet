@@ -33,8 +33,10 @@ Light:
    「来探索新的宇宙吧，管理员」; caption text "Timeless Nascence"; sidebar brand text may become "TIMELESS NASCENCE".
 
 ## Startup splash (new)
-- Asset: `skin/assets/splash.webm` (1440×480, 3.9 s, VP9 + Opus, from the reference video: hands release the silver ∞
-  around the black hole). Serve it from the skin host (`skin/lib/index.js`) e.g. `GET /dsh-nascence-skin/assets/splash.webm`
+- Asset: `skin/assets/splash.webm` (1440×480, 3.9 s, VP9 + Opus). <br>
+  **2026-11 更新**：早期版本是从参考视频里裁的一段（西装主持人 + 霓虹 ∞），既不对题也有版权风险；
+  现已改为按品牌自制：∞ 描边生长 + 星形闪现 + 轨道线，画面纯黑底，随 `promo/src/splash.html` 一起可重跑。
+  Serve it from the skin host (`skin/lib/index.js`) e.g. `GET /dsh-nascence-skin/assets/splash.webm`
   with `Content-Type: video/webm` (support `Range` requests if simple; otherwise full body is fine). Include `assets/`
   in package.json `files`.
 - On the first client load of each app session (sessionStorage flag), show a full-window overlay: black background,

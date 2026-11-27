@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Timeless Nascence — promo</title>
+<style>
+  :root{
+    --void:#05070f; --navy:#0b1430; --navy2:#111c40;
+    --line:rgba(232,238,255,.08); --line2:rgba(232,238,255,.18);
+    --text:#eef2ff; --dim:#8f9abb; --silver:#c9d1e6;
+    --accent:#3d6bff; --accent2:#5b7bff; --gold:#f5d76e;
+    --f-latin:"Bahnschrift Light","Segoe UI Light","Segoe UI",sans-serif;
+    --f-latin-c:"Bahnschrift Light SemiCondensed","Bahnschrift Light","Segoe UI Light",sans-serif;
+    --f-cjk:"Noto Sans SC Light","Microsoft YaHei UI Light","Microsoft YaHei UI",sans-serif;
+    --f-cjk-m:"Noto Sans SC","Microsoft YaHei UI",sans-serif;
+    --f-mono:"Cascadia Mono","Cascadia Code","Consolas",monospace;
+  }
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+  html,body{margin:0;width:1920px;height:1080px;background:#000;overflow:hidden}
+  #stage{position:absolute;inset:0;width:1920px;height:1080px;background:var(--void);overflow:hidden}
+  canvas#stars{position:absolute;inset:0;width:1920px;height:1080px}
+  .vignette{position:absolute;inset:0;
+    background:radial-gradient(120% 90% at 50% 42%,rgba(0,0,0,0) 35%,rgba(0,0,0,.55) 100%);
+    pointer-events:none}
+  section{position:absolute;inset:0;will-change:opacity,transform}
+  .mono{font-family:var(--f-mono);font-weight:300;letter-spacing:.18em;text-transform:uppercase}
+
+  /* ---------- shared ---------- */
+  .streak{position:absolute;height:1px;background:linear-gradient(90deg,
+      rgba(61,107,255,0) 0%,rgba(61,107,255,.85) 22%,#fff 50%,rgba(61,107,255,.85) 78%,rgba(61,107,255,0) 100%);
+    transform-origin:50% 50%;box-shadow:0 0 14px rgba(61,107,255,.55)}
+  .eyebrow{position:absolute;font-family:var(--f-mono);font-size:13px;letter-spacing:.42em;
+    text-transform:uppercase;color:var(--dim)}
+  .eyebrow b{color:var(--accent2);font-weight:400}
+  .rule{position:absolute;height:1px;background:var(--line2)}
+
+  /* ---------- S1 cold open ---------- */
+  #s1 .kicker{position:absolute;left:50%;top:322px;transform:translateX(-50%);
+    font-family:var(--f-mono);font-size:14px;letter-spacing:.62em;text-transform:uppercase;color:var(--silver);opacity:0}
+  #emblem{position:absolute;left:50%;top:452px;width:300px;height:300px;margin-left:-150px;margin-top:-150px}
+  #emblem svg{width:300px;height:300px;overflow:visible}
+  #wordmark{position:absolute;left:0;right:0;top:648px;text-align:center;
+    font-family:var(--f-latin);font-size:62px;font-weight:300;letter-spacing:.30em;color:#fff;
+    padding-left:.30em;white-space:nowrap}
+  #wordmark span{display:inline-block;opacity:0}
+  #s1 .sub{position:absolute;left:0;right:0;top:742px;text-align:center;
+    font-family:var(--f-mono);font-size:12.5px;letter-spacing:.46em;text-transform:uppercase;color:var(--dim);opacity:0}
+  #s1 .under{position:absolute;left:50%;top:790px;width:760px;margin-left:-380px;opacity:0}
+  #glowCore{position:absolute;left:50%;top:452px;width:900px;height:900px;margin:-450px 0 0 -450px;
+    background:radial-gradient(circle,rgba(61,107,255,.20) 0%,rgba(61,107,255,.06) 38%,rgba(0,0,0,0) 68%);
+    opacity:0;pointer-events:none}
+
+  /* ---------- chapters ---------- */
+  .chapter .num{position:absolute;left:150px;top:50%;transform:translateY(-50%);
+    font-family:var(--f-latin-c);font-size:250px;font-weight:300;line-height:.8;
+    color:rgba(238,242,255,.095);letter-spacing:.02em}
+  .chapter .title{position:absolute;left:470px;top:50%;transform:translateY(-50%);
+    font-family:var(--f-cjk);font-size:132px;font-weight:200;color:#fff;letter-spacing:.12em}
+  .chapter .en{position:absolute;left:486px;top:calc(50% + 108px);
+    font-family:var(--f-mono);font-size:14px;letter-spacing:.52em;text-transform:uppercase;color:var(--accent2)}
+  .chapter .bar{position:absolute;left:470px;top:calc(50% + 152px);width:0;height:1px;
+    background:linear-gradient(90deg,var(--accent) 0%,rgba(61,107,255,0) 100%)}
+
+  /* ---------- S3 pet ---------- */
+  #s3 .copy{position:absolute;left:150px;top:300px;width:720px}
+  #s3 h2{font-family:var(--f-cjk);font-weight:200;font-size:66px;line-height:1.34;color:#fff;
+    letter-spacing:.04em;margin:26px 0 0;clip-path:inset(0 100% 0 0)}
+  #s3 .rows{position:absolute;left:150px;top:648px;width:640px}
+  .row{position:relative;height:74px;opacity:0}
+  .row .k{position:absolute;left:0;top:16px;font-family:var(--f-mono);font-size:11.5px;
+    letter-spacing:.34em;text-transform:uppercase;color:var(--dim)}
+  .row .v{position:absolute;left:0;top:36px;font-family:var(--f-cjk-m);font-size:21px;color:var(--silver)}
+  .row .v em{font-style:normal;color:#fff}
+  .row i.hair{position:absolute;left:0;right:0;top:0;height:1px;background:var(--line2);transform:scaleX(0);transform-origin:0 0}
+
+  #petStage{position:absolute;left:960px;top:150px;width:920px;height:860px}
+  #petGlow{position:absolute;left:120px;top:120px;width:680px;height:620px;
+    background:radial-gradient(circle at 50% 45%,rgba(61,107,255,.20) 0%,rgba(91,123,255,.07) 40%,rgba(0,0,0,0) 70%)}
+  #petFloor{position:absolute;left:230px;top:806px;width:460px;height:34px;border-radius:50%;
+    background:radial-gradient(ellipse at 50% 50%,rgba(91,123,255,.30) 0%,rgba(203,214,255,.10) 45%,rgba(0,0,0,0) 72%);
+    filter:blur(6px)}
+  #petHorizon{position:absolute;left:0;top:820px;width:920px;height:1px;
+    background:linear-gradient(90deg,rgba(232,238,255,0),rgba(232,238,255,.16) 30%,rgba(232,238,255,.16) 70%,rgba(232,238,255,0))}
+  .pet{position:absolute;left:16px;top:70px;width:888px;height:748px;opacity:0}
+  #petBubble{position:absolute;left:-120px;top:236px;max-width:430px;padding:16px 20px;
+    background:rgba(11,20,48,.86);border:1px solid var(--line2);border-radius:10px;
+    font-family:var(--f-cjk-m);font-size:18px;line-height:1.6;color:#fff;opacity:0;
+    box-shadow:0 18px 44px rgba(0,0,0,.45);backdrop-filter:blur(2px)}
+  #petBubble:after{content:"";position:absolute;right:-6px;top:34px;width:10px;height:10px;
+    background:rgba(11,20,48,.86);border-right:1px solid var(--line2);border-top:1px solid var(--line2);transform:rotate(45deg)}
+  #states{position:absolute;left:1000px;top:936px;width:840px;display:flex;gap:26px;justify-content:flex-start}
+  .st{display:flex;align-items:center;gap:9px;opacity:.26}
+  .st b{width:6px;height:6px;border-radius:50%;background:var(--dim);display:block}
+  .st span{font-family:var(--f-mono);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+  .st.on{opacity:1}
+  .st.on b{background:var(--accent2);box-shadow:0 0 10px rgba(91,123,255,.9)}
+  .st.on span{color:#fff}
+
+  /* ---------- S5 skin ---------- */
+  #s5 .copy{position:absolute;left:150px;top:150px;width:700px}
+  #s5 h2{font-family:var(--f-cjk);font-weight:200;font-size:52px;line-height:1.3;color:#fff;
+    letter-spacing:.04em;margin:22px 0 0;clip-path:inset(0 100% 0 0)}
+  #s5 .notes{position:absolute;left:150px;top:326px;width:420px}
+  .note{position:relative;padding-left:22px;margin-bottom:16px;opacity:0;
+    font-family:var(--f-cjk-m);font-size:17px;color:var(--silver)}
+  .note:before{content:"";position:absolute;left:0;top:11px;width:10px;height:1px;background:var(--accent)}
+
+  #mockWrap{position:absolute;left:560px;top:300px;width:1220px;height:700px}
+  .mock{position:absolute;inset:0;border-radius:10px;overflow:hidden;
+    border:1px solid var(--m-line2);background:var(--m-void);color:var(--m-text);
+    box-shadow:0 40px 90px rgba(0,0,0,.55)}
+  .mock.dark{--m-void:#05070f;--m-navy:#0b1430;--m-navy2:#111c40;--m-text:#eef2ff;--m-dim:#8f9abb;
+    --m-line:rgba(232,238,255,.08);--m-line2:rgba(232,238,255,.18);--m-accent:#3d6bff;
+    --m-btn:#ffffff;--m-btnink:#0b1430;--m-hair:rgba(232,238,255,.06)}
+  .mock.light{--m-void:#f6f7fb;--m-navy:#ffffff;--m-navy2:#eef1f8;--m-text:#0b1430;--m-dim:#5b6480;
+    --m-line:rgba(11,20,48,.08);--m-line2:rgba(11,20,48,.16);--m-accent:#2148e8;
+    --m-btn:#0b1430;--m-btnink:#ffffff;--m-hair:rgba(11,20,48,.06)}
+  .tb{position:absolute;left:0;top:0;right:0;height:46px;background:var(--m-navy);
+    border-bottom:1px solid var(--m-line);display:flex;align-items:center;padding:0 18px}
+  .tb .menu{font-family:var(--f-cjk-m);font-size:12.5px;color:var(--m-dim);letter-spacing:.02em}
+  .tb .menu span{margin-right:18px}
+  .tb .cap{position:absolute;left:50%;transform:translateX(-50%);font-family:var(--f-latin);
+    font-size:13px;letter-spacing:.35em;color:var(--m-text);padding-left:.35em;white-space:nowrap}
+  .tb .btns{position:absolute;right:16px;top:0;height:46px;display:flex;align-items:center;gap:16px}
+  .tb .btns i{display:block;width:11px;height:11px;border:1px solid var(--m-dim);opacity:.65}
+  .tb .btns i.x{border-radius:2px}
+  .mock .understreak{position:absolute;left:0;right:0;top:46px;height:1px;
+    background:linear-gradient(90deg,rgba(61,107,255,0) 0%,var(--m-accent) 30%,#fff 50%,var(--m-accent) 70%,rgba(61,107,255,0) 100%);
+    opacity:.9}
+  .sb{position:absolute;left:0;top:47px;bottom:0;width:250px;background:var(--m-navy);
+    border-right:1px solid var(--m-line);padding:18px 16px}
+  .sb .brand{display:flex;align-items:center;gap:9px;margin-bottom:20px}
+  .sb .brand img{width:20px;height:20px;opacity:.95}
+  .sb .brand span{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.22em;color:var(--m-text)}
+  .sb .new{display:flex;align-items:center;justify-content:center;gap:8px;height:38px;border-radius:6px;
+    background:var(--m-btn);color:var(--m-btnink);font-family:var(--f-cjk-m);font-size:13px;margin-bottom:22px}
+  .sb .grp{font-family:var(--f-mono);font-size:10px;letter-spacing:.3em;color:var(--m-dim);margin:0 0 10px 4px;text-transform:uppercase}
+  .sb .nav{padding:8px 10px;border-radius:6px;font-family:var(--f-cjk-m);font-size:13px;color:var(--m-dim);margin-bottom:2px}
+  .sb .nav.on{color:var(--m-text);background:var(--m-navy2);position:relative}
+  .sb .nav.on:before{content:"";position:absolute;left:-16px;top:8px;bottom:8px;width:2px;background:var(--m-accent)}
+  .sb .ws{margin-top:22px}
+  .sb .wsitem{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:6px;
+    font-family:var(--f-mono);font-size:12px;color:var(--m-dim);letter-spacing:.04em}
+  .sb .wsitem b{width:12px;height:10px;border:1px solid var(--m-dim);border-radius:1px;opacity:.7}
+  .main{position:absolute;left:250px;top:47px;right:0;bottom:0;padding:0 46px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .main .hero{display:flex;align-items:center;gap:14px;margin-bottom:34px}
+  .main .hero img{width:34px;height:34px;opacity:.9}
+  .main .hero span{font-family:var(--f-cjk);font-weight:300;font-size:27px;color:var(--m-text);letter-spacing:.03em}
+  .composer{width:100%;max-width:760px;border:1px solid var(--m-line2);border-radius:10px;
+    background:var(--m-void);padding:14px 16px 12px}
+  .composer .ph{font-family:var(--f-cjk-m);font-size:13.5px;color:var(--m-dim)}
+  .composer .foot{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+  .composer .foot .l{display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:10.5px;color:var(--m-dim);letter-spacing:.16em}
+  .composer .foot .send{width:30px;height:30px;border-radius:6px;background:var(--m-btn)}
+  .callout{position:absolute;height:1px;background:linear-gradient(90deg,var(--accent) 0%,rgba(61,107,255,.15) 100%);
+    transform-origin:0 50%;transform:scaleX(0)}
+  .callabel{position:absolute;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.26em;
+    text-transform:uppercase;color:var(--accent2);opacity:0;white-space:nowrap}
+
+  /* ---------- S7 features ---------- */
+  .feat{position:absolute;inset:0;opacity:0}
+  .feat .idx{position:absolute;left:150px;top:196px;font-family:var(--f-mono);font-size:12px;
+    letter-spacing:.44em;color:var(--accent2)}
+  .feat .h{position:absolute;left:150px;top:236px;font-family:var(--f-cjk);font-weight:200;
+    font-size:84px;color:#fff;letter-spacing:.06em;line-height:1.1}
+  .feat .sub{position:absolute;left:154px;top:352px;font-family:var(--f-cjk-m);font-size:21px;
+    color:var(--dim);letter-spacing:.02em}
+  .fpanel{position:absolute;left:150px;top:446px;width:1620px;height:330px;
+    border:1px solid var(--line2);border-radius:10px;
+    background:linear-gradient(180deg,rgba(17,28,64,.42),rgba(11,20,48,.20));
+    display:flex;align-items:center;justify-content:center;
+    padding:0 56px;box-sizing:border-box;overflow:hidden}
+  #f1 .formula{font-family:var(--f-mono);font-size:31px;color:var(--silver);letter-spacing:.01em;
+    text-align:center;line-height:1.6;white-space:nowrap}
+  #f1 .formula .op{color:var(--dim);padding:0 .30em}
+  #f1 .formula .hl{color:var(--gold)}
+  #f1 .formula .acc{color:var(--accent2)}
+  #f1 .fnote{position:absolute;left:56px;right:56px;bottom:30px;font-family:var(--f-mono);font-size:11px;
+    letter-spacing:.28em;color:var(--dim);text-transform:uppercase;opacity:0;text-align:center}
+  #f2 .clock{width:100%}
+  #f2 .band{position:relative;height:46px;border:1px solid var(--line2);border-radius:3px;
+    overflow:hidden;background:
+      repeating-linear-gradient(90deg,rgba(232,238,255,.055) 0 1px,transparent 1px calc(100%/24)),
+      rgba(61,107,255,.05)}
+  #f2 .seg{position:absolute;top:0;bottom:0;background:rgba(232,238,255,.08)}
+  #f2 .seg.peak{background:linear-gradient(180deg,rgba(245,215,110,.55),rgba(245,215,110,.22))}
+  #f2 .hrs{position:absolute;top:0;bottom:0;width:1px;background:rgba(232,238,255,.10)}
+  #f2 .ticks{position:relative;height:26px;margin-top:12px}
+  #f2 .ticks span{position:absolute;font-family:var(--f-mono);font-size:12.5px;color:var(--dim);
+    letter-spacing:.16em;transform:translateX(-50%)}
+  #f2 .ticks span.first{transform:none}
+  #f2 .ticks span.last{transform:translateX(-100%)}
+  #f2 .legend{display:flex;align-items:center;gap:9px;margin-top:26px;
+    font-family:var(--f-mono);font-size:11px;letter-spacing:.26em;color:var(--dim);text-transform:uppercase}
+  #f2 .legend .sw{width:16px;height:9px;border:1px solid var(--line2);margin-left:22px}
+  #f2 .legend .sw:first-child{margin-left:0}
+  #f2 .legend .sw.peak{background:rgba(245,215,110,.40);border-color:rgba(245,215,110,.55)}
+  #f2 .now{position:absolute;top:-10px;bottom:-10px;width:1px;background:#fff;
+    box-shadow:0 0 14px rgba(255,255,255,.8)}
+  #f2 .legend{position:relative;height:20px}
+  #f3 .fpanel{justify-content:space-between;gap:54px}
+  #f3 .gauges{flex:1;max-width:980px}
+  #f3 .plate{width:520px;flex:0 0 520px;border:1px solid var(--line2);border-radius:6px;
+    background:rgba(11,20,48,.66);padding:20px 22px;font-family:var(--f-mono);
+    font-size:12px;letter-spacing:.12em;color:var(--dim);opacity:0}
+  #f3 .plate div{display:flex;justify-content:space-between;margin:9px 0}
+  #f3 .plate b{color:var(--silver);font-weight:400}
+  #f4 .wave{width:100%;height:180px;display:flex;align-items:center;gap:5px}
+  #f4 .wave i{flex:1;background:linear-gradient(180deg,var(--accent2),rgba(61,107,255,.22));
+    border-radius:1px;height:2px}
+
+  /* ---------- S8 repos ---------- */
+  #s8 .h{position:absolute;left:0;right:0;top:150px;text-align:center;font-family:var(--f-cjk);
+    font-weight:200;font-size:52px;color:#fff;letter-spacing:.08em;opacity:0}
+  .card{position:absolute;top:330px;width:700px;height:330px;border:1px solid var(--line2);
+    border-radius:12px;background:linear-gradient(180deg,rgba(17,28,64,.72),rgba(11,20,48,.5));
+    padding:38px 40px;opacity:0}
+  #cardPet{left:200px}
+  #cardSkin{left:1020px}
+  .card .top{display:flex;align-items:center;gap:20px}
+  .card img{width:84px;height:84px;border-radius:19px}
+  .ttile{position:relative;width:84px;height:84px;border-radius:19px;overflow:hidden;
+    border:1px solid var(--line2);background:#05070f;flex:0 0 84px}
+  .ttile i{position:absolute;inset:0;display:block}
+  .ttile .d{background:#05070f}
+  .ttile .l{background:#f6f7fb;clip-path:inset(0 0 0 50%)}
+  .ttile:after{content:"";position:absolute;left:50%;top:10%;bottom:10%;width:1px;
+    background:linear-gradient(180deg,rgba(61,107,255,0),#3d6bff 35%,#fff 50%,#3d6bff 65%,rgba(61,107,255,0))}
+  .card .nm{font-family:var(--f-mono);font-size:19px;letter-spacing:.04em;color:#fff}
+  .card .role{font-family:var(--f-cjk-m);font-size:15px;color:var(--dim);margin-top:8px}
+  .card .desc{font-family:var(--f-cjk-m);font-size:17px;line-height:1.75;color:var(--silver);margin-top:26px}
+  .card .foot{position:absolute;left:40px;right:40px;bottom:30px;display:flex;justify-content:space-between;
+    align-items:center;font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+  .chip{border:1px solid var(--line2);border-radius:4px;padding:4px 9px;color:var(--silver)}
+  #s8 .linkline{position:absolute;left:50%;top:700px;width:0;height:1px;margin-left:0;
+    background:linear-gradient(90deg,rgba(61,107,255,0),var(--accent),rgba(61,107,255,0))}
+  #s8 .note{position:absolute;left:0;right:0;top:760px;text-align:center;font-family:var(--f-mono);
+    font-size:12.5px;letter-spacing:.4em;color:var(--dim);text-transform:uppercase;opacity:0}
+
+  /* ---------- S9 end ---------- */
+  #s9 .mark{position:absolute;left:50%;top:300px;width:150px;height:150px;margin-left:-75px;opacity:0}
+  #s9 .line{position:absolute;left:0;right:0;top:506px;text-align:center;font-family:var(--f-cjk);
+    font-weight:200;font-size:78px;color:#fff;letter-spacing:.10em;opacity:0}
+  #s9 .word{position:absolute;left:0;right:0;top:632px;text-align:center;font-family:var(--f-latin);
+    font-size:30px;letter-spacing:.44em;color:var(--silver);padding-left:.44em;opacity:0}
+  #s9 .meta{position:absolute;left:0;right:0;top:714px;text-align:center;font-family:var(--f-mono);
+    font-size:11.5px;letter-spacing:.38em;color:var(--dim);text-transform:uppercase;opacity:0}
+  #s9 .repos{position:absolute;left:0;right:0;top:790px;text-align:center;font-family:var(--f-mono);
+    font-size:12px;letter-spacing:.16em;color:rgba(143,154,187,.75);opacity:0}
+  #fadeOut{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}
+  #flash{position:absolute;inset:0;background:#eef2ff;opacity:0;pointer-events:none}
+  #sub{position:absolute;left:80px;right:80px;bottom:92px;text-align:center;
+    font-family:var(--f-cjk-m);font-size:26px;line-height:1.5;letter-spacing:.03em;
+    color:rgba(238,242,255,.94);opacity:0;
+    text-shadow:0 2px 14px rgba(0,0,0,.92),0 0 30px rgba(0,0,0,.75)}
+  #sub i{font-style:normal;color:var(--silver)}
+  #tc{position:absolute;right:54px;bottom:38px;font-family:var(--f-mono);font-size:10.5px;
+    letter-spacing:.24em;color:rgba(143,154,187,.55)}
+  #tag{position:absolute;left:54px;bottom:38px;font-family:var(--f-mono);font-size:10.5px;
+    letter-spacing:.24em;color:rgba(143,154,187,.45)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="stars" width="1920" height="1080"></canvas>
+  <div class="vignette"></div>
+
+  <!-- S1 -->
+  <section id="s1">
+    <div id="glowCore"></div>
+    <div class="kicker">DeepSeek Harness</div>
+    <div id="emblem"></div>
+    <div id="wordmark"></div>
+    <div class="sub">Desktop Pet · Client Theme</div>
+    <div class="under streak"></div>
+  </section>
+
+  <!-- chapters -->
+  <section id="ch1" class="chapter"><div class="num">01</div><div class="title">桌宠</div><div class="en">Desktop Pet</div><div class="bar"></div></section>
+  <section id="ch2" class="chapter"><div class="num">02</div><div class="title">主题</div><div class="en">Client Theme</div><div class="bar"></div></section>
+  <section id="ch3" class="chapter"><div class="num">03</div><div class="title">能力</div><div class="en">Capabilities</div><div class="bar"></div></section>
+
+  <!-- S3 -->
+  <section id="s3">
+    <div class="copy">
+      <div class="eyebrow"><b>01</b> / Desktop Pet</div>
+      <h2>一只住在<br>界面里的桌宠</h2>
+    </div>
+    <div class="rows">
+      <div class="row" id="r1"><i class="hair"></i><div class="k">Animation</div><div class="v"><em>18 段</em>透明动画 · 888×748 VP9-Alpha</div></div>
+      <div class="row" id="r2"><i class="hair"></i><div class="k">State machine</div><div class="v"><em>三态</em>状态机 · idle / think / sad</div></div>
+      <div class="row" id="r3"><i class="hair"></i><div class="k">Voice</div><div class="v"><em>61 条</em>台词 · 语音与合成音效</div></div>
+    </div>
+    <div id="petStage">
+      <div id="petGlow"></div>
+      <div id="petHorizon"></div>
+      <div id="petFloor"></div>
+      <video class="pet" id="vIdle"  src="/assets/video/idle.webm" muted playsinline preload="auto"></video>
+      <video class="pet" id="vHappy" src="/assets/video/happy.webm" muted playsinline preload="auto"></video>
+      <video class="pet" id="vInt"   src="/assets/video/interact_1.webm" muted playsinline preload="auto"></video>
+      <video class="pet" id="vThink" src="/assets/video/think_idle.webm" muted playsinline preload="auto"></video>
+      <div id="petBubble"></div>
+    </div>
+
+  </section>
+
+  <!-- S5 -->
+  <section id="s5">
+    <div class="copy">
+      <div class="eyebrow"><b>02</b> / Client Theme</div>
+      <h2>深空底的极简神殿</h2>
+    </div>
+    <div class="notes">
+      <div class="note" id="n1">藏青 / 黑 / 白，一屏只有一道光痕</div>
+      <div class="note" id="n2">钴蓝只做指示：焦点、激活、链接</div>
+      <div class="note" id="n3">无投影、无扫描线、无玻璃</div>
+    </div>
+    <div id="mockWrap">
+      <div class="mock light" id="mockLight">
+        <div class="tb"><div class="menu"><span>应用</span><span>编辑</span></div>
+          <div class="cap">Timeless Nascence</div>
+          <div class="btns"><i></i><i></i><i class="x"></i></div></div>
+        <div class="understreak"></div>
+        <div class="sb">
+          <div class="brand"><img src="/promo/src/assets/skin-logo.png"><span>TIMELESS NASCENCE</span></div>
+          <div class="new">＋ 新会话</div>
+          <div class="grp">Workspaces</div>
+          <div class="wsitem"><b></b>project</div>
+          <div class="wsitem"><b></b>notes</div>
+          <div class="wsitem"><b></b>sandbox</div>
+          <div class="grp" style="margin-top:22px">Plugins</div>
+          <div class="nav on">插件</div>
+          <div class="nav">自动化任务</div>
+          <div class="nav">更多</div>
+        </div>
+        <div class="main">
+          <div class="hero"><img src="/promo/src/assets/skin-logo.png"><span>来探索新的宇宙吧，管理员</span></div>
+          <div class="composer">
+            <div class="ph">描述你想要构建的内容，/ 调用指令，@ 文件或对话</div>
+            <div class="foot"><div class="l"><span>＋</span><span>STANDARD MODE</span></div><div class="send"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="mock dark" id="mockDark" style="opacity:0">
+        <div class="tb"><div class="menu"><span>应用</span><span>编辑</span></div>
+          <div class="cap">Timeless Nascence</div>
+          <div class="btns"><i></i><i></i><i class="x"></i></div></div>
+        <div class="understreak"></div>
+        <div class="sb">
+          <div class="brand"><img src="/promo/src/assets/skin-logo.png"><span>TIMELESS NASCENCE</span></div>
+          <div class="new">＋ 新会话</div>
+          <div class="grp">Workspaces</div>
+          <div class="wsitem"><b></b>project</div>
+          <div class="wsitem"><b></b>notes</div>
+          <div class="wsitem"><b></b>sandbox</div>
+          <div class="grp" style="margin-top:22px">Plugins</div>
+          <div class="nav on">插件</div>
+          <div class="nav">自动化任务</div>
+          <div class="nav">更多</div>
+        </div>
+        <div class="main">
+          <div class="hero"><img src="/promo/src/assets/skin-logo.png"><span>来探索新的宇宙吧，管理员</span></div>
+          <div class="composer">
+            <div class="ph">描述你想要构建的内容，/ 调用指令，@ 文件或对话</div>
+            <div class="foot"><div class="l"><span>＋</span><span>STANDARD MODE</span></div><div class="send"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="splashWrap" style="position:absolute;inset:0;background:#000;opacity:0">
+      <video id="vSplash" src="/promo/src/assets/splash.webm" muted playsinline preload="auto"
+             style="position:absolute;left:50%;top:50%;width:1920px;height:640px;margin-left:-960px;margin-top:-320px;object-fit:cover"></video>
+      <div id="splashCap" style="position:absolute;left:0;right:0;top:812px;text-align:center;font-family:var(--f-latin);
+           font-size:34px;letter-spacing:.42em;color:#fff;padding-left:.42em;opacity:0">Timeless Nascence</div>
+      <div id="splashStreak" class="streak" style="left:50%;top:876px;width:520px;margin-left:-260px;opacity:0"></div>
+    </div>
+  </section>
+
+  <!-- S7 -->
+  <section id="s7">
+    <div class="feat" id="f1">
+      <div class="idx">01 / BILLING</div>
+      <div class="h">星尘计费</div>
+      <div class="sub">按每百万 token 价目逐条结算，峰谷不同价</div>
+      <div class="fpanel">
+        <div class="formula" id="formula"></div>
+        <div class="fnote" id="fnote">每百万 token · [ 谷价 , 峰价 ] 内置在 lib/billing.js</div>
+      </div>
+    </div>
+    <div class="feat" id="f2">
+      <div class="idx">02 / TIDE</div>
+      <div class="h">峰谷时段</div>
+      <div class="sub">北京时间工作日 09–12 · 14–18 为潮汐高峰，其余为引力低潮</div>
+      <div class="fpanel">
+        <div class="clock">
+          <div class="band" id="band">
+            <div class="seg peak" style="left:37.5%;width:12.5%"></div>
+            <div class="seg peak" style="left:58.33%;width:16.67%"></div>
+            <div class="now" id="nowMark" style="left:62%"></div>
+          </div>
+          <div class="ticks">
+            <span class="first" style="left:0%">00</span><span style="left:25%">06</span><span style="left:50%">12</span>
+            <span style="left:75%">18</span><span class="last" style="left:100%">24</span>
+          </div>
+          <div class="legend">
+            <i class="sw peak"></i><span>潮汐高峰 09–12 · 14–18</span>
+            <i class="sw"></i><span>引力低潮 · 含周末与节假日</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="feat" id="f3">
+      <div class="idx">03 / HARDWARE</div>
+      <div class="h">硬件挂牌</div>
+      <div class="sub">CPU / 内存 / GPU 用量与温度，页面隐藏即停止采样</div>
+      <div class="fpanel">
+        <div class="gauges">
+          <div class="g" id="g1"><div class="lab"><span>CPU</span><b id="g1v">0%</b></div><div class="track"><div class="fill" id="g1f"></div></div></div>
+          <div class="g" id="g2"><div class="lab"><span>Memory</span><b id="g2v">0%</b></div><div class="track"><div class="fill" id="g2f"></div></div></div>
+          <div class="g" id="g3"><div class="lab"><span>GPU</span><b id="g3v">0%</b></div><div class="track"><div class="fill" id="g3f"></div></div></div>
+        </div>
+        <div class="plate" id="plate">
+          <div><span>CPU</span><b>37 %  ·  52 °C</b></div>
+          <div><span>MEMORY</span><b>18.4 / 32 GB</b></div>
+          <div><span>GPU</span><b>12 %  ·  8.0G / 16G</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="feat" id="f4">
+      <div class="idx">04 / VOICE</div>
+      <div class="h">61 条台词</div>
+      <div class="sub">中文语音随状态切换，音效由纯算法合成</div>
+      <div class="fpanel">
+        <div class="wave" id="wave"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- S8 -->
+  <section id="s8">
+    <div class="h">两个仓库，独立发布</div>
+    <div class="card" id="cardPet">
+      <div class="top"><img src="/promo/src/assets/icon-pet.png"><div><div class="nm">dsh-timelessNascence-pet</div><div class="role">桌宠 · 透明动画 / 状态机 / 计费</div></div></div>
+      <div class="desc">18 段透明动画、61 条语音台词、星尘计费与硬件挂牌。<br>派生自 dsh-closure-pet。</div>
+      <div class="foot"><span>github.com/ArmedHelicopter</span><span class="chip">MIT</span></div>
+    </div>
+    <div class="card" id="cardSkin">
+      <div class="top"><div class="ttile"><i class="d"></i><i class="l"></i></div><div><div class="nm">dsh-timelessNascence-skin</div><div class="role">主题 · 藏青 / 黑 / 白极简</div></div></div>
+      <div class="desc">双主题、一道光痕、启动动画。<br>派生自 dsh-closure-skin。</div>
+      <div class="foot"><span>github.com/ArmedHelicopter</span><span class="chip">MIT</span></div>
+    </div>
+    <div class="linkline" id="linkline"></div>
+    <div class="note">两仓库可分别安装，也可一起用</div>
+  </section>
+
+  <!-- S9 -->
+  <section id="s9">
+    <div class="mark" id="endMark"></div>
+    <div class="line">来探索新的宇宙吧，管理员</div>
+    <div class="word">Timeless Nascence</div>
+    <div class="meta">MIT · for DeepSeek Harness</div>
+    <div class="repos">dsh-timelessNascence-pet · dsh-timelessNascence-skin</div>
+  </section>
+
+  <div id="flash"></div>
+  <div id="fadeOut"></div>
+  <div id="sub"></div>
+  <div id="tag">PV · 2026</div>
+  <div id="tc">00:00</div>
+</div>
+
+<script>
+/* ---------------- helpers ---------------- */
+const $ = s => document.querySelector(s);
+const clamp01 = x => x < 0 ? 0 : x > 1 ? 1 : x;
+const seg = (t, a, b) => clamp01((t - a) / (b - a));
+const smooth = x => x * x * (3 - 2 * x);
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const easeIn = x => x * x * x;
+const lerp = (a, b, k) => a + (b - a) * k;
+const on = (t, a, b) => (t >= a && t < b) ? 1 : 0;
+const bump = (t, a, b, c, d) => Math.min(seg(t, a, b), 1 - seg(t, c, d)); // fade in/out window
+
+/* ---------------- starfield ---------------- */
+const cv = $('#stars'), cx = cv.getContext('2d');
+let rs = 987654321;
+const rnd = () => (rs = (rs * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+const STARS = Array.from({ length: 190 }, () => ({
+  x: rnd() * 1920, y: rnd() * 1080, r: 0.4 + rnd() * 1.25,
+  a: 0.18 + rnd() * 0.55, sp: 0.15 + rnd() * 0.6, ph: rnd() * 6.283, drift: 2 + rnd() * 9
+}));
+function drawStars(t, amp) {
+  cx.clearRect(0, 0, 1920, 1080);
+  for (const s of STARS) {
+    const x = (s.x - t * s.drift * 0.35 + 1920) % 1920;
+    const tw = 0.62 + 0.38 * Math.sin(t * s.sp * 1.7 + s.ph);
+    cx.globalAlpha = s.a * tw * amp;
+    cx.fillStyle = '#dfe6ff';
+    cx.beginPath(); cx.arc(x, s.y, s.r, 0, 6.2832); cx.fill();
+  }
+  cx.globalAlpha = 1;
+}
+
+/* ---------------- emblem (SVG) ---------------- */
+function lemniscate(cx0, cy0, a, n = 240) {
+  let d = '';
+  for (let i = 0; i <= n; i++) {
+    const th = i / n * Math.PI * 2;
+    const den = 1 + Math.sin(th) ** 2;
+    const x = cx0 + a * Math.cos(th) / den;
+    const y = cy0 + a * Math.sin(th) * Math.cos(th) / den * 2.0;
+    d += (i ? 'L' : 'M') + x.toFixed(2) + ' ' + y.toFixed(2);
+  }
+  return d + 'Z';
+}
+function starPath(cx0, cy0, R, r) {
+  let d = '';
+  for (let i = 0; i < 8; i++) {
+    const ang = -Math.PI / 2 + i * Math.PI / 4;
+    const rad = i % 2 === 0 ? R : r;
+    d += (i ? 'L' : 'M') + (cx0 + Math.cos(ang) * rad).toFixed(2) + ' ' + (cy0 + Math.sin(ang) * rad).toFixed(2);
+  }
+  return d + 'Z';
+}
+function emblemSVG(p) {
+  return `
+<svg viewBox="0 0 300 300" fill="none">
+  <ellipse id="orb-${p}" cx="150" cy="150" rx="132" ry="34" transform="rotate(-14 150 150)"
+           stroke="#c9d1e6" stroke-width="1" opacity=".55"/>
+  <path id="inf-${p}" d="${lemniscate(150, 150, 86)}" stroke="#ffffff" stroke-width="15"
+        stroke-linecap="round" stroke-linejoin="round" pathLength="1"/>
+  <path id="star-${p}" d="${starPath(150, 150, 52, 13)}" fill="#ffffff" opacity="${p === 'end' ? 1 : 0}"/>
+  <circle id="core-${p}" cx="150" cy="150" r="9" fill="#5b7bff" opacity="${p === 'end' ? 1 : 0}"/>
+</svg>`;
+}
+$('#emblem').innerHTML = emblemSVG('s1');
+$('#endMark').innerHTML = emblemSVG('end');
+
+/* ---------------- wordmark ---------------- */
+function spell(el, text, sp) {
+  el.innerHTML = '';
+  [...text].forEach(ch => {
+    const s = document.createElement('span');
+    s.textContent = ch === ' ' ? '\u00a0' : ch;
+    el.appendChild(s);
+  });
+  return [...el.children];
+}
+const wmChars = spell($('#wordmark'), 'TIMELESS NASCENCE', 0);
+
+/* ---------------- formula tokens ---------------- */
+(function () {
+  const parts = [
+    ['花费', 'acc'], [' ', 'op'], ['=', 'op'], [' ', 'op'],
+    ['cacheRead', ''], [' ', 'op'], ['×', 'op'], [' ', 'op'], ['谷 / 峰', 'hl'],
+    [' ', 'op'], ['+', 'op'], [' ', 'op'], ['input', ''], [' ', 'op'], ['×', 'op'], [' ', 'op'],
+    ['未命中价', ''], [' ', 'op'], ['+', 'op'], [' ', 'op'], ['output', ''], [' ', 'op'], ['×', 'op'],
+    [' ', 'op'], ['输出价', '']
+  ];
+  const host = $('#formula');
+  host.innerHTML = '';
+  parts.forEach(([txt, cls]) => {
+    const s = document.createElement('span');
+    s.className = cls; s.textContent = txt; s.style.opacity = 0;
+    host.appendChild(s);
+  });
+})();
+const fSpans = [...$('#formula').children];
+
+/* ---------------- wave bars ---------------- */
+(function () {
+  const w = $('#wave'); let s = 424242;
+  for (let i = 0; i < 61; i++) {
+    const b = document.createElement('i');
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    b.dataset.k = ((s / 0x7fffffff) * 0.8 + 0.2).toFixed(3);
+    w.appendChild(b);
+  }
+})();
+const waveBars = [...$('#wave').children];
+
+/* ---------------- timeline ---------------- */
+const TL = {
+  cold: [0.00, 4.04], ch1: [4.04, 5.53], pet: [5.53, 16.51], ch2: [16.51, 17.86],
+  skin: [17.86, 29.89], ch3: [29.89, 31.37], feat: [31.37, 40.29],
+  repos: [40.29, 46.23], end: [46.23, 52.00]
+};
+const PET_CUES = [
+  { t: 5.53, el: $('#vIdle'), st: $('#stIdle'), line: '管理员，今天的星尘飘得很安静呢。' },
+  { t: 8.57, el: $('#vHappy'), st: $('#stHappy'), line: '管理员送来好多星光呢，Nascence 又满血啦！' },
+  { t: 11.47, el: $('#vInt'), st: $('#stHappy'), line: '咔嚓~把此刻的管理员框进我的视线里啦。' },
+  { t: 14.14, el: $('#vThink'), st: $('#stThink'), line: '好宇宙…唔，刚刚思绪飘到银河外边去了。' }
+];
+const FEAT = [31.37, 33.60, 35.83, 38.06];
+let VO_SCHEDULE = [];   // filled from vo/schedule.json (written by build_audio.py)
+
+/* ---------------- render ---------------- */
+function render(t) {
+  const seeks = [];
+
+  /* --- global --- */
+  const inCold = t < TL.cold[1];
+  drawStars(t, inCold ? seg(t, 0.05, 1.1) : (t < 30 ? 0.85 : 0.35));
+
+  /* --- S1 cold open --- */
+  {
+    const s = $('#s1');
+    s.style.display = inCold ? 'block' : 'none';
+    if (inCold) {
+      const o = seg(t, 0.05, 0.6) * (1 - seg(t, 3.92, 4.04));
+      s.style.opacity = o;
+      $('#glowCore').style.opacity = smooth(seg(t, 0.3, 1.6)) * (0.75 + 0.25 * Math.sin(t * 3.4));
+      const kick = $('#s1 .kicker');
+      kick.style.opacity = smooth(seg(t, 0.35, 1.05));
+      kick.style.letterSpacing = (0.62 + 0.22 * (1 - smooth(seg(t, 0.35, 1.6)))).toFixed(3) + 'em';
+
+      // emblem: orbit draws, then infinity, then star
+      const orb = $('#orb-s1'), inf = $('#inf-s1'), st = $('#star-s1'), core = $('#core-s1');
+      const po = smooth(seg(t, 0.45, 1.5));
+      orb.style.strokeDasharray = 1; orb.style.strokeDashoffset = (1 - po).toFixed(3);
+      orb.setAttribute('pathLength', '1');
+      const pi = smooth(seg(t, 0.95, 2.15));
+      inf.style.strokeDasharray = 1; inf.style.strokeDashoffset = (1 - pi).toFixed(3);
+      const ps = seg(t, 1.95, 2.35);
+      st.style.opacity = ps > 0 ? 1 : 0;
+      st.style.transformOrigin = '150px 150px';
+      const k = 0.55 + 0.45 * easeOut(ps);
+      st.style.transform = `scale(${(ps > 0 ? k : 0.6).toFixed(3)}) rotate(${(-40 + 40 * easeOut(ps)).toFixed(1)}deg)`;
+      core.style.opacity = smooth(seg(t, 2.05, 2.4));
+      const blink = Math.max(0, Math.sin((t - 2.05) * 9)) * (1 - seg(t, 2.05, 3.2));
+      core.setAttribute('r', (9 + 10 * blink).toFixed(2));
+
+      // wordmark stagger
+      const wStart = 2.16, wStep = 0.052;
+      wmChars.forEach((c, i) => {
+        const p = seg(t, wStart + i * wStep, wStart + i * wStep + 0.34);
+        c.style.opacity = smooth(p);
+        c.style.transform = `translateY(${(1 - easeOut(p)) * 16}px)`;
+      });
+      const sub = $('#s1 .sub');
+      sub.style.opacity = smooth(seg(t, 3.0, 3.55));
+      const uw = $('#s1 .under');
+      const pw = smooth(seg(t, 3.28, 3.95));
+      uw.style.opacity = pw;
+      uw.style.width = (760 * easeOut(pw)).toFixed(1) + 'px';
+      uw.style.marginLeft = (-380 * easeOut(pw)).toFixed(1) + 'px';
+
+      // anticipation push
+      const push = 1 + 0.045 * easeIn(seg(t, 3.5, 4.04));
+      s.style.transform = `scale(${push.toFixed(4)})`;
+    }
+  }
+
+  /* --- flash on the drop --- */
+  $('#flash').style.opacity = (t >= 4.04 ? Math.max(0, 1 - seg(t, 4.04, 4.24)) : 0).toFixed(3);
+
+  /* --- chapter cards --- */
+  function chapter(sel, a, b, inAt) {
+    const el = $(sel);
+    const live = t >= a && t < b;
+    el.style.display = live ? 'block' : 'none';
+    if (!live) return;
+    const p = smooth(seg(t, a + inAt, a + inAt + 0.42));
+    const out = 1 - seg(t, b - 0.14, b);
+    el.style.opacity = p * out;
+    el.querySelector('.num').style.transform =
+      `translateY(-50%) translateX(${((1 - easeOut(p)) * -26).toFixed(1)}px)`;
+    el.querySelector('.num').style.opacity = p.toFixed(3);
+    const tt = el.querySelector('.title');
+    tt.style.clipPath = `inset(0 ${(100 - 100 * easeOut(p)).toFixed(1)}% 0 0)`;
+    const en = el.querySelector('.en');
+    en.style.opacity = smooth(seg(t, a + inAt + 0.16, a + inAt + 0.56));
+    const bar = el.querySelector('.bar');
+    const pb = smooth(seg(t, a + inAt + 0.1, a + inAt + 0.8));
+    bar.style.width = (620 * easeOut(pb)).toFixed(1) + 'px';
+  }
+  chapter('#ch1', ...TL.ch1, 0.02);
+  chapter('#ch2', ...TL.ch2, 0.02);
+  chapter('#ch3', ...TL.ch3, 0.02);
+
+  /* --- S3 pet --- */
+  {
+    const [a, b] = TL.pet;
+    const el = $('#s3');
+    const live = t >= a && t < b;
+    el.style.display = live ? 'block' : 'none';
+    if (live) {
+      const out = 1 - seg(t, b - 0.12, b);
+      el.style.opacity = smooth(seg(t, a, a + 0.3)) * out;
+
+      const h2 = el.querySelector('h2');
+      h2.style.clipPath = `inset(0 ${(100 - 100 * easeOut(seg(t, a + 0.12, a + 0.75))).toFixed(1)}% 0 0)`;
+
+      [['#r1', 0.55], ['#r2', 0.95], ['#r3', 1.35]].forEach(([sel, d]) => {
+        const r = $(sel);
+        const p = smooth(seg(t, a + d, a + d + 0.4));
+        r.style.opacity = p;
+        r.querySelector('i').style.transform = `scaleX(${easeOut(p).toFixed(3)})`;
+        r.querySelector('.v').style.transform = `translateY(${((1 - easeOut(p)) * 10).toFixed(1)}px)`;
+      });
+
+      // active clip
+      let idx = 0;
+      for (let i = 0; i < PET_CUES.length; i++) if (t >= PET_CUES[i].t) idx = i;
+      // Hard cut on the beat. An opacity cross-fade between two alpha videos
+      // double-blends them against the background and the character visibly
+      // dims for ~100ms, so only one clip is ever visible.
+      PET_CUES.forEach((c, i) => {
+        const active = i === idx;
+        c.el.style.opacity = active ? 1 : 0;
+        if (active) seeks.push({ v: c.el, time: (t - c.t) % 4 });
+      });
+
+      // bubble: appears with each new line
+      const cue = PET_CUES[idx];
+      const bb = $('#petBubble');
+      const tend = Math.min(b, cue.t + 2.55);
+      const po = smooth(seg(t, cue.t + 0.18, cue.t + 0.5)) * (1 - seg(t, tend - 0.3, tend));
+      bb.style.opacity = po.toFixed(3);
+      bb.textContent = cue.line;
+      bb.style.transform = `translateY(${((1 - easeOut(seg(t, cue.t + 0.18, cue.t + 0.55))) * 12).toFixed(1)}px)`;
+
+      // gentle stage bob
+      $('#petStage').style.transform = `translateY(${(Math.sin(t * 1.2) * 4).toFixed(2)}px)`;
+      $('#petGlow').style.opacity = (0.75 + 0.25 * Math.sin(t * 2.1)).toFixed(3);
+    }
+  }
+
+  /* --- S5 skin --- */
+  {
+    const [a, b] = TL.skin;
+    const el = $('#s5');
+    const live = t >= a && t < b;
+    el.style.display = live ? 'block' : 'none';
+    if (live) {
+      const out = 1 - seg(t, b - 0.12, b);
+      el.style.opacity = smooth(seg(t, a, a + 0.3)) * out;
+
+      el.querySelector('h2').style.clipPath =
+        `inset(0 ${(100 - 100 * easeOut(seg(t, a + 0.1, a + 0.8))).toFixed(1)}% 0 0)`;
+      [['#n1', 0.7], ['#n2', 1.05], ['#n3', 1.4]].forEach(([sel, d]) => {
+        const n = $(sel);
+        const p = smooth(seg(t, a + d, a + d + 0.35));
+        n.style.opacity = p;
+        n.style.transform = `translateY(${((1 - easeOut(p)) * 10).toFixed(1)}px)`;
+      });
+
+      const mw = $('#mockWrap');
+      const p = smooth(seg(t, a + 0.05, a + 0.7));
+      mw.style.opacity = p * out;
+      mw.style.transform =
+        `translateY(${((1 - easeOut(p)) * 22).toFixed(1)}px) scale(${(0.975 + 0.025 * easeOut(p)).toFixed(4)})`;
+
+      // theme switch
+      const sw = smooth(seg(t, 23.06, 23.40));
+      $('#mockLight').style.opacity = (1 - sw).toFixed(3);
+      $('#mockDark').style.opacity = sw.toFixed(3);
+
+      // splash takeover
+      const sp = seg(t, 26.91, 27.35);
+      const swrap = $('#splashWrap');
+      swrap.style.opacity = smooth(sp).toFixed(3);
+      if (sp > 0) {
+        seeks.push({ v: $('#vSplash'), time: 0.15 + (t - 26.91) });
+      }
+      const cap = smooth(seg(t, 28.35, 28.95));
+      $('#splashCap').style.opacity = cap.toFixed(3);
+      const stk = smooth(seg(t, 28.5, 29.15));
+      $('#splashStreak').style.opacity = (stk * 0.9).toFixed(3);
+      $('#splashStreak').style.width = (520 * easeOut(stk)).toFixed(0) + 'px';
+      $('#splashStreak').style.marginLeft = (-260 * easeOut(stk)).toFixed(0) + 'px';
+    }
+  }
+
+  /* --- S7 features --- */
+  {
+    const [a, b] = TL.feat;
+    const live = t >= a && t < b;
+    $('#s7').style.display = live ? 'block' : 'none';
+    if (live) {
+      $('#s7').style.opacity = 1;
+      const ids = ['#f1', '#f2', '#f3', '#f4'];
+      ids.forEach((sel, i) => {
+        const s0 = FEAT[i], s1 = i < 3 ? FEAT[i + 1] : b;
+        const el = $(sel);
+        const onnow = t >= s0 && t < s1;
+        el.style.display = onnow ? 'block' : 'none';
+        if (!onnow) return;
+        const pin = smooth(seg(t, s0, s0 + 0.34));
+        const pout = 1 - seg(t, s1 - 0.26, s1);
+        el.style.opacity = pin * pout;
+        el.style.transform = `translateY(${((1 - easeOut(pin)) * 18).toFixed(1)}px)`;
+      });
+
+      // f1 tokens
+      if (t >= FEAT[0] && t < FEAT[1]) {
+        fSpans.forEach((s, i) => {
+          s.style.opacity = smooth(seg(t, FEAT[0] + 0.18 + i * 0.028, FEAT[0] + 0.35 + i * 0.028)).toFixed(3);
+        });
+        $('#fnote').style.opacity = smooth(seg(t, FEAT[0] + 1.0, FEAT[0] + 1.45)).toFixed(3);
+      }
+      // f2 marker
+      if (t >= FEAT[1] && t < FEAT[2]) {
+        $('#nowMark').style.left = (22 + 46 * smooth(seg(t, FEAT[1] + 0.2, FEAT[1] + 1.6))).toFixed(2) + '%';
+      }
+      // f3 gauges
+      if (t >= FEAT[2] && t < FEAT[3]) {
+        const vals = [[37, '#g1f', '#g1v'], [58, '#g2f', '#g2v'], [12, '#g3f', '#g3v']];
+        vals.forEach(([target, f, v], i) => {
+          const p = easeOut(seg(t, FEAT[2] + 0.2 + i * 0.16, FEAT[2] + 1.1 + i * 0.16));
+          const cur = Math.round(target * p);
+          $(f).style.width = cur + '%';
+          $(v).textContent = cur + '%';
+          $(['#g1', '#g2', '#g3'][i]).style.opacity = smooth(seg(t, FEAT[2] + 0.1 + i * 0.16, FEAT[2] + 0.4 + i * 0.16)).toFixed(3);
+        });
+        $('#plate').style.opacity = smooth(seg(t, FEAT[2] + 0.7, FEAT[2] + 1.1)).toFixed(3);
+      }
+      // f4 wave
+      if (t >= FEAT[3]) {
+        waveBars.forEach((b, i) => {
+          const k = parseFloat(b.dataset.k);
+          const s = 0.25 + 0.75 * Math.abs(Math.sin(t * (1.6 + k * 2.2) + i * 0.5));
+          b.style.height = (2 + 150 * k * s * seg(t, FEAT[3] + i * 0.006, FEAT[3] + 0.3 + i * 0.006)).toFixed(1) + 'px';
+        });
+      }
+    }
+  }
+
+  /* --- S8 repos --- */
+  {
+    const [a, b] = TL.repos;
+    const live = t >= a && t < b;
+    $('#s8').style.display = live ? 'block' : 'none';
+    if (live) {
+      const p = smooth(seg(t, a, a + 0.4));
+      $('#s8').style.opacity = (1 - seg(t, b - 0.15, b));
+      const h = $('#s8 .h');
+      h.style.opacity = p;
+      h.style.transform = `translateY(${((1 - easeOut(p)) * 16).toFixed(1)}px)`;
+
+      const pl = smooth(seg(t, a + 0.22, a + 0.72));
+      const pr = smooth(seg(t, a + 0.40, a + 0.90));
+      $('#cardPet').style.opacity = pl;
+      $('#cardPet').style.transform = `translateX(${((1 - easeOut(pl)) * -50).toFixed(1)}px) translateY(${((1 - easeOut(pl)) * 14).toFixed(1)}px)`;
+      $('#cardSkin').style.opacity = pr;
+      $('#cardSkin').style.transform = `translateX(${((1 - easeOut(pr)) * 50).toFixed(1)}px) translateY(${((1 - easeOut(pr)) * 14).toFixed(1)}px)`;
+
+      const lk = smooth(seg(t, a + 0.85, a + 1.5));
+      $('#linkline').style.width = (980 * easeOut(lk)).toFixed(0) + 'px';
+      $('#linkline').style.marginLeft = (-490 * easeOut(lk)).toFixed(0) + 'px';
+      $('#linkline').style.opacity = (lk * 0.9).toFixed(3);
+      $('#s8 .note').style.opacity = smooth(seg(t, a + 1.2, a + 1.7)).toFixed(3);
+    }
+  }
+
+  /* --- S9 end --- */
+  {
+    const [a, b] = TL.end;
+    const live = t >= a;
+    $('#s9').style.display = live ? 'block' : 'none';
+    if (live) {
+      const p = smooth(seg(t, a + 0.1, a + 0.75));
+      $('#s9').style.opacity = 1;
+      const mk = $('#endMark');
+      mk.style.opacity = p;
+      mk.style.transform = `scale(${(0.9 + 0.1 * easeOut(p)).toFixed(3)})`;
+      const line = $('#s9 .line');
+      const pl2 = smooth(seg(t, a + 0.45, a + 1.25));
+      line.style.opacity = pl2;
+      line.style.letterSpacing = lerp(0.16, 0.10, easeOut(pl2)).toFixed(3) + 'em';
+      $('#s9 .word').style.opacity = smooth(seg(t, a + 1.15, a + 1.7));
+      $('#s9 .meta').style.opacity = smooth(seg(t, a + 1.55, a + 2.1));
+      $('#s9 .repos').style.opacity = smooth(seg(t, a + 2.0, a + 2.5));
+    }
+  }
+
+  /* --- narration subtitles --- */
+  {
+    let active = null;
+    for (const cue of VO_SCHEDULE) {
+      if (t >= cue.start - 0.06 && t < cue.end + 0.16) active = cue;
+    }
+    const sub = $('#sub');
+    if (active) {
+      const pin = smooth(seg(t, active.start - 0.06, active.start + 0.20));
+      const pout = 1 - smooth(seg(t, active.end - 0.06, active.end + 0.16));
+      sub.textContent = active.text;
+      sub.style.opacity = (pin * pout).toFixed(3);
+      sub.style.transform = `translateY(${((1 - pin) * 7).toFixed(1)}px)`;
+    } else {
+      sub.style.opacity = 0;
+    }
+  }
+
+  /* --- overlays --- */
+  $('#fadeOut').style.opacity = Math.max(seg(t, 50.35, 51.95), t < 0.04 ? 1 - seg(t, 0, 0.04) : 0).toFixed(3);
+  const tcEl = $('#tc');
+  const ss = Math.floor(t), ff = Math.floor((t - ss) * 25);
+  tcEl.textContent = `00:${String(ss).padStart(2, '0')}:${String(ff).padStart(2, '0')}`;
+  tcEl.style.opacity = (t > TL.ch1[0] && t < TL.end[0]) ? 1 : 0;
+  $('#tag').style.opacity = (t > TL.ch1[0]) ? 1 : 0;
+
+  return seeks;
+}
+
+/* ---------------- playback API for the frame grabber ---------------- */
+function seekVideo(v, time) {
+  return new Promise(res => {
+    const dur = v.duration;
+    if (!dur || !isFinite(dur)) return res();
+    const tt = Math.max(0, Math.min(time % dur, dur - 0.02));
+    if (Math.abs(v.currentTime - tt) < 0.0008) return res();
+    let done = false;
+    const fin = () => { if (!done) { done = true; v.removeEventListener('seeked', fin); res(); } };
+    v.addEventListener('seeked', fin);
+    setTimeout(fin, 400);
+    try { v.currentTime = tt; } catch (e) { fin(); }
+  });
+}
+
+window.ready = Promise.all(
+  [...document.querySelectorAll('video')].map(v => new Promise(r => {
+    if (v.readyState >= 2) return r(true);
+    v.addEventListener('loadeddata', () => r(true), { once: true });
+    v.addEventListener('error', () => r(false), { once: true });
+    setTimeout(() => r(false), 15000);
+  }))
+).then(() => fetch('vo/schedule.json').then(r => r.json()).then(d => { VO_SCHEDULE = d; }).catch(() => []))
+  .then(() => document.fonts.ready).then(() => true);
+
+window.seek = async (t) => {
+  const seeks = render(t);
+  await Promise.all(seeks.map(s => seekVideo(s.v, s.time)));
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  return true;
+};
+
+window.FILM_LENGTH = 52;
+render(0);
+</script>
+</body>
+</html>

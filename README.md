@@ -12,7 +12,9 @@
 > 配套皮肤在另一个仓库：[**dsh-timelessNascence-skin**](https://github.com/ArmedHelicopter/dsh-timelessNascence-skin) —— 藏青 / 黑 / 白极简科技风。
 > 角色形象是基于《明日方舟》截图的二次创作同人素材，**不是官方素材**；授权范围见 [NOTICE.md](NOTICE.md)。
 
-宣传片：**[promo/timeless-nascence-promo.mp4](promo/timeless-nascence-promo.mp4)**
+宣传片：**[promo/timeless-nascence-promo.mp4](promo/timeless-nascence-promo.mp4)**（52 秒，含桌宠本人配音）
+
+![Timeless Nascence 桌宠](promo/poster.jpg)
 
 ---
 

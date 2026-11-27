@@ -9,3 +9,12 @@ _private/
 # 中间产物（可重新生成）
 art/review/shots/
 art/sources/old_v12/
+
+# 宣传片的逐帧与临时文件（成片与源码在 promo/，帧序列不入库）
+promo/src/frames/
+promo/src/_still/
+promo/src/_splash/
+promo/src/_t/
+promo/src/_audio_bgm.wav
+promo/src/_audio_mix.wav
+promo/src/_vo_track.wav

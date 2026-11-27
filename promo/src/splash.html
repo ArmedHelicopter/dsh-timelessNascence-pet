@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Timeless Nascence — splash</title>
+<style>
+  html,body{margin:0;width:1440px;height:480px;background:#000;overflow:hidden}
+  #stage{position:absolute;inset:0;background:#000}
+  canvas{position:absolute;inset:0;width:1440px;height:480px}
+  .vignette{position:absolute;inset:0;
+    background:radial-gradient(90% 120% at 50% 50%,rgba(0,0,0,0) 40%,rgba(0,0,0,.65) 100%)}
+  #streak{position:absolute;left:50%;top:240px;height:1px;
+    background:linear-gradient(90deg,rgba(61,107,255,0),#3d6bff 30%,#fff 50%,#3d6bff 70%,rgba(61,107,255,0));
+    box-shadow:0 0 18px rgba(61,107,255,.6);opacity:0}
+  #core{position:absolute;left:50%;top:240px;width:520px;height:520px;margin:-260px 0 0 -260px;
+    background:radial-gradient(circle,rgba(61,107,255,.28) 0%,rgba(91,123,255,.10) 34%,rgba(0,0,0,0) 66%);
+    opacity:0}
+  #fade{position:absolute;inset:0;background:#000;opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="stars" width="1440" height="480"></canvas>
+  <div class="vignette"></div>
+  <div id="core"></div>
+  <div id="streak"></div>
+  <div id="emblem" style="position:absolute;left:50%;top:50%;width:300px;height:300px;margin:-150px 0 0 -150px"></div>
+  <div id="fade"></div>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+const clamp01 = x => x < 0 ? 0 : x > 1 ? 1 : x;
+const seg = (t, a, b) => clamp01((t - a) / (b - a));
+const smooth = x => x * x * (3 - 2 * x);
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+
+function lemniscate(cx, cy, a, n = 240) {
+  let d = '';
+  for (let i = 0; i <= n; i++) {
+    const th = i / n * Math.PI * 2, den = 1 + Math.sin(th) ** 2;
+    d += (i ? 'L' : 'M') + (cx + a * Math.cos(th) / den).toFixed(2) + ' ' +
+         (cy + a * Math.sin(th) * Math.cos(th) / den * 2).toFixed(2);
+  }
+  return d + 'Z';
+}
+function starPath(cx, cy, R, r) {
+  let d = '';
+  for (let i = 0; i < 8; i++) {
+    const ang = -Math.PI / 2 + i * Math.PI / 4, rad = i % 2 === 0 ? R : r;
+    d += (i ? 'L' : 'M') + (cx + Math.cos(ang) * rad).toFixed(2) + ' ' + (cy + Math.sin(ang) * rad).toFixed(2);
+  }
+  return d + 'Z';
+}
+$('#emblem').innerHTML = `
+<svg viewBox="0 0 300 300" fill="none">
+  <ellipse id="orb" cx="150" cy="150" rx="132" ry="34" transform="rotate(-14 150 150)"
+           stroke="#c9d1e6" stroke-width="1" opacity=".5" pathLength="1"/>
+  <path id="inf" d="${lemniscate(150, 150, 86)}" stroke="#fff" stroke-width="15"
+        stroke-linecap="round" stroke-linejoin="round" pathLength="1"/>
+  <path id="star" d="${starPath(150, 150, 40, 10)}" fill="#fff" opacity="0"/>
+  <circle id="core2" cx="150" cy="150" r="9" fill="#5b7bff" opacity="0"/>
+</svg>`;
+
+/* starfield */
+const cv = $('#stars'), cx = cv.getContext('2d');
+let sd = 24680;
+const rnd = () => (sd = (sd * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+const S = Array.from({length: 120}, () => ({
+  x: rnd() * 1440, y: rnd() * 480, r: .35 + rnd() * 1.0,
+  a: .12 + rnd() * .40, sp: .4 + rnd() * 1.4, ph: rnd() * 6.283
+}));
+function stars(t) {
+  cx.clearRect(0, 0, 1440, 480);
+  for (const s of S) {
+    cx.globalAlpha = s.a * (.55 + .45 * Math.sin(t * s.sp + s.ph));
+    cx.fillStyle = '#dfe6ff';
+    cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, 6.2832); cx.fill();
+  }
+  cx.globalAlpha = 1;
+}
+
+const orb = $('#orb'), inf = $('#inf'), st = $('#star'), co = $('#core2');
+const gcore = $('#core'), streak = $('#streak'), fade = $('#fade');
+
+function render(t) {
+  stars(t);
+  fade.style.opacity = (1 - smooth(seg(t, 0.0, 0.35))).toFixed(3);
+
+  const po = smooth(seg(t, 0.12, 1.05));
+  orb.style.strokeDasharray = 1;
+  orb.style.strokeDashoffset = (1 - po).toFixed(3);
+
+  const pi = smooth(seg(t, 0.45, 1.85));
+  inf.style.strokeDasharray = 1;
+  inf.style.strokeDashoffset = (1 - pi).toFixed(3);
+
+  const ps = seg(t, 1.75, 2.15);
+  st.style.opacity = ps > 0 ? 1 : 0;
+  const k = 0.5 + 0.5 * easeOut(ps);
+  st.style.transformOrigin = '150px 150px';
+  st.style.transform = `scale(${k.toFixed(3)}) rotate(${(-36 + 36 * easeOut(ps)).toFixed(1)}deg)`;
+
+  const pc = smooth(seg(t, 1.85, 2.25));
+  co.style.opacity = pc;
+  const blink = Math.max(0, Math.sin((t - 1.85) * 10)) * (1 - seg(t, 1.85, 2.9));
+  co.setAttribute('r', (9 + 9 * blink).toFixed(2));
+
+  gcore.style.opacity = (0.55 + 0.45 * Math.sin(t * 2.2)) * smooth(seg(t, 0.2, 1.2));
+
+  // no horizontal streak here: the skin overlay draws its own streak under the
+  // caption once the clip ends, so a second one would fight it.
+  streak.style.opacity = 0;
+
+  const scale = 1 + 0.02 * smooth(seg(t, 0.3, 3.9));
+  $('#emblem').style.transform = `scale(${scale.toFixed(4)})`;
+}
+
+window.ready = Promise.resolve(true);
+window.seek = async (t) => {
+  render(t);
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  return true;
+};
+render(0);
+</script>
+</body>
+</html>
