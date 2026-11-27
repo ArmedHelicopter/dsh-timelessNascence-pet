@@ -28,7 +28,7 @@ for i, text in enumerate(lines):
     subprocess.run([FF, "-v", "error", "-y", "-i", src, "-af",
                     "silenceremove=start_periods=1:start_threshold=-50dB,areverse,"
                     "silenceremove=start_periods=1:start_threshold=-50dB,areverse,"
-                    "loudnorm=I=-18:TP=-1.5:LRA=11,afade=t=out:st=0:d=0",
+                    "loudnorm=I=-18:TP=-1.5:LRA=11",
                     "-ar", "44100", "-ac", "1", "-b:a", "96k", dst], check=True)
     err = subprocess.run([FF, "-hide_banner", "-i", dst], capture_output=True, text=True).stderr
     d = re.search(r"Duration: (\d+):(\d+):([\d.]+)", err)
