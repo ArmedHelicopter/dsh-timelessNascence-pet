@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 
 import { makeSettingsSection } from '../assets/src/ui/settings-page.js'
 
@@ -53,8 +54,9 @@ test('设置页渲染：阈值、状态池、事件池分开', () => {
     assert.ok(text.includes(label), 'missing ' + label)
   }
   const values = collect(tree).filter((n) => n.type === 'input').map((n) => String(n.props.value || ''))
-  assert.ok(values.includes('今天也辛苦了，观测者。'), 'settings page should show config defaults')
-  assert.ok(values.includes('观测者，星尘快耗尽了！\n该给轨道补充星尘啦。'), 'settings page should show lowBalance default')
+  const defaults = JSON.parse(readFileSync(new URL('../assets/src/config/dialogues.json', import.meta.url), 'utf8'))
+  assert.ok(values.includes(defaults.interact[0]), 'settings page should show config defaults')
+  assert.ok(values.includes(defaults.lowBalance[0]), 'settings page should show lowBalance default')
 })
 
 test('设置页：改阈值只 PATCH 改动字段并立即生效', () => {

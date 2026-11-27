@@ -1,3 +1,4 @@
 node_modules/
-art/cutouts/_tmp/
+art/inbox/
 *.log
+skin/out*
