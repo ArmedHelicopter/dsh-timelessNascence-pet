@@ -1,4 +1,4 @@
-// dsh-closure-pet — 像素气泡（工厂）
+// dsh-nascence-pet — 像素气泡（工厂）
 //
 // 结构：一个 fixed 容器里放「SVG 背景（像素边框 + 硬阴影）+ 文本层」，
 // 文本用 Ark Pixel 12px 像素字体；整体 pointer-events:none，不挡下面 UI。
@@ -80,9 +80,9 @@ export function createBubble(deps) {
   var bubbleMode = 'info'   // 'event'（事件反馈，过期即收）| 'info'（点击查看，常驻 5.2s）
 
   function ensureFont() {
-    if (document.getElementById('dsh-closure-pet-font')) return
+    if (document.getElementById('dsh-nascence-pet-font')) return
     var st = document.createElement('style')
-    st.id = 'dsh-closure-pet-font'
+    st.id = 'dsh-nascence-pet-font'
     st.textContent = '@font-face{font-family:ArkPixel12;src:url("' + PREFIX
       + '/assets/fonts/ark-pixel-12px-zh_hans.woff2") format("woff2");font-display:block}'
     document.head.appendChild(st)
@@ -97,7 +97,7 @@ export function createBubble(deps) {
   function ensureBubble() {
     if (bubbleEl) return
     bubbleEl = document.createElement('div')
-    bubbleEl.id = 'dsh-closure-pet-bubble'
+    bubbleEl.id = 'dsh-nascence-pet-bubble'
     bubbleEl.style.cssText = [
       'position:fixed', 'left:0', 'top:0', 'z-index:2147482002',
       'pointer-events:none', 'opacity:0',
@@ -116,7 +116,7 @@ export function createBubble(deps) {
       'font-family:' + BUBBLE_FONT,
       'font-size:' + bubblePx(BUBBLE_SIZE) + 'px',
       'line-height:' + bubbleLineH(BUBBLE_SIZE) + 'px',
-      'color:#20232a', 'letter-spacing:0',
+      'color:#e8ecf8', 'letter-spacing:0',
       '-webkit-font-smoothing:none', 'font-smooth:never',
       'text-rendering:geometricPrecision',
     ].join(';')
@@ -199,8 +199,8 @@ export function createBubble(deps) {
     bubbleSvg.setAttribute('viewBox', `0 0 ${w + 6} ${h + 6}`)
     var d = bubblePath(w, h, tailX, bubbleTailUp)
     bubbleSvg.innerHTML =
-      '<path d="' + d + '" fill="#000" fill-opacity=".32" transform="translate(3,3)"/>' +
-      '<path d="' + d + '" fill="#ffffff" stroke="#20232a" stroke-width="2"/>'
+      '<path d="' + d + '" fill="#0a0e24" fill-opacity=".68" transform="translate(3,3)"/>' +
+      '<path d="' + d + '" fill="#111842" stroke="#5b7bff" stroke-width="2"/>'
   }
 
   // 气泡内容按「行」渲染，每行可独立字号/颜色/粗细。行对象：{ text, size, color, bold }
@@ -368,7 +368,7 @@ export function createBubble(deps) {
           return {
             text: r.text,
             size: size,
-            color: r.color || (tier === 'tag' ? '#6b7280' : ''),
+            color: r.color || (tier === 'tag' ? '#9aa7d6' : tier === 'title' ? '#f5d76e' : tier === 'number' ? '#5b7bff' : ''),
             bold: r.bold === undefined ? (tier === 'title' || tier === 'number') : !!r.bold,
           }
         })
@@ -398,30 +398,30 @@ export function createBubble(deps) {
         : BUBBLE_SIZE_BIG
       rows.push({ text: amountText, size: amountSize, bold: true })
       var hint = ''
-      if (b.low) hint = '要花光了哦！'
+      if (b.low) hint = '星尘快耗尽了！'
       if (b.stale) hint = (hint ? hint + ' ' : '') + '未刷新'
-      if (hint) rows.push({ text: hint, size: BUBBLE_SIZE, color: '#c0392b' })
+      if (hint) rows.push({ text: hint, size: BUBBLE_SIZE, color: '#f5d76e' })
     } else if (b && b.signedOut) {
-      rows.push({ text: '博士还没有登录CLSR哦', size: BUBBLE_SIZE })
+      rows.push({ text: '观测者还没有登录视界哦', size: BUBBLE_SIZE })
     } else {
-      rows.push({ text: '嗯……余额数据还没同步', size: BUBBLE_SIZE })
+      rows.push({ text: '嗯……星尘数据还没同步', size: BUBBLE_SIZE })
     }
     if (s) {
       var sp = s.spend
       if (sp) {
-        var parts = ['今天花掉 ' + fmtMoney(sp.today, 'CNY')]
+        var parts = ['今日坍缩 ' + fmtMoney(sp.today, 'CNY')]
         if (Number(sp.turnAmount) > 0) parts.push('本轮 ' + fmtMoney(sp.turnAmount, 'CNY'))
         rows.push({ text: parts.join(' · '), size: BUBBLE_SIZE })
         // 使用源脚注：同样字号、颜色压淡
         var foot = sourceFootnote(sp)
-        if (foot) rows.push({ text: foot, size: BUBBLE_SIZE, color: '#6b7280' })
+        if (foot) rows.push({ text: foot, size: BUBBLE_SIZE, color: '#9aa7d6' })
       }
       var peak = s.period === 'peak'
       var left = s.periodNextChangeAt ? Math.max(0, s.periodNextChangeAt - Date.now()) : null
       rows.push({
-        text: (peak ? '峰时' : '谷时') + (left !== null ? ' 距' + (peak ? '谷时' : '峰时') + ' ' + hhmmss(left) : ''),
+        text: (peak ? '潮汐高峰' : '引力低潮') + (left !== null ? ' 距' + (peak ? '低潮' : '高峰') + ' ' + hhmmss(left) : ''),
         size: BUBBLE_SIZE,
-        color: peak ? '#c0392b' : '#2f855a',
+        color: peak ? '#8c6bff' : '#f5d76e',
       })
     }
     return rows

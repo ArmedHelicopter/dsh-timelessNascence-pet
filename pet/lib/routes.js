@@ -1,4 +1,4 @@
-// dsh-closure-pet — 宿主：HTTP 路由与静态资源
+// dsh-nascence-pet — 宿主：HTTP 路由与静态资源
 //
 // 注册 /ping、/state、/config、/hardware、/assets/*。
 // 源校验：跨站标记、Origin 与 Host 不同源、宿主信任栅栏（connection.requestRejection）三层，
@@ -19,6 +19,7 @@ const CONTENT_TYPES = {
   '.webp': 'image/webp',
   '.webm': 'video/webm',
   '.ogg': 'audio/ogg',
+  '.wav': 'audio/wav',
   '.css': 'text/css; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
 }
@@ -42,7 +43,7 @@ export function createRoutes(opts) {
   const pluginVersion = opts.version
 
   const bootedAt = Date.now()
-  const hardware = createHardwareSampler({ log: (msg) => console.info('[closure-pet] ' + msg) })
+  const hardware = createHardwareSampler({ log: (msg) => console.info('[nascence-pet] ' + msg) })
   const disposers = []
   ctx.effect(() => () => {
     for (const dispose of disposers) {
@@ -95,7 +96,7 @@ export function createRoutes(opts) {
       try {
         return await inner(req, res)
       } catch (err) {
-        console.warn('[closure-pet] 路由处理失败 ' + route.path + '：' + String((err && err.message) || err))
+        console.warn('[nascence-pet] 路由处理失败 ' + route.path + '：' + String((err && err.message) || err))
         try { res.statusCode = 500; res.end('internal error') } catch (e2) { /* 已断开 */ }
       }
     } }
@@ -196,7 +197,7 @@ export function createRoutes(opts) {
     },
   })
 
-  // 设置读写：前端把改动用 PUT 传过来，宿主落盘到 $DSH_HOME/.dshcl.json
+  // 设置读写：前端把改动用 PUT 传过来，宿主落盘到 $DSH_HOME/.dshtn.json
   register({
     kind: 'exact',
     path: URL_PREFIX + '/config',
@@ -289,7 +290,7 @@ export function createRoutes(opts) {
   // 静态资源前缀（视频 / 字体 / 音频）。
   // ⚠️ 前缀**不能带尾斜杠**：DSH 的 webServer 判定条件是
   //    `pathname === prefix || pathname.startsWith(prefix + '/')`
-  //    注册成 '/dsh-closure/assets/' 时，'/dsh-closure/assets/audio/x.ogg' 永远匹配不到（会 404）。
+  //    注册成 '/dsh-nascence/assets/' 时，'/dsh-nascence/assets/audio/x.wav' 永远匹配不到（会 404）。
   function serveTree(basePath, rootDir) {
     register({
       kind: 'prefix',
@@ -319,7 +320,7 @@ export function createRoutes(opts) {
   }
   serveTree(URL_PREFIX + '/assets', assetRoot)
 
-  console.info('[closure-pet] 路由已注册：' + URL_PREFIX + '/ping, /state, /config, /hardware, /assets/*'
+  console.info('[nascence-pet] 路由已注册：' + URL_PREFIX + '/ping, /state, /config, /hardware, /assets/*'
     + (hostFence ? '' : '（注意：宿主信任栅栏不可用，已启用回环校验）'))
 
   return { disposers }

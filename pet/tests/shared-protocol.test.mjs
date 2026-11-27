@@ -8,10 +8,10 @@ import {
 
 test('协议版本与路径', () => {
   assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION >= 1)
-  assert.equal(URL_PREFIX, '/dsh-closure')
-  assert.equal(STATE_PATH, '/dsh-closure/state')
-  assert.equal(CONFIG_PATH, '/dsh-closure/config')
-  assert.equal(HARDWARE_PATH, '/dsh-closure/hardware')
+  assert.equal(URL_PREFIX, '/dsh-nascence')
+  assert.equal(STATE_PATH, '/dsh-nascence/state')
+  assert.equal(CONFIG_PATH, '/dsh-nascence/config')
+  assert.equal(HARDWARE_PATH, '/dsh-nascence/hardware')
 })
 
 test('设置默认值', () => {

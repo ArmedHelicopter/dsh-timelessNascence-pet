@@ -1,4 +1,4 @@
-// dsh-closure-pet — 宿主入口：只做装配
+// dsh-nascence-pet — 宿主入口：只做装配
 //
 // 具体实现：
 //   store.js   运行时状态 / 花费 / 持久化 / 余额轮询
@@ -18,7 +18,7 @@ import { createRoutes } from './routes.js'
 
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const ASSET_ROOT = path.join(PACKAGE_ROOT, 'assets')
-const PLUGIN_NAME = 'dsh-closure-pet'
+const PLUGIN_NAME = 'dsh-nascence-pet'
 
 /** 插件行 id（与 package.json / cordis.patch.yml 一致） */
 export const name = PLUGIN_NAME

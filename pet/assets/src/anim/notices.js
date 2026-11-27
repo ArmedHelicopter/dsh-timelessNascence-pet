@@ -39,7 +39,7 @@ export class CreditedNotice {
     const text = pick(pool(ctx, 'credited', DEFAULT_DIALOGUES.credited), ctx.lastText)
     return {
       segments: [
-        { text: '可露希尔', tier: 'title' },
+        { text: 'Nascence', tier: 'title' },
         { text: text, tier: 'body' },
         { text: '余额 ' + money(cur.balance && cur.balance.total), tier: 'number' },
       ],

@@ -1,7 +1,7 @@
 {
-  "name": "dsh-closure-pet",
+  "name": "dsh-nascence-pet",
   "version": "3.2.0",
-  "description": "可露希尔桌宠（基于游戏截图的二次创作）：透明动画、余额与花费提示",
+  "description": "Timeless Nascence 桌宠：透明动画、星尘余额与花费提示",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -33,8 +33,8 @@
     "dsh-plugin",
     "desktop-pet",
     "video",
-    "arknights",
-    "closure",
+    "nascence",
+    "timeless-nascence",
     "pixel-art"
   ],
   "dsh": {
@@ -48,18 +48,9 @@
   "engines": {
     "dsh": ">=0.2.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fengshiyangrouguan/dsh-closure-pet.git"
-  },
-  "homepage": "https://github.com/fengshiyangrouguan/dsh-closure-pet#readme",
-  "bugs": {
-    "url": "https://github.com/fengshiyangrouguan/dsh-closure-pet/issues"
-  },
   "license": "MIT",
-  "author": "FSYRG",
+  "author": "dsh-nascence contributors",
   "devDependencies": {
     "esbuild": "^0.28.2"
   }
 }
-

@@ -136,7 +136,7 @@ ctx = {
 {
   text: '...',                 // 纯文本
   segments: [                  // 可选，分层字体
-    { text: '可露希尔', tier: 'title' },
+    { text: 'Nascence', tier: 'title' },
     { text: '：余额 ', tier: 'body' },
     { text: '¥3.20', tier: 'number' },
   ],
@@ -397,7 +397,7 @@ class InteractNotice {
     const { balance, period } = ctx.query.current()
     return {
       segments: [
-        { text: '可露希尔', tier: 'title' },
+        { text: 'Nascence', tier: 'title' },
         { text: '：当前余额 ', tier: 'body' },
         { text: formatMoney(balance), tier: 'number' },
         { text: `，${period.name}价`, tier: 'body' },
@@ -493,7 +493,7 @@ STARTUP_DUE -> fire(peak ? 'peak_time' : 'valley_time')
 
 ## 8. 设置页
 
-在 DSH 设置里新增独立「可露希尔桌宠」页面，只放低频配置：
+在 DSH 设置里新增独立「Nascence桌宠」页面，只放低频配置：
 
 - 余额不足阈值（`lowThreshold`，默认 10）；
 - 闲时对话间隔（`idleChatterMs`，默认 45000ms；0 = 关闭）；
@@ -517,7 +517,7 @@ STARTUP_DUE -> fire(peak ? 'peak_time' : 'valley_time')
 - 不改变任何动画状态；
 - 余额条件仍然只负责把 `target` 设为 `sad`，随后 `sad_enter` 正常进场。
 
-配置持久化到 `$DSH_HOME/.dshcl.json` 的 `settings` 与 `dialogues`。
+配置持久化到 `$DSH_HOME/.dshtn.json` 的 `settings` 与 `dialogues`。
 
 余额恢复分支删除：
 

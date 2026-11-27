@@ -1,4 +1,4 @@
-// dsh-closure-pet — 宿主：事件订阅
+// dsh-nascence-pet — 宿主：事件订阅
 //
 // 把 DSH 的事件流折叠成 runtime 里的「当前值 + 计数器」：
 //   session/event          → turn/end、assistant/message（计费）
@@ -40,7 +40,7 @@ export function registerEvents(root, store) {
           { provider, model })
       } catch (err) { /* 计费失败不影响宿主 */ }
     })
-  } catch (err) { console.warn('[closure-pet] 无法订阅 session/event：' + String((err && err.message) || err)) }
+  } catch (err) { console.warn('[nascence-pet] 无法订阅 session/event：' + String((err && err.message) || err)) }
 
   // 模型流：start / reasoning-delta = 思考，text-delta = 输出，end = 收尾
   try {
@@ -69,7 +69,7 @@ export function registerEvents(root, store) {
         }
       } catch (err) { /* 事件处理失败不影响宿主 */ }
     })
-  } catch (err) { console.warn('[closure-pet] 无法订阅 agent/assistant-stream：' + String(err && err.message || err)) }
+  } catch (err) { console.warn('[nascence-pet] 无法订阅 agent/assistant-stream：' + String(err && err.message || err)) }
 
   // 工具结果：成功/失败各自计数（前端做限流后播放 Happy / Sad_Begin）
   try {
@@ -88,7 +88,7 @@ export function registerEvents(root, store) {
         bump()
       } catch (err) {}
     })
-  } catch (err) { console.warn('[closure-pet] 无法订阅 tools/result：' + String(err && err.message || err)) }
+  } catch (err) { console.warn('[nascence-pet] 无法订阅 tools/result：' + String(err && err.message || err)) }
 
   // 模型/轮次级错误：给气泡一个"出错"来源
   try {
@@ -104,7 +104,7 @@ export function registerEvents(root, store) {
         bump()
       } catch (err) {}
     })
-  } catch (err) { console.warn('[closure-pet] 无法订阅 agent/error：' + String(err && err.message || err)) }
+  } catch (err) { console.warn('[nascence-pet] 无法订阅 agent/error：' + String(err && err.message || err)) }
 
   // agent 状态：idle 时收尾（切回基础层）
   try {
@@ -116,5 +116,5 @@ export function registerEvents(root, store) {
         bump()
       } catch (err) {}
     })
-  } catch (err) { console.warn('[closure-pet] 无法订阅 agent/status：' + String(err && err.message || err)) }
+  } catch (err) { console.warn('[nascence-pet] 无法订阅 agent/status：' + String(err && err.message || err)) }
 }

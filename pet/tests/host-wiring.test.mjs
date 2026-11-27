@@ -70,15 +70,15 @@ test('apply() 注册事件与全部路由', async (t) => {
 
   const paths = routes.map((r) => r.kind + ' ' + r.path)
   assert.deepEqual(paths, [
-    'exact /dsh-closure/ping',
-    'exact /dsh-closure/state',
-    'exact /dsh-closure/config',
-    'exact /dsh-closure/hardware',
-    'prefix /dsh-closure/assets',
+    'exact /dsh-nascence/ping',
+    'exact /dsh-nascence/state',
+    'exact /dsh-nascence/config',
+    'exact /dsh-nascence/hardware',
+    'prefix /dsh-nascence/assets',
   ])
 
   // /state
-  const state = await callRoute(routes, '/dsh-closure/state', 'GET')
+  const state = await callRoute(routes, '/dsh-nascence/state', 'GET')
   assert.equal(state.statusCode, 200)
   const payload = JSON.parse(state.body)
   assert.equal(payload.schemaVersion, 1)
@@ -87,35 +87,35 @@ test('apply() 注册事件与全部路由', async (t) => {
   assert.equal(payload.config.lowThreshold, 10)
 
   // /config GET：默认设置
-  const cfg = await callRoute(routes, '/dsh-closure/config', 'GET')
+  const cfg = await callRoute(routes, '/dsh-nascence/config', 'GET')
   const cfgBody = JSON.parse(cfg.body)
   assert.equal(cfgBody.version, 1)
   assert.equal(cfgBody.settings.size, 1)
 
   // /config PUT：越界值被归一化，并落盘
-  const put = await callRoute(routes, '/dsh-closure/config', 'PUT', { settings: { size: 99, opacity: 0, mirror: 'never' } })
+  const put = await callRoute(routes, '/dsh-nascence/config', 'PUT', { settings: { size: 99, opacity: 0, mirror: 'never' } })
   assert.equal(put.statusCode, 200)
   const putBody = JSON.parse(put.body)
   assert.equal(putBody.settings.size, 2)
   assert.equal(putBody.settings.opacity, 0.3)
   assert.equal(putBody.settings.mirror, 'never')
-  const saved = JSON.parse(await fs.readFile(path.join(tmpHome, '.dshcl.json'), 'utf8'))
+  const saved = JSON.parse(await fs.readFile(path.join(tmpHome, '.dshtn.json'), 'utf8'))
   assert.equal(saved.version, 1)
   assert.equal(saved.settings.size, 2)
 
   // 局部 PUT 不能丢掉已保存的 dialogues / 闲时配置
-  const put2 = await callRoute(routes, '/dsh-closure/config', 'PUT', {
+  const put2 = await callRoute(routes, '/dsh-nascence/config', 'PUT', {
     settings: { dialogues: { idle: ['自定义文本'] }, idleChatterMinutes: 5, idleChatterChance: 0.4 },
   })
   assert.equal(put2.statusCode, 200)
-  const saved2 = JSON.parse(await fs.readFile(path.join(tmpHome, '.dshcl.json'), 'utf8'))
+  const saved2 = JSON.parse(await fs.readFile(path.join(tmpHome, '.dshtn.json'), 'utf8'))
   assert.deepEqual(saved2.settings.dialogues, { idle: ['自定义文本'] })
   assert.equal(saved2.settings.idleChatterMinutes, 5)
   assert.equal(saved2.settings.idleChatterChance, 0.4)
   assert.equal(saved2.settings.size, 2, 'partial PUT should keep earlier settings')
 
   // /hardware：固定形状；无 nvidia-smi 也必须是 200 + gpus: []
-  const hw = await callRoute(routes, '/dsh-closure/hardware', 'GET')
+  const hw = await callRoute(routes, '/dsh-nascence/hardware', 'GET')
   assert.equal(hw.statusCode, 200)
   const hwBody = JSON.parse(hw.body)
   assert.equal(hwBody.ok, true)
@@ -123,7 +123,7 @@ test('apply() 注册事件与全部路由', async (t) => {
   assert.equal(typeof hwBody.mem.used, 'number')
   assert.equal(typeof hwBody.mem.total, 'number')
   assert.ok(Array.isArray(hwBody.gpus))
-  const hwPost = await callRoute(routes, '/dsh-closure/hardware', 'POST')
+  const hwPost = await callRoute(routes, '/dsh-nascence/hardware', 'POST')
   assert.equal(hwPost.statusCode, 405)
 
   // session/event：assistant/message 计费后 /state 能读到
@@ -136,7 +136,7 @@ test('apply() 注册事件与全部路由', async (t) => {
       message: { source: { provider: 'deepseek', model: 'deepseek-v4-pro' } },
     },
   })
-  const state2 = JSON.parse((await callRoute(routes, '/dsh-closure/state', 'GET')).body)
+  const state2 = JSON.parse((await callRoute(routes, '/dsh-nascence/state', 'GET')).body)
   assert.ok(state2.spend.today > 0, 'spend.today should increase')
   assert.equal(state2.spend.sources.length, 1)
   assert.equal(state2.spend.sources[0].provider, 'deepseek')
@@ -145,6 +145,6 @@ test('apply() 注册事件与全部路由', async (t) => {
 
   // agent/assistant-stream：thinking
   root.handlers['agent/assistant-stream'][0]({ frame: { type: 'start' } })
-  const state3 = JSON.parse((await callRoute(routes, '/dsh-closure/state', 'GET')).body)
+  const state3 = JSON.parse((await callRoute(routes, '/dsh-nascence/state', 'GET')).body)
   assert.equal(state3.work.mode, 'thinking')
 })

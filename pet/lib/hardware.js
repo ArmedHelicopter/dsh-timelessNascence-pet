@@ -1,6 +1,6 @@
-// dsh-closure-pet — 宿主：硬件采样
+// dsh-nascence-pet — 宿主：硬件采样
 //
-// 只服务 GET /dsh-closure/hardware，供桌宠挂牌显示：
+// 只服务 GET /dsh-nascence/hardware，供桌宠挂牌显示：
 //   · CPU：os.cpus() 两次快照求差；窗口不足时返回上一次有效值
 //   · 内存：total - free
 //   · GPU：nvidia-smi，单飞 + 2s 缓存；无命令/超时退避 60s，失败降级成空数组

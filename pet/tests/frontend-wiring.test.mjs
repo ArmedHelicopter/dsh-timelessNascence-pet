@@ -6,7 +6,7 @@ const listeners = []
 globalThis.window = {
   innerWidth: 1920,
   innerHeight: 1080,
-  __dshClosurePet: { phase: 'running' },
+  __dshNascencePet: { phase: 'running' },
   addEventListener: (t) => listeners.push('win:' + t),
   removeEventListener: () => {},
   requestAnimationFrame: () => 1,

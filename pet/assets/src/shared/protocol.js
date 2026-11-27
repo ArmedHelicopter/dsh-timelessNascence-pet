@@ -1,4 +1,4 @@
-// dsh-closure-pet — 前后端共享协议
+// dsh-nascence-pet — 前后端共享协议
 //
 // 宿主（lib/）与浏览器（assets/src/）都 import 这个文件：
 //   · URL 前缀与 /state、/config 路径
@@ -9,7 +9,7 @@
 
 export const SCHEMA_VERSION = 1
 
-export const URL_PREFIX = '/dsh-closure'
+export const URL_PREFIX = '/dsh-nascence'
 export const STATE_PATH = URL_PREFIX + '/state'
 export const CONFIG_PATH = URL_PREFIX + '/config'
 export const HARDWARE_PATH = URL_PREFIX + '/hardware'

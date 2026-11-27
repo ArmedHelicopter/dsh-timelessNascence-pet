@@ -1,4 +1,4 @@
-// dsh-closure-pet — 位置 / 吸附 / 翻转
+// dsh-nascence-pet — 位置 / 吸附 / 翻转
 //
 // 全是「读 host 尺寸 + 写 host 的 left/top / canvas 的 transform」的薄封装。
 // 依赖注入：host、canvas、settings、pet（可变状态对象）。

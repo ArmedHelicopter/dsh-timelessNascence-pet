@@ -1,4 +1,4 @@
-// DSH 设置页：可露希尔桌宠低频配置。
+// DSH 设置页：Nascence 桌宠低频配置。
 // React 由 client-entry 注入，避免依赖额外运行时。
 
 import DEFAULT_DIALOGUES from '../config/dialogues.json' with { type: 'json' }
@@ -76,7 +76,7 @@ export function makeSettingsSection(React) {
   }
 
   return function SettingsSection({ close }) {
-    const api = window.__dshClosurePet
+    const api = window.__dshNascencePet
     const [settings, setSettings] = React.useState(function () {
       const base = api && api.settings ? api.settings : {}
       return Object.assign({}, SETTINGS_DEFAULTS, base, {
@@ -128,7 +128,7 @@ export function makeSettingsSection(React) {
     }
 
     return h('div', { style: { padding: '8px 4px 32px', maxWidth: 720 } },
-      h('h2', { style: { margin: '0 0 4px', fontSize: 20 } }, '可露希尔桌宠'),
+      h('h2', { style: { margin: '0 0 4px', fontSize: 20 } }, 'Nascence 桌宠'),
       h('p', { style: { margin: '0 0 18px', opacity: 0.65, fontSize: 13 } }, '低频配置。大小、透明度、气泡样式仍在右键面板里。'),
 
       h(Field, {
