@@ -10,9 +10,20 @@ import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-FF = os.environ.get("FFMPEG", "ffmpeg")
+def _ffmpeg():
+    # Prefer an explicit FFMPEG, then the imageio-ffmpeg build (known-good silenceremove), then PATH.
+    if os.environ.get("FFMPEG"):
+        return os.environ["FFMPEG"]
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        return "ffmpeg"
+
+
+FF = _ffmpeg()
 TAKES = os.path.join(ROOT, "art", "voice", "takes")
-OUT = os.path.join(ROOT, "pet", "assets", "voice")
+OUT = os.path.join(ROOT, "assets", "voice")
 
 lines = json.load(open(os.path.join(ROOT, "art", "voice", "lines.json"), encoding="utf-8"))
 os.makedirs(OUT, exist_ok=True)

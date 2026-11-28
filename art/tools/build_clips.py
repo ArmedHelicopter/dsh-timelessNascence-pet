@@ -13,7 +13,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ART = os.path.dirname(HERE)
 ROOT = os.path.dirname(ART)
 SRC = os.path.join(ART, "sources")
-OUT = os.path.join(ROOT, "pet", "assets", "video")
+OUT = os.path.join(ROOT, "assets", "video")
 sys.path.insert(0, HERE)
 import render_clip as rc  # noqa: E402
 

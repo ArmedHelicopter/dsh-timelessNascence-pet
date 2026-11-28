@@ -12,7 +12,7 @@ import numpy as np
 
 FF = r"C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg-win-x86_64-v9.0.2.exe"
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-VID = os.path.join(ROOT, "pet", "assets", "video")
+VID = os.path.join(ROOT, "assets", "video")
 FRAME = dict(x=-229.1, y=-10.6, w=443.6, h=373.4)
 W, H = 888, 748
 BANDS = 11

@@ -2,7 +2,7 @@
 
 Auth: the CLI's own sign-in (`elevenlabs auth login`, OAuth in the OS keyring) — no API key is handled here.
 Usage:  python art/tools/tts_lines.py [--voice-id ID] [--model eleven_v4] [--only 3,7] [--force]
-Writes art/inbox/voice_takes/line_<i>.mp3 for each index in art/voice/lines.json; then run build_voice.py.
+Writes art/voice/takes/line_<i>.mp3 for each index in art/voice/lines.json; then run build_voice.py.
 """
 import argparse
 import glob
@@ -15,7 +15,7 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-OUT = os.path.join(ROOT, "art", "inbox", "voice_takes")
+OUT = os.path.join(ROOT, "art", "voice", "takes")  # raw takes are archived in git
 VOICE_ID = "nIHlF0W9GAWokF1eFwWt"  # 「基石白毛」, designed in ElevenLabs Voice Design
 
 
