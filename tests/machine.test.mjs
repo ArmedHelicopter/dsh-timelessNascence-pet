@@ -151,7 +151,7 @@ test('闲置小动作：只在 Idle 循环且无工作时触发，片段未登�
   const plays = playEffects(fx)
   // 新片段登记后会播其中之一；未登记时回到 Idle（不出错）。
   assert.ok(plays.length <= 1)
-  if (plays.length) assert.match(plays[0].clip, /^(Idle_Star|Idle_Orbit|Idle_Feather|Idle)$/)
+  if (plays.length) assert.match(plays[0].clip, /^(Idle_Star|Idle_Orbit|Idle_Feather|Idle_Infinity|Idle)$/)
 
   const busy = createMachine({ target: 'idle', work: 'outputting' })
   effects(busy, { type: 'CONDITIONS', low: false, work: 'outputting' })

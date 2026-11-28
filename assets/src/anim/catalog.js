@@ -95,7 +95,7 @@ export const EVENTS = {
   },
 
   interact: {
-    videos: ['Interact_1', 'Interact_2'],
+    videos: ['Interact_1', 'Interact_2', 'Idle_Infinity'],
     priority: 80,
     queue: false,
     fadeIn: 320,
@@ -113,7 +113,7 @@ export const EVENTS = {
 
   // 闲置时随机换一段待机小动作（无文字），播完回 Idle 循环。
   idleVariant: {
-    videos: ['Idle_Star', 'Idle_Orbit', 'Idle_Feather'],
+    videos: ['Idle_Star', 'Idle_Orbit', 'Idle_Feather', 'Idle_Infinity'],
     priority: 0,
     queue: false,
     notice: null,

@@ -9,6 +9,7 @@ _private/
 # 中间产物（可重新生成）
 art/review/shots/
 art/sources/old_v12/
+art/inbox/
 
 # 宣传片的逐帧与临时文件（成片与源码在 promo/，帧序列不入库）
 promo/src/frames/

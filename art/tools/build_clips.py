@@ -35,6 +35,7 @@ CLIPS = {
     "idle_star":    ("idle_star.mp4",    0, 0, 2.0, False),
     "idle_orbit":   ("idle_orbit.mp4",   0, 0, 2.0, False),
     "idle_feather": ("idle_feather.mp4", 0, 0, 2.0, False),
+    "idle_infinity": ("idle_infinity.mp4", 0, 0, 2.0, False),
     # scene reactions
     "nod":          ("nod.mp4",          0, 0, 2.4, False),
     "concern":      ("concern.mp4",      0, 0, 2.4, False),
